@@ -1,0 +1,22 @@
+{
+  "ping": "Bu komutu {{interaction.user.username}} kullanıcısı çalıştırdı, bu kullanıcı {{interaction.member.joinedAt}} tarihinde katıldı.",
+  "mod_log": {
+    "warning": "⚠\uFE0F **{{user.username}}**, **{{moderator.username}}** tarafından uyarıldı. Sebep:```{{reason}}```",
+    "ban": "{{emoji}} **{{user.username}}**, **{{moderator.username}}** tarafından yasaklandı. Sebep:```{{reason}}```",
+    "kick": "\uD83D\uDC62 **{{user.username}}**, **{{moderator.username}}** tarafından atıldı. Sebep:```{{reason}}```",
+    "mute": "\uD83D\uDD07 **{{user.username}}**, **{{moderator.username}}** tarafından **{{duration}}** boyunca susturuldu. Sebep:```{{reason}}```",
+    "forced_ban": "{{emoji}} Kullanıcı (`{{user.id}}`), **{{moderator.username}}** tarafından zorla banlandı. Sebep:```{{reason}}```",
+    "timed_ban": "{{emoji}} **{{user.username}}**, **{{moderator.username}}** tarafından **{{duration}}** boyunca yasaklandı. Sebep:```{{reason}}```",
+    "change_warn": "<t:{{time}}> `[{{case}}]` ✏️ Vaka #{{case}}, **{{moderator.username}}** tarafından değiştirildi. Sebep:```{{reason}}```",
+    "unban": "🔓 Kullanıcı (`{{user.id}}`), **{{moderator.username}}** tarafından yasak kaldırıldı. Sebep:```{{reason}}```",
+    "ban_expired": "🔓 Kullanıcı (`{{user.id}}`), **{{moderator.username}}** tarafından **{{duration}}** sonra otomatik olarak yasak kaldırıldı. Sebep:```{{reason}}```",
+    "forced_timed_ban": "{{emoji}} Kullanıcı (`{{user.id}}`), **{{moderator.username}}** tarafından **{{duration}}** boyunca zorla banlandı. Sebep:```{{reason}}```",
+    "timeout": "🔇 **{{user.username}}**, **{{moderator.username}}** tarafından **{{duration}}** boyunca susturuldu. Sebep:```{{reason}}```",
+    "unmute": "\uD83D\uDD0A **{{user.username}}**, **{{moderator.username}}** tarafından susturulması kaldırıldı. Sebep:```{{reason}}```",
+    "function_errors": {
+      "no_guild_config": "Sunucu ayarları bulunamadı, bir tane oluşturuluyor, bu mod_log işlemini durdurur. Bu uyarıyı devre dışı bırakmak için \"Fonksiyon Uyarıları\" ayarını değiştirin.",
+      "channel_error": "Mesajı göndermeye çalışırken bir hata oluştu. Bu muhtemelen kanalın silinmesinden veya botun mesaj gönderme izninin olmamasından kaynaklanmaktadır. Lütfen kanalı kontrol edin ve tekrar deneyin. Bu hata modlog kanal id'sini sunucu ayarlarından kaldırır.",
+      "case_id_error": "Vaka kimliğini artırmaya çalışırken bir hata oluştu. Bu muhtemelen bizim tarafımızdan veritabanı hatasıdır ve çift vaka kimliklerine neden olacaktır. Lütfen bunu bot geliştiricilerine bildirin."
+    }
+  }
+}

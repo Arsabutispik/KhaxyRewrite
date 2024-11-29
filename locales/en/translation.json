@@ -1,0 +1,22 @@
+{
+  "ping": "This command was run by {{interaction.user.username}}, who joined on {{interaction.member.joinedAt}}.",
+  "mod_log": {
+    "warning": "⚠\uFE0F **{{user.username}}** has been warned by **{{moderator.username}}**. Reason:```{{reason}}```",
+    "ban": "{{emoji}}  **{{user.username}}** has been banned by **{{moderator.username}}**. Reason:```{{reason}}```",
+    "kick": "\uD83D\uDC62  **{{user.username}}** has been kicked by **{{moderator.username}}**. Reason:```{{reason}}```",
+    "mute": "\uD83D\uDD07  **{{user.username}}** has been muted by **{{moderator.username}}** for **{{duration}}**. Reason:```{{reason}}```",
+    "forced_ban": "{{emoji}}  User (`{{user.id}}`) has been force banned by **{{moderator.username}}**. Reason:```{{reason}}```",
+    "timed_ban": "{{emoji}}  **{{user.username}}** has been banned by **{{moderator.username}}** for **{{duration}}**. Reason:```{{reason}}```",
+    "change_warn": "<t:{{time}}> `[{{case}}]` ✏️ Case #{{case}}, has been modified by **{{moderator.username}}**. Reason:```{{reason}}```",
+    "unban": "🔓 User (`{{user.id}}`) has been unbanned by **{{moderator.username}}**. Reason:```{{reason}}```",
+    "ban_expired": "🔓 User (`{{user.id}}`) has been automatically unbanned by **{{moderator.username}}** after **{{duration}}**. Reason:```{{reason}}```",
+    "forced_timed_ban": "{{emoji}}  User (`{{user.id}}`) has been force banned by **{{moderator.username}}** for **{{duration}}**. Reason:```{{reason}}```",
+    "timeout": "🔇 **{{user.username}}** has been timed out by **{{moderator.username}}** for **{{duration}}**. Reason:```{{reason}}```",
+    "unmute": "\uD83D\uDD0A  **{{user.username}}** has been unmuted by **{{moderator.username}}**. Reason:```{{reason}}```",
+    "function_errors": {
+      "no_guild_config": "Guild config not found, creating one, this stops the mod_log_operation. To disable this warning change the \"Function Warnings\" setting.",
+      "channel_error": "An error occurred while trying to send the message. This is likely due to the channel being deleted or the bot not having permission to send messages. Please check the channel and try again. This error removes the modlog channel id from the guild config.",
+      "case_id_error": "An error occurred while trying to increment the case id. This is likely a database error on our side. This will likely cause duplicate case ids. Please report this to the bot developers."
+    }
+  }
+}
