@@ -18,5 +18,10 @@
       "channel_error": "An error occurred while trying to send the message. This is likely due to the channel being deleted or the bot not having permission to send messages. Please check the channel and try again. This error removes the modlog channel id from the guild config.",
       "case_id_error": "An error occurred while trying to increment the case id. This is likely a database error on our side. This will likely cause duplicate case ids. Please report this to the bot developers."
     }
+  },
+  "bump_leaderboard": {
+    "initial": "This month's bump leaderboard:\n\n",
+    "last_bump": "Last bump was made {{time}} by {{user}}.",
+    "last_winner":  "Last month's winner: {{user}} with `{{count}}` bump out of **{{totalBump}}** bumps."
   }
 }

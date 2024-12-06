@@ -9,6 +9,7 @@
     "deploy": "pnpm run build && node dist/utils/deploy-commands.js"
   },
   "dependencies": {
+    "cron": "^3.2.1",
     "dayjs": "^1.11.13",
     "discord.js": "^14.16.3",
     "dotenv": "^16.4.5",

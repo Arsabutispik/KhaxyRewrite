@@ -20,6 +20,7 @@ export interface EventBase {
 }
 
 export interface GuildConfig {
+    bumpLeaderboardChannel: string;
     id: string;
     language: string;
     case_id: number;
