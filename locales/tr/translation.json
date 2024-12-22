@@ -22,5 +22,9 @@
   "bump_leaderboard": {
     "initial": "Bu ayın bump lider tablosu:\n\n",
     "last_bump": "En son bump {{user}} tarafından {{time}} yapıldı."
-  }
+  },
+    "unregistered_people": {
+        "kick_message": "Verilen **{{days}}** gün içinde **{{server}}** sunucusunda kayıt olamadınız. Bu sebepten dolayı atıldınız.",
+        "initial": "Üye **{{days}}** gün içinde kayıt olamadı."
+    }
 }
