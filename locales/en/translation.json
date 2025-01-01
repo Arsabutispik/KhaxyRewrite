@@ -27,5 +27,8 @@
   "unregistered_people": {
     "kick_message": "You have failed to register in **{{server}}** server within **{{days}}** days. You have been kicked from the server.",
     "initial": "Member failed to register within {{days}} days."
+  },
+  "ban": {
+    "expired": "Ban has been expired."
   }
 }
