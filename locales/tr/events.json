@@ -1,0 +1,8 @@
+{
+  "guildBanAdd": {
+    "noPermission": "Bu sunucudaki yasaklanan kullanıcıları görmek için Denetim Kaydını Görüntüle iznine ihtiyacım var.",
+    "errorOnFetchAuditLogs": "Denetim kayıtları alınırken bir hata oluştu.",
+    "executorNotMatch": "Bu kullanıcıyı yasaklayan kullanıcıyı bulamadım.",
+    "noReason": "Sebep belirtilmedi."
+  }
+}

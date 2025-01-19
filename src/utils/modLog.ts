@@ -1,10 +1,12 @@
-import dayjs, {Dayjs} from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime.js";
 import "dayjs/locale/en.js";
 import "dayjs/locale/tr.js";
-import {Guild, ChannelType, User} from "discord.js";
-import {GuildConfig, KhaxyClient} from "../../@types/types";
-import {log} from "./utils.js";
+import { Guild, ChannelType, User } from "discord.js";
+import { GuildConfig, KhaxyClient } from "../../@types/types";
+import { log } from "./utils.js";
+
+// Define the possible actions for the mod log
 type actions =
     | "WARNING"
     | "BAN"
@@ -31,65 +33,75 @@ export default async (
     },
     client: KhaxyClient
 ) => {
-    const {guild, user, action, moderator, reason, duration, caseID} = data;
-    const {rows} = await client.pgClient.query('SELECT language, mod_log_channel, case_id FROM guilds WHERE id = $1', [guild.id]);
-    const guildConfig = rows[0] as GuildConfig | null;
-    const lang = guildConfig?.language || "en";
+    const { guild, user, action, moderator, reason, duration, caseID } = data;
+
+    // Fetch guild configuration from the database
+    const { rows } = await client.pgClient.query('SELECT language, mod_log_channel, case_id FROM guilds WHERE id = $1', [guild.id]) as { rows: GuildConfig[] };
+    const lang = rows[0].language || "en";
     const t = client.i18next.getFixedT(lang);
-    if(!guildConfig) {
+
+    // If no guild configuration is found, create a new one
+    if (!rows[0]) {
         log("WARNING", "modLog.ts", `Guild config for ${guild.id} not found. Creating...`);
-        await client.pgClient.query('INSERT INTO guilds  (id, language) VALUES ($1, $2)', [guild.id, 'en']);
+        await client.pgClient.query('INSERT INTO guilds (id, language) VALUES ($1, $2)', [guild.id, 'en']);
         log("INFO", "modLog.ts", `Guild config for ${guild.id} created successfully.`);
-        return {message: t("mod_log.function_errors.no_guild_config"), type: "WARNING"};
+        return { message: t("mod_log.function_errors.no_guild_config"), type: "WARNING" };
     }
-    if(!guildConfig.mod_log_channel) return;
-    const caseNumber = caseID || guildConfig!.case_id
+
+    // If mod log channel is not configured, exit the function
+    if (!rows[0].mod_log_channel) return;
+
+    const caseNumber = caseID || rows[0].case_id;
     let message = `<t:${Math.floor(Date.now() / 1000)}> \`[${caseNumber}]\``;
 
     dayjs.extend(relativeTime);
     dayjs.locale(lang);
+
+    // Construct the log message based on the action
     switch (action) {
         case "WARNING":
-            message += t("mod_log.warning", {moderator, user, reason});
+            message += t("mod_log.warning", { moderator, user, reason });
             break;
         case "BAN":
-            message += t("mod_log.ban", {moderator, user, reason, emoji: "🔨"});
+            message += t("mod_log.ban", { moderator, user, reason, emoji: "🔨" });
             break;
         case "KICK":
-            message += t("mod_log.kick", {moderator, user, reason});
+            message += t("mod_log.kick", { moderator, user, reason });
             break;
         case "MUTE":
-            message += t("mod_log.mute", {moderator, user, reason, duration: dayjs(duration).fromNow(true)});
+            message += t("mod_log.mute", { moderator, user, reason, duration: dayjs(duration).fromNow(true) });
             break;
         case "FORCED_BAN":
-            message += t("mod_log.forced_ban", {moderator, user, reason});
+            message += t("mod_log.forced_ban", { moderator, user, reason });
             break;
         case "TIMED_BAN":
-            message += t("mod_log.timed_ban", {moderator, user, reason, duration: dayjs(duration).fromNow(true)});
+            message += t("mod_log.timed_ban", { moderator, user, reason, duration: dayjs(duration).fromNow(true) });
             break;
         case "CHANGES":
-            message += t("mod_log.changes", {moderator, user, reason, case: caseID, time: `${Math.floor(Date.now() / 1000)}`});
+            message += t("mod_log.changes", { moderator, user, reason, case: caseID, time: `${Math.floor(Date.now() / 1000)}` });
             break;
         case "UNBAN":
-            message += t("mod_log.unban", {moderator, user, reason});
+            message += t("mod_log.unban", { moderator, user, reason });
             break;
         case "BAN_EXPIRED":
-            message += t("mod_log.ban_expired", {moderator, user, reason});
+            message += t("mod_log.ban_expired", { moderator, user, reason });
             break;
         case "FORCED_TIMED_BAN":
-            message += t("mod_log.forced_timed_ban", {moderator, user, reason, duration: dayjs(duration).fromNow(true)});
+            message += t("mod_log.forced_timed_ban", { moderator, user, reason, duration: dayjs(duration).fromNow(true) });
             break;
         case "TIMEOUT":
-            message += t("mod_log.timeout", {moderator, user, reason, duration: dayjs(duration).fromNow(true)});
+            message += t("mod_log.timeout", { moderator, user, reason, duration: dayjs(duration).fromNow(true) });
             break;
         case "UNMUTE":
-            message += t("mod_log.unmute", {moderator, user, reason});
+            message += t("mod_log.unmute", { moderator, user, reason });
             break;
     }
+
     try {
-        const channel = await guild.channels.fetch(guildConfig.mod_log_channel);
-        if(channel && channel.isTextBased() && channel.type === ChannelType.GuildText) {
-            await channel.send({content: message});
+        // Fetch the mod log channel and send the log message
+        const channel = await guild.channels.fetch(rows[0].mod_log_channel);
+        if (channel && channel.isTextBased() && channel.type === ChannelType.GuildText) {
+            await channel.send({ content: message });
         }
     } catch (error) {
         log(
@@ -104,14 +116,16 @@ export default async (
         } catch (error) {
             log("ERROR", "modLog.ts", `An error occurred while deleting the modlog channel id from the database: ${error.message}`);
         }
-        return {message: t("mod_log.function_errors.channel_error"), type: "ERROR"};
+        return { message: t("mod_log.function_errors.channel_error"), type: "ERROR" };
     }
-    if(action !== "CHANGES") {
+
+    // Update the case ID in the database if the action is not "CHANGES"
+    if (action !== "CHANGES") {
         try {
             await client.pgClient.query('UPDATE guilds SET case_id = $1 WHERE id = $2', [caseNumber + 1, guild.id]);
         } catch (error) {
             log("ERROR", "modLog.ts", `An error occurred while updating the case id for ${guild.id}: ${error.message}`);
-            return {message: t("mod_log.function_errors.case_id_error"), type: "ERROR"};
+            return { message: t("mod_log.function_errors.case_id_error"), type: "ERROR" };
         }
     }
 }

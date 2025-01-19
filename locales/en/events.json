@@ -1,0 +1,14 @@
+{
+  "guildBanAdd": {
+    "noPermission": "I need the View Audit Log permission to see the banned users in this server.",
+    "errorOnFetchAuditLogs": "Error occurred while fetching audit logs.",
+    "executorNotMatch": "I couldn't find the user who banned this user.",
+    "noReason": "No reason provided."
+  },
+    "guildBanRemove": {
+        "noPermission": "I need the View Audit Log permission to see the unbanned users in this server.",
+        "errorOnFetchAuditLogs": "Error occurred while fetching audit logs.",
+        "executorNotMatch": "I couldn't find the user who unbanned this user.",
+        "noReason": "No reason provided."
+    },
+}

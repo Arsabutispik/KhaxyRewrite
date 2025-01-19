@@ -22,7 +22,8 @@
   "bump_leaderboard": {
     "initial": "This month's bump leaderboard:\n\n",
     "last_bump": "Last bump was made {{time}} by {{user}}.",
-    "last_winner":  "Last month's winner: {{user}} with `{{count}}` bump out of **{{totalBump}}** bumps."
+    "last_winner":  "Last month's winner: {{user}} with `{{count}}` bump out of **{{totalBump}}** bumps.",
+    "message_not_sent_by_bot": "There are messages in the bump leaderboard channel that are not sent by the bot. Please remove them to avoid errors."
   },
   "unregistered_people": {
     "kick_message": "You have failed to register in **{{server}}** server within **{{days}}** days. You have been kicked from the server.",
