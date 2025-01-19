@@ -10,5 +10,5 @@
         "errorOnFetchAuditLogs": "Error occurred while fetching audit logs.",
         "executorNotMatch": "I couldn't find the user who unbanned this user.",
         "noReason": "No reason provided."
-    },
+    }
 }
