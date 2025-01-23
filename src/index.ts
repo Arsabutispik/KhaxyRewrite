@@ -45,7 +45,7 @@ i18next.use(FsBackend).init({
     lng: 'en',
     fallbackLng: 'en',
     preload: ['en', 'tr'],
-    ns: ['translation', 'events'],
+    ns: ['translation', 'events', 'permissions'],
     defaultNS: 'translation',
     backend: {
         loadPath: 'locales/{{lng}}/{{ns}}.json'

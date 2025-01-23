@@ -15,9 +15,11 @@
     "dotenv": "^16.4.7",
     "i18next": "^24.2.1",
     "i18next-fs-backend": "^2.6.0",
+    "lodash": "^4.17.21",
     "pg": "^8.13.1"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.14",
     "@types/pg": "^8.11.10",
     "typescript": "^5.7.3"
   },

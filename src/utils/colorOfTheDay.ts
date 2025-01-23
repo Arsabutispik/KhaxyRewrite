@@ -3,7 +3,7 @@ import {ColorResolvable, PermissionsBitField} from "discord.js";
 import ntc from "./ntc.js";
 import dayjs from "dayjs";
 import {GuildTypes} from "../../@types/PostgreTypes";
-import {log} from "./utils";
+import {log} from "./utils.js";
 
 export default async (client: KhaxyClient) => {
     // Fetch guild configurations from the database

@@ -1,5 +1,6 @@
 import {GuildConfig, KhaxyClient} from "../../@types/types";
-import {Snowflake, TextChannel, User, time} from "discord.js";
+import {Snowflake, TextChannel, time, User} from "discord.js";
+import _ from "lodash";
 
 const consoleColors = {
     SUCCESS: "\u001b[32m",
@@ -118,6 +119,36 @@ async function bumpLeaderboard(client: KhaxyClient, guildID: Snowflake, lastBump
 }
 
 /**
+ * Recursively sanitizes an object to include only read-only properties.
+ * Limits the depth of recursion to avoid maximum call stack size exceeded errors.
+ *
+ * @param obj - The object to sanitize.
+ * @param depth - The current depth of recursion.
+ * @param maxDepth - The maximum allowed depth of recursion.
+ * @param seen - A set to track seen objects and avoid circular references.
+ * @returns A sanitized object with only the allowed properties.
+ */
+function sanitizeObject(obj: Record<string, any>, depth: number = 0, maxDepth: number = 10, seen: Set<any> = new Set()): Record<string, any> {
+    if (depth > maxDepth || seen.has(obj)) {
+        return {};
+    }
+    seen.add(obj);
+
+    const sanitized: Record<string, any> = {};
+    for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            const value = obj[key];
+            if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+                sanitized[key] = sanitizeObject(value, depth + 1, maxDepth, seen);
+            } else if (typeof value !== "function") {
+                sanitized[key] = value;
+            }
+        }
+    }
+    return sanitized;
+}
+
+/**
  * Replaces placeholders in the given template with corresponding values from the provided contexts.
  * Placeholders are in the format `#{context.property}` and support nested properties.
  *
@@ -131,24 +162,31 @@ function replacePlaceholders(
     contexts: Record<string, any>, // Supports multiple contexts as objects
     defaultValue: string = ""
 ): string {
+    // Sanitize all contexts to ensure only read-only properties are accessible
+    const sanitizedContexts = _.mapValues(contexts, context => sanitizeObject(context));
+
     return template.replace(/#{([\w.]+)}/g, (match, key) => {
         // Split the placeholder key into context and property path (e.g., "user.profile.name")
-        const [contextName, ...propertyPath] = key.split(".");
-        const context = contexts[contextName]; // Access the corresponding context by its name
+        const [, ...propertyPath] = key.split(".");
+        // Safely access the nested value using lodash's get method
+        const value = _.get(sanitizedContexts, [...propertyPath].join("."), defaultValue);
 
-        // If the context doesn't exist, return the default value or keep the placeholder
-        if (!context) return defaultValue || match;
-
-        // Traverse the property path to get the nested value
-        let value: any = context;
-        for (const prop of propertyPath) {
-            value = value?.[prop]; // Safely access the next property in the path
-            if (value === undefined) break; // Stop if the property doesn't exist
-        }
+        // Log the resolved value for debugging
+        console.log(`Resolved value for ${key}:`, value);
 
         // Return the resolved value, or use the default value or original placeholder if unresolved
-        return value !== undefined ? value : defaultValue || match;
+        return value !== undefined ? String(value) : defaultValue || match;
     });
 }
+/**
+ * Returns a string of missing permissions in a human-readable format.
+ * @param client - KhaxyClient instance
+ * @param missing - Array of missing permissions
+ * @param language - The language code
+ */
+function missingPermissionsAsString(client: KhaxyClient, missing: string[], language: string) {
+    const t = client.i18next.getFixedT(language);
+    return missing.map((perm) => t(`permissions:${perm}`)).join(", ");
+}
 
-export {log, sleep, bumpLeaderboard, replacePlaceholders}
+export {log, sleep, bumpLeaderboard, replacePlaceholders, missingPermissionsAsString};

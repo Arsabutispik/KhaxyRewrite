@@ -1,6 +1,6 @@
 import {EventBase, KhaxyClient} from "../../@types/types";
-import {Events, Interaction} from "discord.js";
-import {log} from "../utils/utils.js";
+import {Events, GuildMember, Interaction, MessageFlagsBitField} from "discord.js";
+import {log, missingPermissionsAsString} from "../utils/utils.js";
 
 export default {
     name: Events.InteractionCreate,
@@ -8,7 +8,6 @@ export default {
     async execute(interaction: Interaction) {
         // Check if the interaction is a chat input command
         if(!interaction.isChatInputCommand()) return;
-
         // Check if the guild configuration exists in the database
         if(interaction.guildId && !(await(interaction.client as KhaxyClient).pgClient.query('SELECT EXISTS (SELECT 1 FROM guilds WHERE id = $1)', [interaction.guildId])).rows[0]) {
             log("WARNING", "interactionCreate.ts", `Guild config for ${interaction.guildId} not found. Creating...`);
@@ -28,7 +27,22 @@ export default {
             log("ERROR", "interactionCreate.ts", `No command matching ${interaction.commandName} was found.`);
             return;
         }
-
+        // Retrieve the language from the guild configuration
+        const language = (await (interaction.client as KhaxyClient).pgClient.query('SELECT language FROM guilds WHERE id = $1', [interaction.guildId])).rows[0].language;
+        // Retrieve the translation function
+        const t = (interaction.client as KhaxyClient).i18next.getFixedT(language);
+        // Check if the member has the required permissions to execute the command
+        if(command.memberPermissions && interaction.member instanceof GuildMember && !interaction.member.permissions.has(command.memberPermissions)) {
+            const missingPermissions = missingPermissionsAsString(interaction.client as KhaxyClient, interaction.member.permissions.missing(command.memberPermissions), language);
+            await interaction.reply({ content: t('events:interactionCreate.memberMissingPermissions', {permissions: missingPermissions}), flags: MessageFlagsBitField.Flags.Ephemeral });
+            return;
+        }
+        // Check if the client has the required permissions to execute the command
+        if(command.clientPermissions && interaction.guild && !interaction.guild.members.me!.permissions.has(command.clientPermissions)) {
+            const missingPermissions = missingPermissionsAsString(interaction.client as KhaxyClient, interaction.guild.members.me!.permissions.missing(command.clientPermissions), language);
+            await interaction.reply({ content: t('events:interactionCreate.botMissingPermissions', {permissions: missingPermissions}), flags: MessageFlagsBitField.Flags.Ephemeral });
+            return;
+        }
         try {
             // Execute the command
             await command.execute(interaction);

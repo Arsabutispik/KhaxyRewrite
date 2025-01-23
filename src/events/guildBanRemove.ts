@@ -2,7 +2,7 @@ import { EventBase, KhaxyClient } from "../../@types/types";
 import { AuditLogEvent, Events, GuildBan, PermissionsBitField } from "discord.js";
 import modLog from "../utils/modLog.js";
 import { GuildTypes } from "../../@types/PostgreTypes";
-import { log } from "../utils/utils";
+import { log } from "../utils/utils.js";
 
 export default {
     name: Events.GuildBanRemove,

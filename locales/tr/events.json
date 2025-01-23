@@ -4,5 +4,14 @@
     "errorOnFetchAuditLogs": "Denetim kayıtları alınırken bir hata oluştu.",
     "executorNotMatch": "Bu kullanıcıyı yasaklayan kullanıcıyı bulamadım.",
     "noReason": "Sebep belirtilmedi."
+  },
+  "guildBanRemove": {
+    "noPermission": "Bu sunucudaki yasaklanan kullanıcıları görmek için Denetim Kaydını Görüntüle iznine ihtiyacım var.",
+    "errorOnFetchAuditLogs": "Denetim kayıtları alınırken bir hata oluştu.",
+    "executorNotMatch": "Bu kullanıcıyı yasak kaldıran kullanıcıyı bulamadım.",
+    "noReason": "Sebep belirtilmedi."
+  },
+  "interactionCreate": {
+    "memberMissingPermissions": "Bu komutu kullanabilmek için gerekli `{{permissions}}` izinlerine sahip değilsiniz."
   }
 }

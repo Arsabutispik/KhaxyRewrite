@@ -1,4 +1,4 @@
-import {ChatInputCommandInteraction, Client, Collection, SlashCommandBuilder} from "discord.js";
+import {ChatInputCommandInteraction, Client, Collection, PermissionsBitField, SlashCommandBuilder} from "discord.js";
 import {Client as PgClient} from "pg"
 import {i18n} from "i18next";
 export declare class KhaxyClient extends Client {
@@ -9,6 +9,8 @@ export declare class KhaxyClient extends Client {
     public i18next: i18n
 }
 export interface SlashCommandBase {
+    memberPermissions?: PermissionsBitField[];
+    clientPermissions?: PermissionsBitField[];
     data?: SlashCommandBuilder;
     execute(interaction: ChatInputCommandInteraction): any;
 }
