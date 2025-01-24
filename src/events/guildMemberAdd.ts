@@ -1,7 +1,8 @@
 import {EventBase, KhaxyClient} from "../../@types/types";
 import {ChannelType, Events, GuildMember, PermissionsBitField} from "discord.js";
 import {GuildTypes, PunishmentsTypes} from "../../@types/PostgreTypes";
-import {log, replacePlaceholders} from "../utils/utils.js";
+import {replacePlaceholders} from "../utils/utils.js";
+import logger from "../lib/logger.js";
 
 export default {
     name: Events.GuildMemberAdd,
@@ -20,7 +21,15 @@ export default {
             try {
                 await member.roles.add(rows[0].mute_role);
             } catch (error) {
-                log("ERROR", "guildMemberAdd.ts", error);
+                logger.log({
+                    level: "error",
+                    message: "Error assigning member role",
+                    error: error,
+                    meta: {
+                        guildID: member.guild.id,
+                        userID: member.id
+                    }
+                })
             }
         }
 
@@ -39,7 +48,15 @@ export default {
                 try {
                     await member.roles.add(rows[0].member_role);
                 } catch (error) {
-                    log("ERROR", "guildMemberAdd.ts", error);
+                    logger.log({
+                        level: "error",
+                        message: "Error assigning member role",
+                        error: error,
+                        meta: {
+                            guildID: member.guild.id,
+                            userID: member.id
+                        }
+                    })
                 }
             }
             return;

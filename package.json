@@ -16,7 +16,9 @@
     "i18next": "^24.2.1",
     "i18next-fs-backend": "^2.6.0",
     "lodash": "^4.17.21",
-    "pg": "^8.13.1"
+    "pg": "^8.13.1",
+    "winston": "^3.17.0",
+    "winston-transport": "^4.9.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.14",

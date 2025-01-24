@@ -1,7 +1,7 @@
 import {EventBase, KhaxyClient} from "../../@types/types";
 import {Events, GuildMember, Interaction, MessageFlagsBitField} from "discord.js";
-import {log, missingPermissionsAsString} from "../utils/utils.js";
-
+import {missingPermissionsAsString} from "../utils/utils.js";
+import logger from "../lib/logger.js";
 export default {
     name: Events.InteractionCreate,
     once: false,
@@ -10,13 +10,13 @@ export default {
         if(!interaction.isChatInputCommand()) return;
         // Check if the guild configuration exists in the database
         if(interaction.guildId && !(await(interaction.client as KhaxyClient).pgClient.query('SELECT EXISTS (SELECT 1 FROM guilds WHERE id = $1)', [interaction.guildId])).rows[0]) {
-            log("WARNING", "interactionCreate.ts", `Guild config for ${interaction.guildId} not found. Creating...`);
+            logger.warn(`Guild config for ${interaction.guildId} not found. Creating...`);
             try {
                 // Insert a new guild configuration into the database
                 await (interaction.client as KhaxyClient).pgClient.query('INSERT INTO guilds (id, language) VALUES ($1, $2)', [interaction.guildId, 'en']);
-                log("INFO", "interactionCreate.ts", `Guild config for ${interaction.guildId} created successfully.`);
+                logger.info(`Guild config for ${interaction.guildId} created successfully.`);
             } catch (error) {
-                log("ERROR", "interactionCreate.ts", error);
+                logger.error(error)
                 return;
             }
         }
@@ -24,7 +24,7 @@ export default {
         // Retrieve the command from the client's slash commands collection
         const command = (interaction.client as KhaxyClient).slashCommands.get(interaction.commandName);
         if (!command) {
-            log("ERROR", "interactionCreate.ts", `No command matching ${interaction.commandName} was found.`);
+            logger.error(`No command matching ${interaction.commandName} was found.`);
             return;
         }
         // Retrieve the language from the guild configuration
@@ -47,7 +47,17 @@ export default {
             // Execute the command
             await command.execute(interaction);
         } catch (error) {
-            log("ERROR", "interactionCreate.ts", error);
+            logger.log({
+                level: 'error',
+                message: 'Error executing command',
+                error: error,
+                meta: {
+                    command: interaction.commandName,
+                    interactionID: interaction.id,
+                    guildID: interaction.guildId,
+                    userID: interaction.user.id
+                }
+            })
             // Handle errors during command execution
             if (interaction.replied || interaction.deferred) {
                 await interaction.followUp({ content: 'There was an unexpected error while executing this command!', ephemeral: true });

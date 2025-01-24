@@ -3,7 +3,7 @@ import {ColorResolvable, PermissionsBitField} from "discord.js";
 import ntc from "./ntc.js";
 import dayjs from "dayjs";
 import {GuildTypes} from "../../@types/PostgreTypes";
-import {log} from "./utils.js";
+import logger from "../lib/logger.js";
 
 export default async (client: KhaxyClient) => {
     // Fetch guild configurations from the database
@@ -45,7 +45,14 @@ export default async (client: KhaxyClient) => {
             WHERE id = $2`;
             await client.pgClient.query(query, [dayjs().add(1, 'day').toISOString(), id]);
         } catch (error) {
-            console.error(error);
+            logger.log({
+                level: "error",
+                message: "Error updating color of the day",
+                error: error,
+                meta: {
+                    guildID: id
+                }
+            })
         }
     }
 }
@@ -54,7 +61,7 @@ export async function specificGuildColorUpdate(client: KhaxyClient, guildId: str
     // Fetch guild configuration for the specific guild
     const {rows} = await client.pgClient.query('SELECT color_id_of_the_day, color_name_of_the_day, id FROM guilds WHERE id = $1', [guildId]) as {rows: GuildTypes[]};
     if(rows.length === 0) {
-        log("WARNING", "colorOfTheDay.ts", `Guild config for ${guildId} not found.`);
+        logger.warn(`Guild config for ${guildId} not found.`);
         return;
     }
     const {color_id_of_the_day, color_name_of_the_day, id} = rows[0];
@@ -92,6 +99,13 @@ export async function specificGuildColorUpdate(client: KhaxyClient, guildId: str
             WHERE id = $2`;
         await client.pgClient.query(query, [dayjs().add(1, 'day').toISOString(), id]);
     } catch (error) {
-        console.error(error);
+        logger.log({
+            level: "error",
+            message: "Error updating color of the day",
+            error: error,
+            meta: {
+                guildID: id
+            }
+        })
     }
 }

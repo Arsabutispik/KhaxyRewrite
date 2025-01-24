@@ -10,7 +10,7 @@ import FsBackend from "i18next-fs-backend";
 import pg from "pg"
 import {CronJob} from "cron";
 import colorOfTheDay from "./utils/colorOfTheDay.js";
-import {log} from "./utils/utils.js";
+import logger from "./lib/logger.js";
 const { Client: PgClient } = pg
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,10 +37,10 @@ const pgClient = new PgClient({
 (async () => {
     await pgClient.connect();
     const res = await pgClient.query('SELECT $1::text as connected', ['Connection to postgres successful!']);
-    console.log(res.rows[0].connected);
+    logger.info(res.rows[0].connected);
 })();
 
-i18next.use(FsBackend).init({
+await i18next.use(FsBackend).init({
     initAsync: false,
     lng: 'en',
     fallbackLng: 'en',
@@ -52,7 +52,7 @@ i18next.use(FsBackend).init({
     }
 }, (err) => {
     if (err) return console.error(err)
-    console.log('i18next is ready...')
+    logger.info("i18next has been initialized.")
     client.i18next = i18next;
 });
 client.slashCommands = new Collection();
@@ -74,7 +74,7 @@ for (const file of eventFiles) {
 CronJob.from({
     cronTime: '0 0 0 * * *',
     onTick: () => colorOfTheDay(client),
-    onComplete: () => log("INFO", "src/index.ts", "Color of the day cronjob has been completed."),
+    onComplete: () => {logger.info("Color of the day cronjob has been completed.")},
     start: true,
     timeZone: 'UTC'
 })

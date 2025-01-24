@@ -2,7 +2,7 @@ import fs from "fs";
 import {KhaxyClient} from "../../@types/types";
 import path from "path";
 import {fileURLToPath, pathToFileURL} from "url";
-import {log} from "./utils.js";
+import logger from "../lib/logger.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 async function RegisterSlashCommands(client: KhaxyClient) {
@@ -20,7 +20,7 @@ async function RegisterSlashCommands(client: KhaxyClient) {
             if ('data' in command && 'execute' in command) {
                 client.slashCommands.set(command.data.name, command);
             } else {
-                log("WARNING", "deploy-commands.ts", `The command at ${pathToFileURL(filePath)} is missing a required "data" or "execute" property.`);
+                logger.warn(`The command at ${pathToFileURL(filePath)} is missing a required "data" or "execute" property.`);
             }
         }
     }

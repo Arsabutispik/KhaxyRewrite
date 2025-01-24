@@ -4,7 +4,7 @@ import "dayjs/locale/en.js";
 import "dayjs/locale/tr.js";
 import { Guild, ChannelType, User } from "discord.js";
 import { GuildConfig, KhaxyClient } from "../../@types/types";
-import { log } from "./utils.js";
+import logger from "../lib/logger.js";
 
 // Define the possible actions for the mod log
 type actions =
@@ -42,9 +42,13 @@ export default async (
 
     // If no guild configuration is found, create a new one
     if (!rows[0]) {
-        log("WARNING", "modLog.ts", `Guild config for ${guild.id} not found. Creating...`);
-        await client.pgClient.query('INSERT INTO guilds (id, language) VALUES ($1, $2)', [guild.id, 'en']);
-        log("INFO", "modLog.ts", `Guild config for ${guild.id} created successfully.`);
+        try {
+            logger.warn(`Guild config for ${guild.id} not found. Creating a new one...`);
+            await client.pgClient.query('INSERT INTO guilds (id, language) VALUES ($1, $2)', [guild.id, 'en']);
+            logger.info(`Guild config for ${guild.id} created successfully.`);
+        } catch (error) {
+            logger.error(error);
+        }
         return { message: t("mod_log.function_errors.no_guild_config"), type: "WARNING" };
     }
 
@@ -104,17 +108,13 @@ export default async (
             await channel.send({ content: message });
         }
     } catch (error) {
-        log(
-            "ERROR",
-            "modLog.ts",
-            `An error occurred while sending modlog message to ${guild.name} (${guild.id}): ${error.message}`,
-        );
-        log("INFO", "modLog.ts", "Deleting the modlog channel id to prevent this issue in the future...");
+        logger.error(error);
+        logger.info(`Modlog channel for ${guild.name} (${guild.id}) not found. Deleting the modlog channel id from the database...`);
         try {
             await client.pgClient.query('UPDATE guilds SET mod_log_channel = NULL WHERE id = $1', [guild.id]);
-            log("INFO", "modLog.ts", `Modlog channel id for ${guild.id} deleted successfully.`);
+            logger.info(`Modlog channel id for ${guild.id} deleted successfully.`);
         } catch (error) {
-            log("ERROR", "modLog.ts", `An error occurred while deleting the modlog channel id from the database: ${error.message}`);
+            logger.error(error);
         }
         return { message: t("mod_log.function_errors.channel_error"), type: "ERROR" };
     }
@@ -124,7 +124,15 @@ export default async (
         try {
             await client.pgClient.query('UPDATE guilds SET case_id = $1 WHERE id = $2', [caseNumber + 1, guild.id]);
         } catch (error) {
-            log("ERROR", "modLog.ts", `An error occurred while updating the case id for ${guild.id}: ${error.message}`);
+            logger.log({
+                level: "error",
+                message: "Error updating case ID",
+                error: error,
+                meta: {
+                    guildID: guild.id,
+                    oldCaseNumber: caseNumber,
+                }
+            })
             return { message: t("mod_log.function_errors.case_id_error"), type: "ERROR" };
         }
     }

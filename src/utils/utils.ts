@@ -1,25 +1,8 @@
 import {GuildConfig, KhaxyClient} from "../../@types/types";
 import {Snowflake, TextChannel, time, User} from "discord.js";
 import _ from "lodash";
+import logger from "../lib/logger.js";
 
-const consoleColors = {
-    SUCCESS: "\u001b[32m",
-    WARNING: "\u001b[33m",
-    ERROR: "\u001b[31m",
-    INFO: "\u001b[36m",
-};
-/**
- * Logs a message to the console with a specific type and path.
- *
- * @param type - The type of the log message (SUCCESS, ERROR, WARNING, INFO).
- * @param path - The path or context of the log message.
- * @param text - The text of the log message.
- */
-function log(type: "SUCCESS" | "ERROR" | "WARNING" | "INFO", path: string, text: string) {
-    console.log(
-        `\u001b[36;1m<bot-prefab>\u001b[0m\u001b[34m [${path}]\u001b[0m - ${consoleColors[type]}${text}\u001b[0m`,
-    );
-}
 /**
  * Pauses execution for a specified number of milliseconds.
  *
@@ -66,7 +49,7 @@ async function bumpLeaderboard(client: KhaxyClient, guildID: Snowflake, lastBump
     if (message) {
         // Check if the message was sent by the bot
         if (message.author.id !== client.user!.id) {
-            log("WARNING", "src/utils.ts", `bumpLeaderboard: The message in ${guild.id} is not sent by the bot. Aborting the task`);
+            logger.warn(`The message in ${guild.id} is not sent by the bot. Aborting the task`);
             return { error: t("bump_leaderboard.message_not_sent_by_bot") };
         }
 
@@ -189,4 +172,4 @@ function missingPermissionsAsString(client: KhaxyClient, missing: string[], lang
     return missing.map((perm) => t(`permissions:${perm}`)).join(", ");
 }
 
-export {log, sleep, bumpLeaderboard, replacePlaceholders, missingPermissionsAsString};
+export {sleep, bumpLeaderboard, replacePlaceholders, missingPermissionsAsString};

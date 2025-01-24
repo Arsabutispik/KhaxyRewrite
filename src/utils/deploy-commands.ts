@@ -3,7 +3,7 @@ import "dotenv/config.js";
 import fs from 'fs';
 import path from 'path';
 import { pathToFileURL, fileURLToPath } from 'url';
-import {log} from "./utils.js";
+import logger from "../lib/logger.js";
 const __filename = fileURLToPath(import.meta.url);
 const commands: any[] = [];
 const __dirname = path.dirname(__filename);
@@ -21,11 +21,17 @@ async function registerCommands(...dirs: string[]) {
                         if ('data' in command && 'execute' in command) {
                             commands.push(command.data.toJSON());
                         } else {
-                            log("WARNING", "deploy-commands.ts", `The command at ${pathToFileURL(path.join(__dirname, dir, file))} is missing a required "data" or "execute" property.`);
+                            logger.warn(`The command at ${pathToFileURL(path.join(__dirname, dir, file))} is missing a required "data" or "execute" property.`);
                         }
                     } catch (e) {
-                        log("ERROR", "src/registry.js", `Error loading commands: ${e.message}`);
-                        console.log(e);
+                        logger.log({
+                            level: "error",
+                            message: "Error loading command",
+                            error: e,
+                            meta: {
+                                file: path.join(__dirname, dir, file)
+                            }
+                        })
                     }
                 }
             }
@@ -49,8 +55,7 @@ const rest = new REST().setToken(process.env.TOKEN);
         throw new Error("Client ID is not defined in the .env file");
     }
     try {
-        log("INFO", "deploy-commands.ts", `Started refreshing ${commands.length} application (/) commands.`);
-
+        logger.info(`Started refreshing ${commands.length} application (/) commands.`);
         // The put method is used to fully refresh all commands in the guild with the current set
         const data = await rest.put(
             // Only add the comment from the line below if you don't want to deploy commands to a specific guild.
@@ -60,9 +65,13 @@ const rest = new REST().setToken(process.env.TOKEN);
             { body: commands },
         );
         //@ts-ignore
-        log("INFO", "deploy-commands.ts", `Successfully reloaded ${data.length} application (/) commands.`);
+        logger.info(`Successfully reloaded ${data.length} application (/) commands.`);
     } catch (error) {
         // And of course, make sure you catch and log any errors!
-        console.error(error);
+        logger.log({
+            level: "error",
+            message: "Error refreshing application (/) commands",
+            error: error
+        })
     }
 })();

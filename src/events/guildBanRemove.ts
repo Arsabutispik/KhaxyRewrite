@@ -2,8 +2,7 @@ import { EventBase, KhaxyClient } from "../../@types/types";
 import { AuditLogEvent, Events, GuildBan, PermissionsBitField } from "discord.js";
 import modLog from "../utils/modLog.js";
 import { GuildTypes } from "../../@types/PostgreTypes";
-import { log } from "../utils/utils.js";
-
+import logger from "../lib/logger.js";
 export default {
     name: Events.GuildBanRemove,
     once: false,
@@ -66,8 +65,15 @@ export default {
                 moderator: ban.client.user,
                 reason: (ban.client as KhaxyClient).i18next.getFixedT(rows[0].language)("events:guildBanRemove.errorOnFetchAuditLogs")
             }, ban.client as KhaxyClient);
-            log("ERROR", "guildBanRemove.ts", error);
-            console.error(error);
+            logger.log({
+                level: "error",
+                message: "Error fetching audit logs",
+                error: error,
+                meta: {
+                    guildID: ban.guild.id,
+                    userID: ban.user.id
+                }
+            })
         }
     }
 } as EventBase;
