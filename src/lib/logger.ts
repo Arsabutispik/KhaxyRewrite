@@ -1,5 +1,6 @@
 import { createLogger, transports, format } from "winston";
 import DiscordTransport from "./DiscordTransport.js";
+import 'dotenv/config.js';
 const logger = createLogger({
     transports: [
         new transports.Console({
@@ -19,7 +20,7 @@ const logger = createLogger({
             format: format.combine(format.json()),
         }),
         new DiscordTransport({
-            webhook: "https://discord.com/api/webhooks/1332312985816793148/qpheFh6AlCcxNi8GWvtW2AFL7r_BuRbs8Ufg-TDd68v0h5ZI1g8Od9X-Sq2gbjgoDy9y",
+            webhook: process.env.WEBHOOKURL!,
             level: "error",
         })
     ],

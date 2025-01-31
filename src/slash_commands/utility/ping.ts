@@ -1,23 +1,24 @@
-import {SlashCommandBuilder} from 'discord.js';
+import {GuildMember, SlashCommandBuilder} from 'discord.js';
 import {SlashCommandBase} from "../../../@types/types";
-import logger from "../../lib/logger.js";
+import {useMainPlayer} from "discord-player";
+
 export default {
     data: new SlashCommandBuilder()
         .setName('user')
         .setDescription('Provides information about the user.'),
     async execute(interaction) {
         try {
-            await interaction.guild!.members.fetch("23")
-        } catch (err) {
-            logger.log({
-                level: "error",
-                message: "Error fetching user",
-                error: err,
-                meta: {
-                    userID: interaction.user.id,
-                    guildID: interaction.guildId!,
-                }
-            })
+            const player = useMainPlayer();
+            await interaction.deferReply();
+            const result = await player.play((interaction.member! as GuildMember).voice.channel!, 'rick roll', {
+                nodeOptions: {
+                    metadata: interaction,
+                },
+            });
+            await interaction.followUp(result.track.title);
+        } catch (e) {
+            console.error(e);
+            await interaction.followUp('An error occurred while playing the track.');
         }
     },
 } as SlashCommandBase;

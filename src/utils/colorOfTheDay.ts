@@ -74,7 +74,7 @@ export async function specificGuildColorUpdate(client: KhaxyClient, guildId: str
     if (!role) return;
     // Check if the bot's highest role is higher than the target role
     if (role.position >= guild.members.me.roles.highest.position) return;
-    const name = role.name.replace(color_name_of_the_day || "", "");
+    const name = role.name.replace(color_name_of_the_day || "", " ");
     // Generate a random color
     const x = Math.round(0xffffff * Math.random()).toString(16);
     const y = 6 - x.length;
@@ -88,7 +88,7 @@ export async function specificGuildColorUpdate(client: KhaxyClient, guildId: str
         await client.pgClient.query('UPDATE guilds SET color_name_of_the_day = $1 WHERE id = $2', [colorName, id]);
         // Edit the role with the new color and name
         await role.edit({
-            name: `${colorName} ${name}`,
+            name: `${name}${colorName}`,
             color: color,
             reason: "Color of the day has been updated."
         });

@@ -13,5 +13,17 @@
   },
   "interactionCreate": {
     "memberMissingPermissions": "You don't have the required `{{permissions}}` permissions to use this command."
+  },
+  "guildMemberUpdate": {
+    "noPermission": "I need the View Audit Log permission to see the updated members in this server.",
+    "noReason": "No reason provided."
+  },
+  "playerStart": {
+    "embed": {
+      "author": "Now Playing ♪",
+      "description": "\uD83C\uDFB6 | Now playing **[{{track.title}}]({{track.url}})**!",
+      "fieldName0": "Requested by",
+      "fieldName1": "Duration"
+    }
   }
 }

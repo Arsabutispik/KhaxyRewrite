@@ -60,7 +60,7 @@ export default class DiscordTransport extends Transport {
      * @param callback Callback to winston to complete the log
      */
     log(info: any, callback: { (): void }) {
-        if (info.discord !== false) {
+        if (info.discord) {
             setImmediate(() => {
                 this.initialized.then(() => {
                     this.sendToDiscord(info).then(() => {});

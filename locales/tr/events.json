@@ -13,5 +13,17 @@
   },
   "interactionCreate": {
     "memberMissingPermissions": "Bu komutu kullanabilmek için gerekli `{{permissions}}` izinlerine sahip değilsiniz."
+  },
+  "guildMemberUpdate": {
+    "noPermission": "Bu sunucudaki güncellenen üyeleri görmek için Denetim Kaydını Görüntüle iznine ihtiyacım var.",
+    "noReason": "Sebep belirtilmedi."
+  },
+  "playerStart": {
+    "embed": {
+      "author": "Şimdi Çalıyor ♪",
+      "description": "\uD83C\uDFB6 | Şimdi **[{{track.title}}]({{track.url}})** çalıyor!",
+      "fieldName0": "Şarkıyı Talep Eden",
+      "fieldName1": "Şarkı Süresi"
+    }
   }
 }
