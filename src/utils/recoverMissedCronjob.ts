@@ -4,7 +4,7 @@ import logger from "../lib/logger.js";
 export default async (client: KhaxyClient) => {
   // Fetch all cron jobs from the database
   const { rows } = await client.pgClient.query(
-    "SELECT * FROM colorcronjobs C INNER JOIN resetbumpleaderboardcronjobs R ON C.id = R.id",
+    "SELECT * FROM colorcronjobs",
   );
 
   for (const cronjob of rows) {
