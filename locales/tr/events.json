@@ -25,5 +25,11 @@
       "fieldName0": "Şarkıyı Talep Eden",
       "fieldName1": "Şarkı Süresi"
     }
-  }
+  },
+    "emptyChannel": {
+        "embed": {
+        "description": "Sesli kanalda kimse kalmadığı için müzik durduruldu.",
+        "title": "Boş Kanal"
+        }
+    }
 }

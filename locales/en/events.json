@@ -25,5 +25,11 @@
       "fieldName0": "Requested by",
       "fieldName1": "Duration"
     }
+  },
+  "emptyChannel": {
+    "embed": {
+      "description": "Music has been stopped because no one is left in the voice channel.",
+      "title": "Empty Channel"
+    }
   }
 }

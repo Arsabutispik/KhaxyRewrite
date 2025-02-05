@@ -33,3 +33,12 @@ export interface GuildConfig {
     case_id: number;
     mod_log_channel?: string
 }
+
+export interface infractionParameters {
+    guild: Guild;
+    member: Snowflake;
+    moderator: Snowflake;
+    type: "warn" | "mute" | "kick" | "ban" | "forceban";
+    reason: string;
+    client: KhaxyClient;
+}
