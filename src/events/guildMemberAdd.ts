@@ -1,25 +1,25 @@
 import { EventBase, KhaxyClient } from "../../@types/types";
 import { ChannelType, Events, GuildMember, PermissionsBitField } from "discord.js";
-import { GuildTypes, PunishmentsTypes } from "../../@types/PostgreTypes";
+import { Guilds, Punishments } from "../../@types/DatabaseTypes";
 import { replacePlaceholders } from "../utils/utils.js";
-import logger from "../lib/logger.js";
+import logger from "../lib/Logger.js";
 
 export default {
   name: Events.GuildMemberAdd,
   async execute(member: GuildMember) {
     // Fetch guild data from the database
-    const { rows } = (await (member.client as KhaxyClient).pgClient.query("SELECT * FROM guilds WHERE id = $1", [
+    const { rows } = (await (member.client as KhaxyClient).pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
       member.guild.id,
-    ])) as { rows: GuildTypes[] };
+    ]))
 
     // If no guild data is found, exit the function
     if (rows.length === 0) return;
 
     // Fetch punishment data for the member from the database
-    const { rows: punishment_rows } = (await (member.client as KhaxyClient).pgClient.query(
+    const { rows: punishment_rows } = (await (member.client as KhaxyClient).pgClient.query<Punishments>(
       "SELECT * FROM punishments WHERE guild_id = $1 AND user_id = $2 AND type = $3",
       [member.guild.id, member.id, "mute"],
-    )) as { rows: PunishmentsTypes[] };
+    ))
 
     // If punishment data exists and the mute role is present, assign the mute role to the member
     if (punishment_rows.length > 0 && rows[0].mute_role && member.guild.roles.cache.has(rows[0].mute_role)) {
@@ -52,7 +52,7 @@ export default {
       welcome_channel.send(replacePlaceholders(rows[0].welcome_message, member));
     }
 
-    // If no register channel is configured or it does not exist, assign the member role if present and exit the function
+    // If no register channel is configured, or it does not exist, assign the member role if present and exit the function
     if (!rows[0].register_channel || !member.guild.channels.cache.has(rows[0].register_channel)) {
       if (rows[0].member_role && member.guild.roles.cache.has(rows[0].member_role)) {
         try {

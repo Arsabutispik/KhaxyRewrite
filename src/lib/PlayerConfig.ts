@@ -1,6 +1,6 @@
 import "dotenv/config.js";
 import { KhaxyClient } from "../../@types/types";
-import logger from "./logger.js";
+import logger from "./Logger.js";
 
 export default {
   IconURL: "https://cdn.discordapp.com/attachments/933095626844037224/1016257179872923708/music-disc.gif",

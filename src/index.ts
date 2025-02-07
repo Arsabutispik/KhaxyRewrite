@@ -9,7 +9,7 @@ import { RegisterSlashCommands } from "./utils/registry.js";
 import i18next from "i18next";
 import FsBackend from "i18next-fs-backend";
 import pg from "pg";
-import logger from "./lib/logger.js";
+import logger from "./lib/Logger.js";
 import { Player } from "discord-player";
 import { DefaultExtractors } from "@discord-player/extractor";
 const { Client: PgClient } = pg;

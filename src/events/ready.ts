@@ -3,7 +3,7 @@ import { EventBase, KhaxyClient } from "../../@types/types";
 import { loadEmojis } from "../lib/PlayerConfig.js";
 import { CronJob } from "cron";
 import colorOfTheDay from "../utils/colorOfTheDay.js";
-import logger from "../lib/logger.js";
+import logger from "../lib/Logger.js";
 import checkPunishments from "../utils/checkPunishments.js";
 import recoverMissedCronjob from "../utils/recoverMissedCronjob.js";
 

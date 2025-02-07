@@ -4,7 +4,7 @@ import "dayjs/locale/en.js";
 import "dayjs/locale/tr.js";
 import { Guild, ChannelType, User } from "discord.js";
 import { GuildConfig, KhaxyClient } from "../../@types/types";
-import logger from "../lib/logger.js";
+import logger from "../lib/Logger.js";
 
 // Define the possible actions for the mod log
 type actions =

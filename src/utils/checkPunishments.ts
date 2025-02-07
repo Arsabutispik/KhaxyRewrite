@@ -2,14 +2,12 @@ import { KhaxyClient } from "../../@types/types";
 import modlog from "./modLog.js";
 import { User } from "discord.js";
 import dayjs from "dayjs";
-import { GuildTypes, PunishmentsTypes } from "../../@types/PostgreTypes";
+import { Guilds, Punishments } from "../../@types/DatabaseTypes";
 
 export default async (client: KhaxyClient) => {
   const check = async () => {
     // Fetch punishments that have expired
-    const { rows } = (await client.pgClient.query("SELECT * FROM punishments WHERE expires < $1", [new Date()])) as {
-      rows: PunishmentsTypes[];
-    };
+    const { rows } = (await client.pgClient.query<Punishments>("SELECT * FROM punishments WHERE expires < $1", [new Date()]))
 
     for (const result of rows) {
       // Destructure punishment details
@@ -18,10 +16,10 @@ export default async (client: KhaxyClient) => {
       if (!guild) continue;
 
       // Fetch guild configuration
-      const { rows } = (await client.pgClient.query(
+      const { rows } = (await client.pgClient.query<Guilds>(
         "SELECT language, mute_get_all_roles, mute_role FROM guilds WHERE id = $1",
         [guild.id],
-      )) as { rows: GuildTypes[] };
+      ))
       if (!rows[0]) continue;
 
       const member = guild.members.cache.get(user_id);

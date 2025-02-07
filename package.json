@@ -5,8 +5,14 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
-    "deploy": "pnpm run build && node dist/utils/deploy-commands.js"
+    "deploy:commands": "tsc && node dist/utils/deploy-commands.js",
+    "start": "tsc && pnpm db:migrate && node .",
+    "generate:types": "tsc && node ./dist/lib/GenerateTypes.js",
+    "db:init": "tsc && node ./dist/scripts/db-init.js",
+    "db:migrate": "tsc && node ./dist/scripts/migrate.js",
+    "migrate:create": "node scripts/CreateMigrations.js",
+    "migrate:up": "node-pg-migrate up",
+    "migrate:down": "node-pg-migrate down"
   },
   "dependencies": {
     "@discord-player/extractor": "^7.1.0",
@@ -29,6 +35,7 @@
     "eslint": "^9.19.0",
     "eslint-config-prettier": "^10.0.1",
     "globals": "^15.14.0",
+    "node-pg-migrate": "^7.9.0",
     "prettier": "^3.4.2",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.23.0"

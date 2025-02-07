@@ -2,12 +2,12 @@ import { KhaxyClient } from "../../@types/types";
 import { ColorResolvable, PermissionsBitField } from "discord.js";
 import ntc from "./ntc.js";
 import dayjs from "dayjs";
-import { GuildTypes } from "../../@types/PostgreTypes";
-import logger from "../lib/logger.js";
+import { Guilds } from "../../@types/DatabaseTypes";
+import logger from "../lib/Logger.js";
 
 export default async (client: KhaxyClient) => {
   // Fetch guild configurations from the database
-  const result = await client.pgClient.query("SELECT color_id_of_the_day, color_name_of_the_day, id FROM guilds");
+  const result = await client.pgClient.query<Guilds>("SELECT color_id_of_the_day, color_name_of_the_day, id FROM guilds");
   const rows = result.rows;
   for (const row of rows) {
     const { color_id_of_the_day, color_name_of_the_day, id } = row;
@@ -40,8 +40,8 @@ export default async (client: KhaxyClient) => {
       });
       // Update the color change time in the database
       const query = `
-            UPDATE colorcronjobs
-            SET colortime = $1
+            UPDATE cronjobs
+            SET color_time = $1
             WHERE id = $2`;
       await client.pgClient.query(query, [dayjs().add(1, "day").toISOString(), id]);
     } catch (error) {
@@ -59,10 +59,10 @@ export default async (client: KhaxyClient) => {
 
 export async function specificGuildColorUpdate(client: KhaxyClient, guildId: string) {
   // Fetch guild configuration for the specific guild
-  const { rows } = (await client.pgClient.query(
+  const { rows } = (await client.pgClient.query<Guilds>(
     "SELECT color_id_of_the_day, color_name_of_the_day, id FROM guilds WHERE id = $1",
     [guildId],
-  )) as { rows: GuildTypes[] };
+  ))
   if (rows.length === 0) {
     logger.warn(`Guild config for ${guildId} not found.`);
     return;
@@ -97,8 +97,8 @@ export async function specificGuildColorUpdate(client: KhaxyClient, guildId: str
     });
     // Update the color change time in the database
     const query = `
-            UPDATE colorcronjobs
-            SET colortime = $1
+            UPDATE cronjobs
+            SET color_time = $1
             WHERE id = $2`;
     await client.pgClient.query(query, [dayjs().add(1, "day").toISOString(), id]);
   } catch (error) {

@@ -3,7 +3,7 @@ import "dotenv/config.js";
 import fs from "fs";
 import path from "path";
 import { pathToFileURL, fileURLToPath } from "url";
-import logger from "../lib/logger.js";
+import logger from "../lib/Logger.js";
 const __filename = fileURLToPath(import.meta.url);
 const commands: any[] = [];
 const __dirname = path.dirname(__filename);
