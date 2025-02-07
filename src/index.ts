@@ -12,6 +12,7 @@ import pg from "pg";
 import logger from "./lib/Logger.js";
 import { Player } from "discord-player";
 import { DefaultExtractors } from "@discord-player/extractor";
+import process from "node:process";
 const { Client: PgClient } = pg;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,11 +31,11 @@ const client = new Client({
 const player = new Player(client);
 await player.extractors.loadMulti(DefaultExtractors);
 const pgClient = new PgClient({
-  user: "postgres",
-  password: "54465446",
-  host: "localhost",
+  user: process.env.DB_USER,
+  host: 'localhost',
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
   port: 5432,
-  database: "postgres",
 });
 (async () => {
   await pgClient.connect();

@@ -2,14 +2,15 @@
 import pg from 'pg';
 import fs from 'fs';
 import path from 'path';
-
+import "dotenv/config.js"
+import * as process from "node:process";
 
 
 const pool = new pg.Pool({
-  user: 'postgres',
+  user: process.env.DB_USER,
   host: 'localhost',
-  database: 'postgres',
-  password: '54465446',
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
   port: 5432,
 });
 
