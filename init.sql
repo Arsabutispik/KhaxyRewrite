@@ -18,7 +18,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: jsonb_remove_array_element(jsonb, jsonb); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: jsonb_remove_array_element(jsonb, jsonb); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.jsonb_remove_array_element(arr jsonb, element jsonb) RETURNS jsonb
@@ -39,14 +39,12 @@ CREATE FUNCTION public.jsonb_remove_array_element(arr jsonb, element jsonb) RETU
 $$;
 
 
-ALTER FUNCTION public.jsonb_remove_array_element(arr jsonb, element jsonb) OWNER TO postgres;
-
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
 
 --
--- Name: cronjobs; Type: TABLE; Schema: public; Owner: postgres
+-- Name: cronjobs; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.cronjobs (
@@ -56,10 +54,8 @@ CREATE TABLE public.cronjobs (
 );
 
 
-ALTER TABLE public.cronjobs OWNER TO postgres;
-
 --
--- Name: guilds; Type: TABLE; Schema: public; Owner: postgres
+-- Name: guilds; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.guilds (
@@ -83,10 +79,8 @@ CREATE TABLE public.guilds (
 );
 
 
-ALTER TABLE public.guilds OWNER TO postgres;
-
 --
--- Name: infractions; Type: TABLE; Schema: public; Owner: postgres
+-- Name: infractions; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.infractions (
@@ -102,10 +96,8 @@ CREATE TABLE public.infractions (
 );
 
 
-ALTER TABLE public.infractions OWNER TO postgres;
-
 --
--- Name: infractions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: infractions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.infractions_id_seq
@@ -117,17 +109,15 @@ CREATE SEQUENCE public.infractions_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.infractions_id_seq OWNER TO postgres;
-
 --
--- Name: infractions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: infractions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE public.infractions_id_seq OWNED BY public.infractions.id;
 
 
 --
--- Name: punishments; Type: TABLE; Schema: public; Owner: postgres
+-- Name: punishments; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.punishments (
@@ -141,17 +131,56 @@ CREATE TABLE public.punishments (
 );
 
 
-ALTER TABLE public.punishments OWNER TO postgres;
-
 --
--- Name: infractions id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: infractions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.infractions ALTER COLUMN id SET DEFAULT nextval('public.infractions_id_seq'::regclass);
 
 
 --
--- Name: cronjobs colorcronjobs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Data for Name: cronjobs; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.cronjobs (id, color_time, unregistered_people_time) FROM stdin;
+1304804827796344925	2025-02-06 11:44:16.219	\N
+\.
+
+
+--
+-- Data for Name: guilds; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.guilds (id, language, case_id, mod_log_channel, color_id_of_the_day, color_name_of_the_day, days_to_kick, register_channel, member_role, mute_role, mute_get_all_roles, welcome_channel, register_welcome_channel, welcome_message, register_welcome_message, bump_leaderboard_channel, default_expiry) FROM stdin;
+1304804827796344925	tr	3	1312031350248968254	1334892665082220675	Punch	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	7 days
+\.
+
+
+--
+-- Data for Name: infractions; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.infractions (id, guild_id, user_id, moderator_id, reason, created_at, expires_at, case_id, type) FROM stdin;
+\.
+
+
+--
+-- Data for Name: punishments; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.punishments (expires, type, user_id, guild_id, previous_roles, staff_id, created_at) FROM stdin;
+\.
+
+
+--
+-- Name: infractions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public.infractions_id_seq', 1, false);
+
+
+--
+-- Name: cronjobs colorcronjobs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.cronjobs
@@ -159,7 +188,7 @@ ALTER TABLE ONLY public.cronjobs
 
 
 --
--- Name: guilds guilds_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: guilds guilds_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.guilds
@@ -167,7 +196,7 @@ ALTER TABLE ONLY public.guilds
 
 
 --
--- Name: infractions infractions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: infractions infractions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.infractions
@@ -175,7 +204,7 @@ ALTER TABLE ONLY public.infractions
 
 
 --
--- Name: punishments punishments_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: punishments punishments_pk; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.punishments
@@ -183,7 +212,7 @@ ALTER TABLE ONLY public.punishments
 
 
 --
--- Name: infractions infractions_guild_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: infractions infractions_guild_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.infractions

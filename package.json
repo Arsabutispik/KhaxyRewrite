@@ -10,9 +10,11 @@
     "generate:types": "tsc && node ./dist/lib/GenerateTypes.js",
     "db:init": "tsc && node ./dist/scripts/db-init.js",
     "db:migrate": "tsc && node ./dist/scripts/migrate.js",
+    "db:setup": "node scripts/SetupDb.js",
+    "db:stop": "node scripts/StopDb.js",
     "migrate:create": "node scripts/CreateMigrations.js",
     "migrate:up": "node-pg-migrate up",
-    "migrate:down": "node-pg-migrate down"
+    "migrate:down": "node-pg-migrate down",
   },
   "dependencies": {
     "@discord-player/extractor": "^7.1.0",
