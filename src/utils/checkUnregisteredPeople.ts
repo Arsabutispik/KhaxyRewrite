@@ -14,19 +14,34 @@ export default async (client: KhaxyClient) => {
   for (const row of rows) {
     const { id, days_to_kick, register_channel, member_role, mute_role, language } = row;
     const guild = client.guilds.cache.get(id);
-    if (!guild) continue;
+    if (!guild) {
+      logger.warn(`Guild with ID ${id} not found.`);
+      continue;
+    }
     const t = client.i18next.getFixedT(language);
     // Check if the bot has permission to moderate members
-    if (!guild.members.me?.permissions.has(PermissionsBitField.Flags.ModerateMembers)) continue;
+    if (!guild.members.me?.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
+      logger.warn(`Missing permissions to moderate members in guild ${guild.id}`);
+      continue;
+    }
 
     // Skip if days_to_kick is set to 0
-    if (days_to_kick === 0) continue;
+    if (days_to_kick === 0) {
+      logger.info(`Skipping guild ${guild.id} because days_to_kick is set to 0`);
+      continue;
+    }
 
     // Skip if register_channel is not configured or does not exist
-    if (!register_channel || !guild.channels.cache.has(register_channel)) continue;
+    if (!register_channel || !guild.channels.cache.has(register_channel)) {
+      logger.info(`Skipping guild ${guild.id} because register_channel is not configured or does not exist`);
+      continue;
+    }
 
     // Skip if member_role is not configured or does not exist
-    if (!member_role || !guild.roles.cache.has(member_role)) continue;
+    if (!member_role || !guild.roles.cache.has(member_role)) {
+      logger.info(`Skipping guild ${guild.id} because member_role is not configured or does not exist`);
+      continue;
+    }
 
     try {
       // Fetch all members of the guild
@@ -80,23 +95,39 @@ export async function specificGuildUnregisteredPeopleUpdate(client: KhaxyClient,
     [guildId],
   ))
   if (rows.length === 0) {
+    logger.warn(`Guild config for ${guildId} not found.`);
     return;
   }
   const { days_to_kick, register_channel, member_role, mute_role, language } = rows[0];
   const guild = client.guilds.cache.get(guildId);
-  if (!guild) return;
+  if (!guild) {
+    logger.warn(`Guild ${guildId} not found.`);
+    return;
+  }
   const t = client.i18next.getFixedT(language);
   // Check if the bot has permission to moderate members
-  if (!guild.members.me?.permissions.has(PermissionsBitField.Flags.ModerateMembers)) return;
+  if (!guild.members.me?.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
+    logger.warn(`Missing permissions to moderate members in guild ${guild.id}`);
+    return;
+  }
 
   // Skip if days_to_kick is set to 0
-  if (days_to_kick === 0) return;
+  if (days_to_kick === 0) {
+    logger.info(`Skipping guild ${guild.id} because days_to_kick is set to 0`);
+    return;
+  }
 
   // Skip if register_channel is not configured or does not exist
-  if (!register_channel || !guild.channels.cache.has(register_channel)) return;
+  if (!register_channel || !guild.channels.cache.has(register_channel)) {
+    logger.info(`Skipping guild ${guild.id} because register_channel is not configured or does not exist`);
+    return;
+  }
 
   // Skip if member_role is not configured or does not exist
-  if (!member_role || !guild.roles.cache.has(member_role)) return;
+  if (!member_role || !guild.roles.cache.has(member_role)) {
+    logger.info(`Skipping guild ${guild.id} because member_role is not configured or does not exist`);
+    return;
+  }
 
   try {
     // Fetch all members of the guild

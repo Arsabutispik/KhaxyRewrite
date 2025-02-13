@@ -5,12 +5,10 @@
     "ban": "{{emoji}}  **{{user.username}}** has been banned by **{{moderator.username}}**. Reason:```{{reason}}```",
     "kick": "\uD83D\uDC62  **{{user.username}}** has been kicked by **{{moderator.username}}**. Reason:```{{reason}}```",
     "mute": "\uD83D\uDD07  **{{user.username}}** has been muted by **{{moderator.username}}** for **{{duration}}**. Reason:```{{reason}}```",
-    "forced_ban": "{{emoji}}  User (`{{user.id}}`) has been force banned by **{{moderator.username}}**. Reason:```{{reason}}```",
     "timed_ban": "{{emoji}}  **{{user.username}}** has been banned by **{{moderator.username}}** for **{{duration}}**. Reason:```{{reason}}```",
     "change_warn": "<t:{{time}}> `[{{case}}]` ✏️ Case #{{case}}, has been modified by **{{moderator.username}}**. Reason:```{{reason}}```",
     "unban": "🔓 User (`{{user.id}}`) has been unbanned by **{{moderator.username}}**. Reason:```{{reason}}```",
     "ban_expired": "🔓 User (`{{user.id}}`) has been automatically unbanned by **{{moderator.username}}** after **{{duration}}**. Reason:```{{reason}}```",
-    "forced_timed_ban": "{{emoji}}  User (`{{user.id}}`) has been force banned by **{{moderator.username}}** for **{{duration}}**. Reason:```{{reason}}```",
     "timeout": "🔇 **{{user.username}}** has been timed out by **{{moderator.username}}** for **{{duration}}**. Reason:```{{reason}}```",
     "unmute": "\uD83D\uDD0A  **{{user.username}}** has been unmuted by **{{moderator.username}}**. Reason:```{{reason}}```",
     "function_errors": {
@@ -30,6 +28,26 @@
     "initial": "Member failed to register within {{days}} days."
   },
   "ban": {
-    "expired": "Ban has been expired."
+    "expired": "Ban has been expired.",
+    "no_reason": "No reason provided.",
+    "cant_ban_self": "You can't ban yourself.",
+    "cant_ban_mod": "You can't ban a moderator.",
+    "cant_ban_higher": "You can't ban a user with a higher role than you.",
+    "cant_ban_me": "You can't ban me.",
+    "cant_ban_bot": "You can't ban a bot.",
+    "message": {
+      "dm": {
+        "duration": "You have been banned from **{{guild}}** for **{{duration}}**. Reason:```{{reason}}```",
+        "permanent": "You have been permanently banned from **{{guild}}**. Reason:```{{reason}}```"
+      },
+      "success": {
+        "duration": "{{confirm}} **{{user}}** has been banned for **{{duration}}** (Case #{{case}}) User has been notified with a DM.",
+        "permanent": "{{confirm}} **{{user}}** has been permanently banned (Case #{{case}}). User has been notified with a DM."
+      },
+      "fail": {
+        "duration": "{{confirm}} **{{user}}** has been banned for **{{duration}}** (Case #{{case}}) User has not been notified with a DM.",
+        "permanent": "{{confirm}} **{{user}}** has been permanently banned (Case #{{case}}). User has not been notified with a DM."
+      }
+    }
   }
 }

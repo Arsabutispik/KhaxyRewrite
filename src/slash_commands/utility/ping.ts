@@ -1,24 +1,15 @@
-import { GuildMember, SlashCommandBuilder } from "discord.js";
+import { SlashCommandBuilder } from "discord.js";
 import { SlashCommandBase } from "../../../@types/types";
-import { useMainPlayer } from "discord-player";
 
 export default {
   data: new SlashCommandBuilder().setName("user").setDescription("Provides information about the user."),
   async execute(interaction) {
-    try {
-      const player = useMainPlayer();
-      await interaction.deferReply();
-      const result = await player.play((interaction.member! as GuildMember).voice.channel!, "rick roll", {
-        nodeOptions: {
-          metadata: interaction,
-          leaveOnEndCooldown: 10000,
-        },
-        requestedBy: interaction.user,
+   interaction.client.users.fetch("1270308971181506614").then(async (user) => {
+     console.log(user);
+      await interaction.reply({
+        content: `User: ${user.tag}`,
+        ephemeral: true,
       });
-      await interaction.followUp(result.track.title);
-    } catch (e) {
-      console.error(e);
-      await interaction.followUp("An error occurred while playing the track.");
-    }
+    });
   },
 } as SlashCommandBase;

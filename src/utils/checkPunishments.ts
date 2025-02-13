@@ -8,7 +8,6 @@ export default async (client: KhaxyClient) => {
   const check = async () => {
     // Fetch punishments that have expired
     const { rows } = (await client.pgClient.query<Punishments>("SELECT * FROM punishments WHERE expires < $1", [new Date()]))
-
     for (const result of rows) {
       // Destructure punishment details
       const { user_id, type, previous_roles, staff_id, expires, created_at, guild_id } = result;
@@ -22,8 +21,7 @@ export default async (client: KhaxyClient) => {
       ))
       if (!rows[0]) continue;
 
-      const member = guild.members.cache.get(user_id);
-      if (!member) continue;
+      const member = await guild.members.fetch(user_id);
 
       const staff = await guild.members.fetch(staff_id);
       const expiresDate = dayjs(expires);

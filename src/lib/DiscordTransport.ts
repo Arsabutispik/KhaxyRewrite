@@ -62,7 +62,7 @@ export default class DiscordTransport extends Transport {
    * @param callback Callback to winston to complete the log
    */
   log(info: any, callback: { (): void }) {
-    if (info.discord) {
+    if (("discord" in info.metadata) ? info.metadata.discord : true) {
       setImmediate(() => {
         this.initialized
           .then(() => {

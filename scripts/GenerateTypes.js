@@ -14,7 +14,7 @@ const pool = new pg.Pool({
   port: 5432,
 });
 
-const pgToTsMap: Record<string, string> = {
+const pgToTsMap = {
   integer: 'number',
   smallint: 'number',
   bigint: 'number',
@@ -52,7 +52,7 @@ const pgToTsMap: Record<string, string> = {
   'USER-DEFINED': 'any',
 };
 
-async function getTables(): Promise<string[]> {
+async function getTables() {
   const result = await pool.query(`
       SELECT table_name
       FROM information_schema.tables
@@ -61,7 +61,7 @@ async function getTables(): Promise<string[]> {
   return result.rows.map(row => row.table_name);
 }
 
-async function getTableSchema(table: string) {
+async function getTableSchema(table) {
   const result = await pool.query(`
     SELECT column_name, data_type, udt_name
     FROM information_schema.columns 
@@ -105,10 +105,10 @@ async function generateTypes() {
   fs.writeFileSync(filePath, output);
 
   console.log(`✅ Type definitions generated at ${filePath}`);
-  pool.end();
+  await pool.end();
 }
 
-function capitalize(str: string) {
+function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 

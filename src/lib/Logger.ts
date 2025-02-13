@@ -1,13 +1,17 @@
 import { createLogger, transports, format } from "winston";
 import DiscordTransport from "./DiscordTransport.js";
 import "dotenv/config.js";
+import _ from "lodash";
 const logger = createLogger({
   transports: [
     new transports.Console({
       format: format.combine(
         format.colorize({ all: true }),
         format.printf(({ timestamp, level, message, metadata }) => {
-          return `[${timestamp}] ${level}: ${message}. ${JSON.stringify(metadata)}`;
+          const copy = _.cloneDeep(metadata);
+          // @ts-ignore
+          delete copy.discord;
+          return `[${timestamp}] ${level}: ${message}${copy && Object.keys(copy).length ? ` ${JSON.stringify(copy)}` : ''}`;
         }),
       ),
     }),
@@ -19,7 +23,6 @@ const logger = createLogger({
     }),
     new DiscordTransport({
       webhook: process.env.WEBHOOKURL!,
-      level: "error",
     }),
   ],
   format: format.combine(format.metadata(), format.timestamp()),

@@ -40,7 +40,11 @@ const pgClient = new PgClient({
 (async () => {
   await pgClient.connect();
   const res = await pgClient.query("SELECT $1::text as connected", ["Connection to postgres successful!"]);
-  logger.info(res.rows[0].connected);
+  logger.log({
+    level: "info",
+    message: res.rows[0].connected,
+    discord: false,
+  })
 })();
 
 await i18next.use(FsBackend).init(
@@ -54,10 +58,19 @@ await i18next.use(FsBackend).init(
     backend: {
       loadPath: "locales/{{lng}}/{{ns}}.json",
     },
+    interpolation: {escapeValue: false},
   },
   (err) => {
-    if (err) return console.error(err);
-    logger.info("i18next has been initialized.");
+    if (err) return logger.log({
+      level: "error",
+      message: err,
+      discord: false,
+    })
+    logger.log({
+      level: "info",
+      message: "i18next has been initialized.",
+      discord: false,
+    })
     client.i18next = i18next;
   },
 );

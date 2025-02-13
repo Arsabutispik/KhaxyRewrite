@@ -31,5 +31,8 @@
       "description": "Music has been stopped because no one is left in the voice channel.",
       "title": "Empty Channel"
     }
+  },
+  "guildMemberRemove": {
+    "noReason": "No reason provided."
   }
 }

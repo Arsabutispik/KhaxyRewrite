@@ -69,14 +69,29 @@ export async function specificGuildColorUpdate(client: KhaxyClient, guildId: str
   }
   const { color_id_of_the_day, color_name_of_the_day, id } = rows[0];
   const guild = client.guilds.cache.get(id);
-  if (!guild) return;
-  if (!guild.members.me) return;
+  if (!guild) {
+    logger.warn(`Guild ${id} not found.`);
+    return;
+  }
+  if (!guild.members.me) {
+    logger.warn(`Bot is not in guild ${id}.`);
+    return
+  }
   // Check if the bot has permission to manage roles
-  if (!guild.members.me.permissions.has(PermissionsBitField.Flags.ManageRoles)) return;
+  if (!guild.members.me.permissions.has(PermissionsBitField.Flags.ManageRoles)) {
+    logger.warn(`Bot doesn't have permission to manage roles in guild ${id}.`);
+    return;
+  }
   const role = guild.roles.cache.find((role) => role.id === color_id_of_the_day);
-  if (!role) return;
+  if (!role) {
+    logger.warn(`Role ${color_id_of_the_day} not found in guild ${id}.`);
+    return;
+  }
   // Check if the bot's highest role is higher than the target role
-  if (role.position >= guild.members.me.roles.highest.position) return;
+  if (role.position >= guild.members.me.roles.highest.position) {
+    logger.warn(`Bot's highest role is lower than the target role in guild ${id}.`);
+    return;
+  }
   const name = role.name.replace(color_name_of_the_day || "", " ");
   // Generate a random color
   const x = Math.round(0xffffff * Math.random()).toString(16);

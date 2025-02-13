@@ -25,7 +25,6 @@ export default {
     confirm: "1278053289992392795",
     reject: "1278053315334111353",
     ban: "1278053275429634162",
-    forceban: "1278053258492907591",
   },
 };
 export async function loadEmojis(
@@ -34,10 +33,12 @@ export async function loadEmojis(
 ): Promise<void> {
   try {
     const emojis = await client.application?.emojis.fetch();
+    console.log(emojis)
     if (!emojis) {
       logger.log({
         level: "warn",
         message: "No emojis found.",
+        discord: false
       });
       for (const emoji of emojiObject) {
         client.allEmojis.set(emoji.id, {
@@ -50,7 +51,11 @@ export async function loadEmojis(
     for (const emoji of emojiObject) {
       const fetchedEmoji = emojis.find((e) => e.id === emoji.id);
       if (!fetchedEmoji) {
-        logger.warn(`Emoji ${emoji.name} not found.`);
+        logger.log({
+          level: "warn",
+          message: `Emoji "${emoji.name}" not found.`,
+          discord: false,
+        })
         client.allEmojis.set(emoji.id, {
           name: emoji.name,
           format: emoji.fallBack,

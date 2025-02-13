@@ -12,19 +12,17 @@ type actions =
   | "BAN"
   | "KICK"
   | "MUTE"
-  | "FORCED_BAN"
   | "TIMED_BAN"
   | "CHANGES"
   | "UNBAN"
   | "BAN_EXPIRED"
-  | "FORCED_TIMED_BAN"
   | "TIMEOUT"
   | "UNMUTE";
 
 export default async (
   data: {
     guild: Guild;
-    user: User;
+    user: User
     action: actions;
     moderator: User;
     reason?: string;
@@ -34,7 +32,6 @@ export default async (
   client: KhaxyClient,
 ) => {
   const { guild, user, action, moderator, reason, duration, caseID } = data;
-
   // Fetch guild configuration from the database
   const { rows } = (await client.pgClient.query("SELECT language, mod_log_channel, case_id FROM guilds WHERE id = $1", [
     guild.id,
@@ -69,7 +66,7 @@ export default async (
       message += t("mod_log.warning", { moderator, user, reason });
       break;
     case "BAN":
-      message += t("mod_log.ban", { moderator, user, reason, emoji: "🔨" });
+      message += t("mod_log.ban", { moderator, user, reason, emoji: client.allEmojis.get(client.config.Emojis.ban)?.format });
       break;
     case "KICK":
       message += t("mod_log.kick", { moderator, user, reason });
@@ -77,11 +74,8 @@ export default async (
     case "MUTE":
       message += t("mod_log.mute", { moderator, user, reason, duration: dayjs(duration).fromNow(true) });
       break;
-    case "FORCED_BAN":
-      message += t("mod_log.forced_ban", { moderator, user, reason });
-      break;
     case "TIMED_BAN":
-      message += t("mod_log.timed_ban", { moderator, user, reason, duration: dayjs(duration).fromNow(true) });
+      message += t("mod_log.timed_ban", { moderator, user, reason, duration: dayjs(duration).fromNow(true), emoji: client.allEmojis.get(client.config.Emojis.ban)?.format });
       break;
     case "CHANGES":
       message += t("mod_log.changes", {
@@ -97,9 +91,6 @@ export default async (
       break;
     case "BAN_EXPIRED":
       message += t("mod_log.ban_expired", { moderator, user, reason });
-      break;
-    case "FORCED_TIMED_BAN":
-      message += t("mod_log.forced_timed_ban", { moderator, user, reason, duration: dayjs(duration).fromNow(true) });
       break;
     case "TIMEOUT":
       message += t("mod_log.timeout", { moderator, user, reason, duration: dayjs(duration).fromNow(true) });

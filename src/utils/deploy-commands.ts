@@ -57,7 +57,7 @@ const rest = new REST().setToken(process.env.TOKEN);
     throw new Error("Client ID is not defined in the .env file");
   }
   try {
-    logger.info(`Started refreshing ${commands.length} application (/) commands.`);
+    logger.info(`Started refreshing ${commands.length} application (/) commands.`, {discord: false});
     // The put method is used to fully refresh all commands in the guild with the current set
     const data = await rest.put(
       // Only add the comment from the line below if you don't want to deploy commands to a specific guild.
@@ -67,13 +67,14 @@ const rest = new REST().setToken(process.env.TOKEN);
       { body: commands },
     );
     //@ts-ignore
-    logger.info(`Successfully reloaded ${data.length} application (/) commands.`);
+    logger.info(`Successfully reloaded ${data.length} application (/) commands.`, {discord: false});
   } catch (error) {
     // And of course, make sure you catch and log any errors!
     logger.log({
       level: "error",
       message: "Error refreshing application (/) commands",
       error: error,
+      discord: false,
     });
   }
 })();

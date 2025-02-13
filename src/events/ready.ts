@@ -42,18 +42,17 @@ export default {
         id: client.config.Emojis.ban,
         fallBack: "🔨",
       },
-      {
-        name: "forceban",
-        id: client.config.Emojis.forceban,
-        fallBack: "🔨",
-      },
     ];
     await loadEmojis(client, emojis);
     CronJob.from({
       cronTime: "0 0 0 * * *",
       onTick: () => colorOfTheDay(client),
       onComplete: () => {
-        logger.info("Color of the day cronjob has been completed.");
+        logger.log({
+          level: "info",
+          message: "Color of the day cronjob has been completed.",
+          discord: false,
+        })
       },
       start: true,
       timeZone: "UTC",
@@ -62,7 +61,11 @@ export default {
       cronTime: "0 0 0 * * *",
       onTick: () => checkPunishments(client),
       onComplete: () => {
-        logger.info("Check punishments cronjob has been completed.");
+        logger.log({
+          level: "info",
+          message: "Check punishments cronjob has been completed.",
+          discord: false,
+        })
       },
       start: true,
       timeZone: "UTC",
