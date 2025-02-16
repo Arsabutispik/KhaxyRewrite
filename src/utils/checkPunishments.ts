@@ -1,13 +1,14 @@
 import { KhaxyClient } from "../../@types/types";
 import modlog from "./modLog.js";
-import { User } from "discord.js";
 import dayjs from "dayjs";
 import { Guilds, Punishments } from "../../@types/DatabaseTypes";
 
 export default async (client: KhaxyClient) => {
   const check = async () => {
     // Fetch punishments that have expired
-    const { rows } = (await client.pgClient.query<Punishments>("SELECT * FROM punishments WHERE expires < $1", [new Date()]))
+    const { rows } = await client.pgClient.query<Punishments>("SELECT * FROM punishments WHERE expires < $1", [
+      new Date(),
+    ]);
     for (const result of rows) {
       // Destructure punishment details
       const { user_id, type, previous_roles, staff_id, expires, created_at, guild_id } = result;
@@ -15,15 +16,15 @@ export default async (client: KhaxyClient) => {
       if (!guild) continue;
 
       // Fetch guild configuration
-      const { rows } = (await client.pgClient.query<Guilds>(
+      const { rows } = await client.pgClient.query<Guilds>(
         "SELECT language, mute_get_all_roles, mute_role FROM guilds WHERE id = $1",
         [guild.id],
-      ))
+      );
       if (!rows[0]) continue;
 
-      const member = await guild.members.fetch(user_id);
+      const user = await client.users.fetch(user_id);
 
-      const staff = await guild.members.fetch(staff_id);
+      const staff = await client.users.fetch(staff_id);
       const expiresDate = dayjs(expires);
       const createdAtDate = dayjs(created_at);
       const duration = dayjs(expiresDate.diff(createdAtDate));
@@ -31,19 +32,20 @@ export default async (client: KhaxyClient) => {
       if (type === "BAN") {
         // If the punishment is a ban, unban the user
         if (!guild.bans.cache.get(user_id)) continue;
-        await guild.members.unban(user_id, client.i18next.getFixedT(rows[0].language)("commands:ban.expired"),);
+        await guild.members.unban(user_id, client.i18next.getFixedT(rows[0].language)("commands:ban.expired"));
         await modlog(
           {
             guild,
-            user: member.user,
+            user: user,
             action: "BAN_EXPIRED",
-            moderator: (staff ? staff : staff_id) as unknown as User,
+            moderator: staff,
             reason: client.i18next.getFixedT(rows[0].language)("commands:ban.expired"),
             duration,
           },
           client,
         );
       } else if (type === "MUTE") {
+        const member = guild.members.cache.get(user_id);
         // If the punishment is a mute, remove the mute role and restore previous roles
         if (!member) {
           continue;

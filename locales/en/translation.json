@@ -14,7 +14,8 @@
     "function_errors": {
       "no_guild_config": "Guild config not found, creating one, this stops the mod_log_operation. To disable this warning change the \"Function Warnings\" setting.",
       "channel_error": "An error occurred while trying to send the message. This is likely due to the channel being deleted or the bot not having permission to send messages. Please check the channel and try again. This error removes the modlog channel id from the guild config.",
-      "case_id_error": "An error occurred while trying to increment the case id. This is likely a database error on our side. This will likely cause duplicate case ids. Please report this to the bot developers."
+      "case_id_error": "An error occurred while trying to increment the case id. This is likely a database error on our side. This will likely cause duplicate case ids. Please report this to the bot developers.",
+      "no_modlog_channel": "No modlog channel is set in the guild config. Please set one to enable modlog."
     }
   },
   "bump_leaderboard": {

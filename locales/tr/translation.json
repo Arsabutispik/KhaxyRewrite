@@ -14,7 +14,8 @@
     "function_errors": {
       "no_guild_config": "Sunucu ayarları bulunamadı, bir tane oluşturuluyor, bu mod_log işlemini durdurur. Bu uyarıyı devre dışı bırakmak için \"Fonksiyon Uyarıları\" ayarını değiştirin.",
       "channel_error": "Mesajı göndermeye çalışırken bir hata oluştu. Bu muhtemelen kanalın silinmesinden veya botun mesaj gönderme izninin olmamasından kaynaklanmaktadır. Lütfen kanalı kontrol edin ve tekrar deneyin. Bu hata modlog kanal id'sini sunucu ayarlarından kaldırır.",
-      "case_id_error": "Vaka kimliğini artırmaya çalışırken bir hata oluştu. Bu muhtemelen bizim tarafımızdan veritabanı hatasıdır ve çift vaka kimliklerine neden olacaktır. Lütfen bunu bot geliştiricilerine bildirin."
+      "case_id_error": "Vaka kimliğini artırmaya çalışırken bir hata oluştu. Bu muhtemelen bizim tarafımızdan veritabanı hatasıdır ve çift vaka kimliklerine neden olacaktır. Lütfen bunu bot geliştiricilerine bildirin.",
+        "no_modlog_channel": "Sunucu ayarlarında modlog kanalı ayarlanmamış. Modlog'u etkinleştirmek için bir tane ayarlayın."
     }
   },
   "bump_leaderboard": {

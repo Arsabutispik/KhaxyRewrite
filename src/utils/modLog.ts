@@ -22,7 +22,7 @@ type actions =
 export default async (
   data: {
     guild: Guild;
-    user: User
+    user: User;
     action: actions;
     moderator: User;
     reason?: string;
@@ -52,7 +52,9 @@ export default async (
   }
 
   // If mod log channel is not configured, exit the function
-  if (!rows[0].mod_log_channel) return;
+  if (!rows[0].mod_log_channel) {
+    return { message: t("mod_log.function_errors.no_modlog_channel"), type: "WARNING" };
+  }
 
   const caseNumber = caseID || rows[0].case_id;
   let message = `<t:${Math.floor(Date.now() / 1000)}> \`[${caseNumber}]\``;
@@ -66,7 +68,12 @@ export default async (
       message += t("mod_log.warning", { moderator, user, reason });
       break;
     case "BAN":
-      message += t("mod_log.ban", { moderator, user, reason, emoji: client.allEmojis.get(client.config.Emojis.ban)?.format });
+      message += t("mod_log.ban", {
+        moderator,
+        user,
+        reason,
+        emoji: client.allEmojis.get(client.config.Emojis.ban)?.format,
+      });
       break;
     case "KICK":
       message += t("mod_log.kick", { moderator, user, reason });
@@ -75,7 +82,13 @@ export default async (
       message += t("mod_log.mute", { moderator, user, reason, duration: dayjs(duration).fromNow(true) });
       break;
     case "TIMED_BAN":
-      message += t("mod_log.timed_ban", { moderator, user, reason, duration: dayjs(duration).fromNow(true), emoji: client.allEmojis.get(client.config.Emojis.ban)?.format });
+      message += t("mod_log.timed_ban", {
+        moderator,
+        user,
+        reason,
+        duration: dayjs(duration).fromNow(true),
+        emoji: client.allEmojis.get(client.config.Emojis.ban)?.format,
+      });
       break;
     case "CHANGES":
       message += t("mod_log.changes", {

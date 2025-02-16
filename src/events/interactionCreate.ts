@@ -15,7 +15,7 @@ export default {
         await (interaction.client as KhaxyClient).pgClient.query("SELECT EXISTS (SELECT 1 FROM guilds WHERE id = $1)", [
           interaction.guildId,
         ])
-      ).rows[0]
+      ).rows[0].exists
     ) {
       logger.warn(`Guild config for ${interaction.guildId} not found. Creating...`);
       try {

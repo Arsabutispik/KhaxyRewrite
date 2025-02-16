@@ -33,12 +33,11 @@ export async function loadEmojis(
 ): Promise<void> {
   try {
     const emojis = await client.application?.emojis.fetch();
-    console.log(emojis)
     if (!emojis) {
       logger.log({
         level: "warn",
         message: "No emojis found.",
-        discord: false
+        discord: false,
       });
       for (const emoji of emojiObject) {
         client.allEmojis.set(emoji.id, {
@@ -55,7 +54,7 @@ export async function loadEmojis(
           level: "warn",
           message: `Emoji "${emoji.name}" not found.`,
           discord: false,
-        })
+        });
         client.allEmojis.set(emoji.id, {
           name: emoji.name,
           format: emoji.fallBack,

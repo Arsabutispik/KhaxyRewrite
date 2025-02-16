@@ -53,7 +53,7 @@ export default {
     }
     const client = interaction.client as KhaxyClient;
     const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
-    const t = client.i18next.getFixedT(rows[0].language || "en", "commands:kick");
+    const t = client.i18next.getFixedT(rows[0].language || "en", "commands", "kick");
 
     const member = interaction.options.getMember("user");
     const reason = interaction.options.getString("reason") || t("no_reason");
