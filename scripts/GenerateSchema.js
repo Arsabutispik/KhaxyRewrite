@@ -10,11 +10,14 @@ try {
   console.log("🔄 Dumping database schema from Docker...");
 
   // Run `pg_dump` inside the container, but write output to the local machine
-  execSync(`docker exec -t ${CONTAINER_NAME} pg_dump -U ${DB_USER} -s ${DB_NAME} --encoding=UTF8 --no-owner --no-acl > init.sql
-`, {
-    shell: "powershell.exe", // Use PowerShell for correct redirection on Windows
-    stdio: "inherit",
-  });
+  execSync(
+    `docker exec -t ${CONTAINER_NAME} pg_dump -U ${DB_USER} -s ${DB_NAME} --encoding=SQL_ASCII --no-owner --no-acl > init.sql
+`,
+    {
+      shell: "powershell.exe", // Use PowerShell for correct redirection on Windows
+      stdio: "inherit",
+    },
+  );
 
   console.log(`✅ Schema exported to init.sql`);
 } catch (error) {

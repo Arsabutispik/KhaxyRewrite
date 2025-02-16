@@ -4,75 +4,92 @@ import fs from "fs";
 import path from "path";
 import { pathToFileURL, fileURLToPath } from "url";
 import logger from "../lib/Logger.js";
+
 const __filename = fileURLToPath(import.meta.url);
-const commands: any[] = [];
 const __dirname = path.dirname(__filename);
-// Recursive function to read all files in a directory and subdirectories
+const commands: any[] = [];
+
+// Prevent manual execution
+if (import.meta.url === `file://${process.argv[1]}`) {
+  console.error("❌ This script must be run using 'pnpm deploy-commands'.");
+  process.exit(1);
+}
+
+// Recursive function to read all command files
 async function registerCommands(...dirs: string[]) {
   for (const dir of dirs) {
     const files = await fs.promises.readdir(path.join(__dirname, dir));
     for (const file of files) {
       const stat = await fs.promises.lstat(path.join(__dirname, dir, file));
-      if (stat.isDirectory()) await registerCommands(path.join(dir, file));
-      else {
-        if (file.endsWith(".js")) {
-          try {
-            const command = (await import(pathToFileURL(path.join(__dirname, dir, file)).href)).default;
-            if ("data" in command && "execute" in command) {
-              commands.push(command.data.toJSON());
-            } else {
-              logger.warn(
-                `The command at ${pathToFileURL(path.join(__dirname, dir, file))} is missing a required "data" or "execute" property.`,
-              );
-            }
-          } catch (e) {
-            logger.log({
-              level: "error",
-              message: "Error loading command",
-              error: e,
-              meta: {
-                file: path.join(__dirname, dir, file),
-              },
-            });
+      if (stat.isDirectory()) {
+        await registerCommands(path.join(dir, file));
+      } else if (file.endsWith(".js")) {
+        try {
+          const command = (await import(pathToFileURL(path.join(__dirname, dir, file)).href)).default;
+          if ("data" in command && "execute" in command) {
+            commands.push(command.data.toJSON());
+          } else {
+            logger.warn(
+              `The command at ${path.join(__dirname, dir, file)} is missing a required "data" or "execute" property.`,
+            );
           }
+        } catch (e) {
+          logger.log({
+            level: "error",
+            message: "Error loading command",
+            error: e,
+            meta: { file: path.join(__dirname, dir, file) },
+          });
         }
       }
     }
   }
 }
-// Change the path to the folder where your slash commands are stored
+
+// Load commands from the folder
 await registerCommands("../slash_commands");
 
 if (!process.env.TOKEN) {
-  throw new Error("Token is not defined in the .env file");
+  logger.error("❌ Token is not defined in the .env file", { discord: false });
+  process.exit(1);
 }
-// Construct and prepare an instance of the REST module
+
+// Create a REST client
 const rest = new REST().setToken(process.env.TOKEN);
-// and deploy your commands!
+
+// Deploy commands based on environment
 (async () => {
-  if (!process.env.GUILD_ID) {
-    throw new Error("Guild ID is not defined in the .env file");
-  }
-  if (!process.env.CLIENT_ID) {
-    throw new Error("Client ID is not defined in the .env file");
-  }
   try {
-    logger.info(`Started refreshing ${commands.length} application (/) commands.`, {discord: false});
-    // The put method is used to fully refresh all commands in the guild with the current set
-    const data = await rest.put(
-      // Only add the comment from the line below if you don't want to deploy commands to a specific guild.
-      Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
-      // Only remove the comment from the line below if you want to deploy global commands
-      // Routes.applicationCommands(clientId),
-      { body: commands },
-    );
+    logger.info(`🚀 Deploying ${commands.length} application (/) commands...`, { discord: false });
+
+    let data;
+    if (!process.env.CLIENT_ID) {
+      logger.error("❌ Client ID is not defined in the .env file", { discord: false });
+      process.exit(1);
+    }
+    if (process.env.NODE_ENV === "development") {
+      if (!process.env.GUILD_ID) {
+        logger.error("❌ Guild ID is not defined in the .env file", { discord: false });
+        process.exit(1);
+      }
+      console.log("🛠️ Running in development mode: Deploying to guild only.");
+      data = await rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID), {
+        body: commands,
+      });
+    } else if (process.env.NODE_ENV === "production") {
+      console.log("🌍 Running in production mode: Deploying globally.");
+      data = await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands });
+    } else {
+      logger.error("❌ NODE_ENV is not defined in the .env file", { discord: false });
+      process.exit(1);
+    }
+
     //@ts-ignore
-    logger.info(`Successfully reloaded ${data.length} application (/) commands.`, {discord: false});
+    logger.info(`✅ Successfully deployed ${data.length} application (/) commands.`, { discord: false });
   } catch (error) {
-    // And of course, make sure you catch and log any errors!
     logger.log({
       level: "error",
-      message: "Error refreshing application (/) commands",
+      message: "❌ Error deploying application (/) commands",
       error: error,
       discord: false,
     });

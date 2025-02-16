@@ -1,5 +1,5 @@
 import { KhaxyClient, SlashCommandBase } from "../../../@types/types";
-import { GuildMemberRoleManager, MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
+import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { Guilds } from "../../../@types/DatabaseTypes";
 import ms from "ms";
 import modLog from "../../utils/modLog.js";
@@ -69,37 +69,41 @@ export default {
         ),
     ),
   async execute(interaction) {
+    if(!interaction.inCachedGuild()) {
+      await interaction.reply("Guild not cached. This error should not happen.");
+      return;
+    }
     const client = interaction.client as KhaxyClient;
     const {rows} = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild!.id]);
     if(rows.length === 0) {
       await interaction.reply({content: "No guild data found, this shouldn't happen.", flags: MessageFlagsBitField.Flags.Ephemeral});
       return;
     }
-    const t = client.i18next.getFixedT(rows[0].language || "en");
+    const t = client.i18next.getFixedT(rows[0].language || "en", "commands:ban");
     const user = interaction.options.getUser("user", true);
     if(user.id === interaction.user.id) {
-      await interaction.reply({content: t("ban.cant_ban_self"), flags: MessageFlagsBitField.Flags.Ephemeral});
+      await interaction.reply({content: t("cant_ban_self"), flags: MessageFlagsBitField.Flags.Ephemeral});
       return;
     }
     if(user.id === interaction.client.user!.id) {
-      await interaction.reply({content: t("ban.cant_ban_me"), flags: MessageFlagsBitField.Flags.Ephemeral});
+      await interaction.reply({content: t("cant_ban_me"), flags: MessageFlagsBitField.Flags.Ephemeral});
       return;
     }
     if(user.bot) {
-      await interaction.reply({content: t("ban.cant_ban_bot"), flags: MessageFlagsBitField.Flags.Ephemeral});
+      await interaction.reply({content: t("cant_ban_bot"), flags: MessageFlagsBitField.Flags.Ephemeral});
       return
     }
     const member = interaction.guild!.members.cache.get(user.id);
     if(member && (member.permissions.has(PermissionsBitField.Flags.BanMembers) || member.roles.cache.has(rows[0].staff_role))) {
-      await interaction.reply({content: t("ban.cant_ban_mod"), flags: MessageFlagsBitField.Flags.Ephemeral});
+      await interaction.reply({content: t("cant_ban_mod"), flags: MessageFlagsBitField.Flags.Ephemeral});
       return;
     }
-    if(member && (member.roles.highest.position >= (interaction.member!.roles as GuildMemberRoleManager).highest.position)) {
-      await interaction.reply({ content: t("ban.cant_ban_higher"), flags: MessageFlagsBitField.Flags.Ephemeral });
+    if(member && (member.roles.highest.position >= interaction.member.roles.highest.position)) {
+      await interaction.reply({ content: t("cant_ban_higher"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return
     }
 
-    const reason = interaction.options.getString("reason") || t("ban.no_reason");
+    const reason = interaction.options.getString("reason") || t("no_reason");
     const duration = interaction.options.getNumber("duration");
     const time = interaction.options.getString("time");
     if(duration && time) {
@@ -112,11 +116,11 @@ export default {
           .replace(/days|day/, "gün");
       }
       try {
-        await user.send(t("ban.message.dm.duration", { guild: interaction.guild!.name, reason, duration: longDuration }));
+        await user.send(t("message.dm.duration", { guild: interaction.guild!.name, reason, duration: longDuration }));
         await interaction.guild!.members.ban(user, { reason, deleteMessageSeconds: 604800});
-        await interaction.reply({ content: t("ban.message.success.duration", { user: user.tag, duration: longDuration, case: rows[0].case_id, confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format }), flags: MessageFlagsBitField.Flags.Ephemeral });
+        await interaction.reply({ content: t("message.success.duration", { user: user.tag, duration: longDuration, case: rows[0].case_id, confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format }), flags: MessageFlagsBitField.Flags.Ephemeral });
       } catch (e) {
-        await interaction.reply({ content: t("ban.message.fail.duration", { user: user.tag, duration: longDuration, case: rows[0].case_id, confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format }), flags: MessageFlagsBitField.Flags.Ephemeral });
+        await interaction.reply({ content: t("message.fail.duration", { user: user.tag, duration: longDuration, case: rows[0].case_id, confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format }), flags: MessageFlagsBitField.Flags.Ephemeral });
         logger.error({
           message: `Error while banning user ${user.tag} from guild ${interaction.guild!.name}`,
           error: e,
@@ -136,11 +140,11 @@ export default {
       }
     } else {
       try {
-        await user.send(t("ban.message.dm.permanent", { guild: interaction.guild!.name, reason }));
+        await user.send(t("message.dm.permanent", { guild: interaction.guild!.name, reason }));
         await interaction.guild!.members.ban(user, { reason, deleteMessageSeconds: 604800 });
-        await interaction.reply({ content: t("ban.message.success.permanent", { user: user.tag, case: rows[0].case_id, confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format }), flags: MessageFlagsBitField.Flags.Ephemeral });
+        await interaction.reply({ content: t("message.success.permanent", { user: user.tag, case: rows[0].case_id, confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format }), flags: MessageFlagsBitField.Flags.Ephemeral });
       } catch (e) {
-        await interaction.reply({ content: t("ban.message.fail.permanent", { user: user.tag, case: rows[0].case_id, confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format }), flags: MessageFlagsBitField.Flags.Ephemeral });
+        await interaction.reply({ content: t("message.fail.permanent", { user: user.tag, case: rows[0].case_id, confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format }), flags: MessageFlagsBitField.Flags.Ephemeral });
         logger.error({
           message: `Error while banning user ${user.tag} from guild ${interaction.guild!.name}`,
           error: e,

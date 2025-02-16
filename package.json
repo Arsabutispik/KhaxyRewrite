@@ -6,10 +6,10 @@
   "main": "dist/index.js",
   "scripts": {
     "deploy-commands": "tsc && node dist/utils/deploy-commands.js",
-    "start": "tsc && pnpm db-migrate && node .",
+    "start": "tsc && pnpm db-setup && node .",
     "generate-types": "node scripts/GenerateTypes.js",
     "generate-schema": "node scripts/GenerateSchema.js",
-    "db-migrate": "tsc && node scripts/migrate.js",
+    "db-migrate": "node scripts/migrate.js",
     "db-setup": "node scripts/SetupDb.js",
     "db-stop": "node scripts/StopDb.js",
     "migrate-create": "node scripts/CreateMigrations.js",

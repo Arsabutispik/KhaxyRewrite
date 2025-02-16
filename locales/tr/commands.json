@@ -1,0 +1,28 @@
+{
+  "ban": {
+    "expired": "Yasaklanma süresi doldu.",
+    "no_reason": "Sebep belirtilmedi.",
+    "cant_ban_self": "Kendini yasaklayamazsın.",
+    "cant_ban_mod": "Moderatörü yasaklayamazsın.",
+    "cant_ban_higher": "Senden daha yüksek bir role sahip kullanıcıyı yasaklayamazsın.",
+    "cant_ban_me": "Beni yasaklayamazsın.",
+    "cant_ban_bot": "Botu yasaklayamazsın.",
+    "message": {
+      "dm": {
+        "duration": "**{{guild}}** sunucusundan **{{duration}}** süreyle yasaklandınız. Sebep:```{{reason}}```",
+        "permanent": "**{{guild}}** sunucusundan kalıcı olarak yasaklandınız. Sebep:```{{reason}}```"
+      },
+      "success": {
+        "duration": "{{confirm}} **{{user}}**, **{{duration}}** süreyle yasaklandı (Vaka #{{case}}) Kullanıcıya DM ile bildirildi.",
+        "permanent": "{{confirm}} **{{user}}**, kalıcı olarak yasaklandı (Vaka #{{case}}). Kullanıcıya DM ile bildirildi."
+      },
+      "fail": {
+        "duration": "{{confirm}} **{{user}}**, **{{duration}}** süreyle yasaklandı (Vaka #{{case}}) Kullanıcıya DM ile bildirilmedi.",
+        "permanent": "{{confirm}} **{{user}}**, kalıcı olarak yasaklandı (Vaka #{{case}}). Kullanıcıya DM ile bildirilmedi."
+      }
+    }
+  },
+  "kick": {
+    "no_reason": "Sebep belirtilmedi."
+  }
+}

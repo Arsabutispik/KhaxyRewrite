@@ -31,14 +31,14 @@ export default async (client: KhaxyClient) => {
       if (type === "BAN") {
         // If the punishment is a ban, unban the user
         if (!guild.bans.cache.get(user_id)) continue;
-        await guild.members.unban(user_id, "Ban Duration Expired");
+        await guild.members.unban(user_id, client.i18next.getFixedT(rows[0].language)("commands:ban.expired"),);
         await modlog(
           {
             guild,
             user: member.user,
             action: "BAN_EXPIRED",
             moderator: (staff ? staff : staff_id) as unknown as User,
-            reason: client.i18next.getFixedT(rows[0].language)("ban.expired"),
+            reason: client.i18next.getFixedT(rows[0].language)("commands:ban.expired"),
             duration,
           },
           client,

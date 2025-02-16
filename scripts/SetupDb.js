@@ -9,9 +9,8 @@ const DB_PASSWORD = process.env.DB_PASSWORD;
 const CONTAINER_NAME = process.env.DB_CONTAINER;
 const PG_PORT = 5432;
 
-const DB_VOLUME_PATH = path.resolve(process.cwd(), "db_data");
 const INIT_SQL_PATH = path.resolve(process.cwd(), "init.sql");
-const INIT_SQL_DEST = path.join(DB_VOLUME_PATH, "init.sql");
+const VOLUME_NAME = `${CONTAINER_NAME}_data`;
 
 const sleep = (seconds) => {
   if (process.platform === "win32") {
@@ -49,35 +48,56 @@ function isPostgresRunningInDocker() {
   }
 }
 
-function isDatabaseInitialized() {
+function isLocalPostgresRunning() {
   try {
-    const result = execSync(`docker exec ${CONTAINER_NAME} psql -U ${DB_USER} -d ${DB_NAME} -c "SELECT 1 FROM guilds LIMIT 1;"`, { stdio: "ignore" });
-    return !!result;
+    execSync(`pg_isready -U ${DB_USER}`, { stdio: "ignore" });
+    return true;
   } catch {
     return false;
+  }
+}
+
+function isDatabaseInitialized() {
+  try {
+    execSync(`docker exec ${CONTAINER_NAME} psql -U ${DB_USER} -d ${DB_NAME} -c "SELECT 1 FROM guilds LIMIT 1;"`, {
+      stdio: "ignore",
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function removeExistingContainer() {
+  try {
+    execSync(`docker rm -f ${CONTAINER_NAME}`, { stdio: "ignore" });
+    console.log(`🗑️ Removed existing container: ${CONTAINER_NAME}`);
+  } catch (err) {
+    console.log("ℹ️ No existing container found.");
   }
 }
 
 if (isDockerInstalled()) {
   if (!isPostgresRunningInDocker()) {
     console.log("🚀 Starting PostgreSQL in Docker...");
+    removeExistingContainer();
 
-    // Ensure db_data folder exists
-    if (!fs.existsSync(DB_VOLUME_PATH)) {
-      fs.mkdirSync(DB_VOLUME_PATH);
-    }
-
-    // Copy init.sql into the folder
-    if (!fs.existsSync(INIT_SQL_DEST)) {
-      fs.copyFileSync(INIT_SQL_PATH, INIT_SQL_DEST);
-    }
-
-    runCommand(`docker run --name ${CONTAINER_NAME} -e POSTGRES_USER=${DB_USER} -e POSTGRES_PASSWORD=${DB_PASSWORD} -e POSTGRES_DB=${DB_NAME} -p ${PG_PORT}:5432 -v "${DB_VOLUME_PATH}:/docker-entrypoint-initdb.d" -d postgres`);
+    runCommand(
+      `docker run --name ${CONTAINER_NAME} \
+        -e POSTGRES_USER=${DB_USER} \
+        -e POSTGRES_PASSWORD=${DB_PASSWORD} \
+        -e POSTGRES_DB=${DB_NAME} \
+        -p ${PG_PORT}:5432 \
+        -v ${VOLUME_NAME}:/var/lib/postgresql/data \
+        -d postgres`,
+    );
   } else {
     console.log("✅ PostgreSQL is already running in Docker.");
   }
+} else if (isLocalPostgresRunning()) {
+  console.log("✅ Using local PostgreSQL.");
 } else {
-  console.error("❌ Docker is not installed. Please install Docker.");
+  console.error("❌ No PostgreSQL instance found (Docker or Local). Exiting...");
   process.exit(1);
 }
 
@@ -101,15 +121,17 @@ function waitForPostgres() {
 }
 waitForPostgres();
 
-// Check if the database is already initialized
+// Run init.sql if the database is not initialized
 if (isDatabaseInitialized()) {
   console.log("✅ Database is already initialized. Skipping init.sql.");
 } else {
   console.log("📂 Running init.sql...");
-  runCommand(`docker exec -i ${CONTAINER_NAME} psql -U ${DB_USER} -d ${DB_NAME} -f /docker-entrypoint-initdb.d/init.sql`);
+  runCommand(
+    `docker exec -i ${CONTAINER_NAME} psql -U ${DB_USER} -d ${DB_NAME} -f /docker-entrypoint-initdb.d/init.sql`,
+  );
 }
 
 console.log("📂 Running migrations...");
-runCommand("pnpm migrate:up");
+runCommand("pnpm migrate-up");
 
 console.log("✅ Database setup complete!");
