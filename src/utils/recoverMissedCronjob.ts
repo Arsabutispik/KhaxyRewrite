@@ -3,6 +3,7 @@ import { specificGuildColorUpdate } from "./colorOfTheDay.js";
 import logger from "../lib/Logger.js";
 import { specificGuildUnregisteredPeopleUpdate } from "./checkUnregisteredPeople.js";
 import { Cronjobs } from "../../@types/DatabaseTypes";
+
 export default async (client: KhaxyClient) => {
   // Fetch all cron jobs from the database
   const { rows } = await client.pgClient.query<Cronjobs>("SELECT * FROM cronjobs");

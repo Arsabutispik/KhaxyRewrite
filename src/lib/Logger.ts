@@ -1,7 +1,8 @@
-import { createLogger, transports, format } from "winston";
+import { createLogger, format, transports } from "winston";
 import DiscordTransport from "./DiscordTransport.js";
 import "dotenv/config.js";
 import _ from "lodash";
+
 const logger = createLogger({
   transports: [
     new transports.Console({
@@ -11,7 +12,7 @@ const logger = createLogger({
           const copy = _.cloneDeep(metadata);
           // @ts-ignore
           delete copy.discord;
-          return `[${timestamp}] ${level}: ${message}${copy && Object.keys(copy).length ? ` ${JSON.stringify(copy)}` : ''}`;
+          return `[${timestamp}] ${level}: ${message}${copy && Object.keys(copy).length ? ` ${JSON.stringify(copy)}` : ""}`;
         }),
       ),
     }),

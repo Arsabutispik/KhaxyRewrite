@@ -16,6 +16,12 @@ export type Punishments = {
   user_id: string;
 };
 
+export type Pgmigrations = {
+  id: number;
+  run_on: string;
+  name: string;
+};
+
 export type Infractions = {
   created_at: string;
   expires_at: string;
@@ -26,12 +32,6 @@ export type Infractions = {
   guild_id: string;
   user_id: string;
   moderator_id: string;
-};
-
-export type Pgmigrations = {
-  id: number;
-  run_on: string;
-  name: string;
 };
 
 export type Guilds = {

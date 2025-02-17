@@ -2,7 +2,7 @@ import { REST, Routes } from "discord.js";
 import "dotenv/config.js";
 import fs from "fs";
 import path from "path";
-import { pathToFileURL, fileURLToPath } from "url";
+import { fileURLToPath, pathToFileURL } from "url";
 import logger from "../lib/Logger.js";
 
 const __filename = fileURLToPath(import.meta.url);

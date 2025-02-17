@@ -5,6 +5,7 @@ import ms from "ms";
 import modLog from "../../utils/modLog.js";
 import dayjs from "dayjs";
 import logger from "../../lib/Logger.js";
+
 export default {
   memberPermissions: [PermissionsBitField.Flags.BanMembers],
   clientPermissions: [PermissionsBitField.Flags.BanMembers],

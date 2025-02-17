@@ -2,7 +2,7 @@ import dayjs, { Dayjs } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime.js";
 import "dayjs/locale/en.js";
 import "dayjs/locale/tr.js";
-import { Guild, ChannelType, User } from "discord.js";
+import { ChannelType, Guild, User } from "discord.js";
 import { GuildConfig, KhaxyClient } from "../../@types/types";
 import logger from "../lib/Logger.js";
 

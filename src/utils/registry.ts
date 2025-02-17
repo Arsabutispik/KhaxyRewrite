@@ -3,8 +3,10 @@ import { KhaxyClient } from "../../@types/types";
 import path from "path";
 import { fileURLToPath, pathToFileURL } from "url";
 import logger from "../lib/Logger.js";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 async function RegisterSlashCommands(client: KhaxyClient) {
   //Change the path to the folder where your slash commands are stored
   const foldersPath = path.join(__dirname, "../slash_commands");

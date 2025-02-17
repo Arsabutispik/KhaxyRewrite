@@ -5,22 +5,23 @@ import { replacePlaceholders } from "../utils/utils.js";
 import logger from "../lib/Logger.js";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime.js";
+
 export default {
   name: Events.GuildMemberAdd,
   async execute(member: GuildMember) {
     // Fetch guild data from the database
-    const { rows } = (await (member.client as KhaxyClient).pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
+    const { rows } = await (member.client as KhaxyClient).pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
       member.guild.id,
-    ]))
+    ]);
 
     // If no guild data is found, exit the function
     if (rows.length === 0) return;
 
     // Fetch punishment data for the member from the database
-    const { rows: punishment_rows } = (await (member.client as KhaxyClient).pgClient.query<Punishments>(
+    const { rows: punishment_rows } = await (member.client as KhaxyClient).pgClient.query<Punishments>(
       "SELECT * FROM punishments WHERE guild_id = $1 AND user_id = $2 AND type = $3",
       [member.guild.id, member.id, "mute"],
-    ))
+    );
 
     // If punishment data exists and the mute role is present, assign the mute role to the member
     if (punishment_rows.length > 0 && rows[0].mute_role && member.guild.roles.cache.has(rows[0].mute_role)) {
@@ -47,13 +48,9 @@ export default {
       "{joinPosition}": (member.guild.memberCount - 1).toString(),
       "{createdAt}": dayjs(member.user.createdAt).format("DD/MM/YYYY"),
       "{createdAgo}": dayjs(member.user.createdAt).fromNow(),
-    }
+    };
     // If a welcome message and channel are configured, send the welcome message to the channel
-    if (
-      rows[0].join_message &&
-      rows[0].join_channel &&
-      member.guild.channels.cache.has(rows[0].join_channel)
-    ) {
+    if (rows[0].join_message && rows[0].join_channel && member.guild.channels.cache.has(rows[0].join_channel)) {
       const welcome_channel = member.guild.channels.cache.get(rows[0].join_channel)!;
       if (!welcome_channel.isTextBased()) return;
       if (welcome_channel.type !== ChannelType.GuildText) return;

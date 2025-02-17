@@ -2,6 +2,7 @@ import { EventBase, KhaxyClient } from "../../@types/types";
 import { Events, GuildMember, Interaction, MessageFlagsBitField } from "discord.js";
 import { missingPermissionsAsString } from "../utils/utils.js";
 import logger from "../lib/Logger.js";
+
 export default {
   name: Events.InteractionCreate,
   once: false,

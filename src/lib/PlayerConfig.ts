@@ -27,6 +27,7 @@ export default {
     ban: "1278053275429634162",
   },
 };
+
 export async function loadEmojis(
   client: KhaxyClient,
   emojiObject: Array<{ name: string; id: string; fallBack: string }>,

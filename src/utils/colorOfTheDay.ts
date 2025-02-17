@@ -7,7 +7,9 @@ import logger from "../lib/Logger.js";
 
 export default async (client: KhaxyClient) => {
   // Fetch guild configurations from the database
-  const result = await client.pgClient.query<Guilds>("SELECT color_id_of_the_day, color_name_of_the_day, id FROM guilds");
+  const result = await client.pgClient.query<Guilds>(
+    "SELECT color_id_of_the_day, color_name_of_the_day, id FROM guilds",
+  );
   const rows = result.rows;
   for (const row of rows) {
     const { color_id_of_the_day, color_name_of_the_day, id } = row;
@@ -59,10 +61,10 @@ export default async (client: KhaxyClient) => {
 
 export async function specificGuildColorUpdate(client: KhaxyClient, guildId: string) {
   // Fetch guild configuration for the specific guild
-  const { rows } = (await client.pgClient.query<Guilds>(
+  const { rows } = await client.pgClient.query<Guilds>(
     "SELECT color_id_of_the_day, color_name_of_the_day, id FROM guilds WHERE id = $1",
     [guildId],
-  ))
+  );
   if (rows.length === 0) {
     logger.warn(`Guild config for ${guildId} not found.`);
     return;
@@ -75,7 +77,7 @@ export async function specificGuildColorUpdate(client: KhaxyClient, guildId: str
   }
   if (!guild.members.me) {
     logger.warn(`Bot is not in guild ${id}.`);
-    return
+    return;
   }
   // Check if the bot has permission to manage roles
   if (!guild.members.me.permissions.has(PermissionsBitField.Flags.ManageRoles)) {

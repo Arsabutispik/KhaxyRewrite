@@ -1,4 +1,4 @@
-import { Events, ActivityType } from "discord.js";
+import { ActivityType, Events } from "discord.js";
 import { EventBase, KhaxyClient } from "../../@types/types";
 import { loadEmojis } from "../lib/PlayerConfig.js";
 import { CronJob } from "cron";
@@ -52,7 +52,7 @@ export default {
           level: "info",
           message: "Color of the day cronjob has been completed.",
           discord: false,
-        })
+        });
       },
       start: true,
       timeZone: "UTC",
@@ -65,7 +65,7 @@ export default {
           level: "info",
           message: "Check punishments cronjob has been completed.",
           discord: false,
-        })
+        });
       },
       start: true,
       timeZone: "UTC",

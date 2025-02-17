@@ -1,8 +1,9 @@
 import { EventBase, KhaxyClient } from "../../@types/types";
-import { Events, GuildMember, AuditLogEvent } from "discord.js";
+import { AuditLogEvent, Events, GuildMember } from "discord.js";
 import { sleep } from "../utils/utils.js";
 import modlog from "../utils/modLog.js";
 import dayjs from "dayjs";
+
 export default {
   name: Events.GuildMemberUpdate,
   once: false,

@@ -7,9 +7,9 @@ import logger from "../lib/Logger.js";
 
 export default async (client: KhaxyClient) => {
   // Fetch guild configurations from the database
-  const { rows } = (await client.pgClient.query<Guilds>(
+  const { rows } = await client.pgClient.query<Guilds>(
     "SELECT id, days_to_kick, register_channel, member_role, mute_role, language from guilds",
-  ))
+  );
 
   for (const row of rows) {
     const { id, days_to_kick, register_channel, member_role, mute_role, language } = row;
@@ -90,10 +90,10 @@ export default async (client: KhaxyClient) => {
 
 export async function specificGuildUnregisteredPeopleUpdate(client: KhaxyClient, guildId: string) {
   // Fetch guild configuration for the specific guild
-  const { rows } = (await client.pgClient.query<Guilds>(
+  const { rows } = await client.pgClient.query<Guilds>(
     "SELECT days_to_kick, register_channel, member_role, mute_role, language from guilds WHERE id = $1",
     [guildId],
-  ))
+  );
   if (rows.length === 0) {
     logger.warn(`Guild config for ${guildId} not found.`);
     return;
@@ -143,27 +143,24 @@ export async function specificGuildUnregisteredPeopleUpdate(client: KhaxyClient,
         return member.joinedTimestamp! + (days_to_kick || 0) * 86400000 < Date.now();
       })
       .forEach((member) => {
-          // Send a DM to the member before kicking
-          member.send(t("unregistered_member.kick_dm", { guild: guild.name, days: days_to_kick })).catch(() => {
-          });
+        // Send a DM to the member before kicking
+        member.send(t("unregistered_member.kick_dm", { guild: guild.name, days: days_to_kick })).catch(() => {});
 
-          // Kick the member from the guild
-          member.kick(t("unregistered_member.initial", { days: days_to_kick })).catch(() => {
-          });
+        // Kick the member from the guild
+        member.kick(t("unregistered_member.initial", { days: days_to_kick })).catch(() => {});
 
-          // Log the kick action using the modLog utility
-          modLog(
-            {
-              guild,
-              user: member.user,
-              action: "KICK",
-              moderator: client.user!,
-              reason: t("unregistered_member.initial", { days: days_to_kick }),
-            },
-            client,
-          );
-        }
-      );
+        // Log the kick action using the modLog utility
+        modLog(
+          {
+            guild,
+            user: member.user,
+            action: "KICK",
+            moderator: client.user!,
+            reason: t("unregistered_member.initial", { days: days_to_kick }),
+          },
+          client,
+        );
+      });
   } catch (e) {
     logger.log({
       level: "error",

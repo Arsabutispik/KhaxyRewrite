@@ -1,7 +1,8 @@
 import { EventBase, KhaxyClient } from "../../@types/types";
-import { AutoModerationActionExecution, Events, AutoModerationActionType } from "discord.js";
+import { AutoModerationActionExecution, AutoModerationActionType, Events } from "discord.js";
 import modlog from "../utils/modLog.js";
 import dayjs from "dayjs";
+
 export default {
   name: Events.AutoModerationActionExecution,
   once: false,

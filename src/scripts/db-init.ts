@@ -12,7 +12,9 @@ const DOCKER_DB_COMMAND = `docker exec -i ${process.env.DB_CONTAINER} psql -U ${
 
 function isDockerRunning(): boolean {
   try {
-    const output = execSync(`docker ps --filter "name=${process.env.DB_CONTAINER}" --format "{{.Names}}"`).toString().trim();
+    const output = execSync(`docker ps --filter "name=${process.env.DB_CONTAINER}" --format "{{.Names}}"`)
+      .toString()
+      .trim();
     return output === process.env.DB_CONTAINER;
   } catch (error) {
     return false;

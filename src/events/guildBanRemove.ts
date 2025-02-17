@@ -3,14 +3,15 @@ import { AuditLogEvent, Events, GuildBan, PermissionsBitField } from "discord.js
 import modLog from "../utils/modLog.js";
 import { Guilds } from "../../@types/DatabaseTypes";
 import logger from "../lib/Logger.js";
+
 export default {
   name: Events.GuildBanRemove,
   once: false,
   async execute(ban: GuildBan) {
     // Fetch guild data from the database
-    const { rows } = (await (ban.client as KhaxyClient).pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
+    const { rows } = await (ban.client as KhaxyClient).pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
       ban.guild.id,
-    ]))
+    ]);
 
     // If no guild data is found, exit the function
     if (rows.length === 0) return;
