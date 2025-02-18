@@ -23,6 +23,34 @@
     }
   },
   "kick": {
-    "no_reason": "Sebep belirtilmedi."
+    "no_reason": "Sebep belirtilmedi.",
+    "cant_kick_yourself": "Kendini atamazsın.",
+    "no_member": "Kullanıcı bulunamadı.",
+    "cant_kick_bot": "Botu atamazsın.",
+    "cant_kick_higher": "Senden daha yüksek bir role sahip kullanıcıyı atamazsın.",
+    "cant_kick_mod": "Moderatörü atamazsın.",
+    "cant_kick": "Bu kullanıcı atılamaz.",
+    "message": {
+      "dm": "Sunucudan atıldınız. Sebep:```{{reason}}```",
+      "success": "{{confirm}} **{{user}}**, atıldı (Vaka #{{case}}) Kullanıcıya DM ile bildirildi.",
+      "fail": "{{confirm}} **{{user}}**, atıldı (Vaka #{{case}}) Kullanıcıya DM ile bildirilmedi."
+    }
+  },
+  "mute": {
+    "no_reason": "Sebep belirtilmedi.",
+    "no_user": "Kullanıcı bulunamadı.",
+    "no_mute_role": "Susturma rolü bulunamadı.",
+    "already_muted": "Kullanıcı zaten susturulmuş.",
+    "already_muted_no_punishments": "Kullanıcı zaten susturulmuş ancak ceza bulunamadı. Rol kaldırılıyor.",
+    "not_muted": "Kullanıcı susturulmuş ancak ceza bulunamadı. Rol ekleniyor.",
+    "cant_mute_yourself": "Kendini susturamazsın.",
+    "cant_mute_higher": "Senden daha yüksek bir role sahip kullanıcıyı susturamazsın.",
+    "cant_mute_bot": "Botu susturamazsın.",
+    "cant_mute_mod": "Moderatörü susturamazsın.",
+    "message": {
+      "dm": "**{{guild}}** sunucusunda **{{duration}}** boyunca susturuldunuz. Sebep:```{{reason}}```",
+      "success": "{{confirm}} **{{user}}**, **{{duration}}** boyunca susturuldu (Vaka #{{case}}) Kullanıcıya DM ile bildirildi.",
+      "fail": "{{confirm}} **{{user}}**, **{{duration}}** boyunca susturuldu (Vaka #{{case}}) Kullanıcıya DM ile bildirilmedi."
+    }
   }
 }

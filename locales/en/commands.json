@@ -35,5 +35,22 @@
       "success": "{{confirm}} **{{user}}** has been kicked (Case #{{case}}) User has been notified with a DM.",
       "fail": "{{confirm}} **{{user}}** has been kicked (Case #{{case}}) User has not been notified with a DM."
     }
+  },
+  "mute": {
+    "no_reason": "No reason provided.",
+    "no_user": "User not found.",
+    "no_mute_role": "Mute role not found.",
+    "already_muted": "User is already muted.",
+    "already_muted_no_punishments": "User is already muted but no punishments found. Removing the role.",
+    "not_muted": "Found a punishment but user is not muted. Adding the role.",
+    "cant_mute_yourself": "You can't mute yourself.",
+    "cant_mute_higher": "You can't mute a user with a higher role than you.",
+    "cant_mute_bot": "You can't mute a bot.",
+    "cant_mute_mod": "You can't mute a moderator.",
+    "message": {
+      "dm": "You have been muted in **{{guild}}** for **{{duration}}**. Reason:```{{reason}}```",
+      "success": "{{confirm}} **{{user}}** has been muted for **{{duration}}** (Case #{{case}}) User has been notified with a DM.",
+      "fail": "{{confirm}} **{{user}}** has been muted for **{{duration}}** (Case #{{case}}) User has not been notified with a DM."
+    }
   }
 }

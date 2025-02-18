@@ -1,9 +1,11 @@
 import { KhaxyClient, SlashCommandBase } from "../../../@types/types";
 import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { Guilds } from "../../../@types/DatabaseTypes";
-import ms from "ms";
-import modLog from "../../utils/modLog.js";
 import dayjs from "dayjs";
+import dayjsduration from "dayjs/plugin/duration.js";
+import relativeTime from "dayjs/plugin/relativeTime.js";
+import modLog from "../../utils/modLog.js";
+import "dayjs/locale/tr.js";
 import logger from "../../lib/Logger.js";
 
 export default {
@@ -59,11 +61,11 @@ export default {
         })
         .setRequired(false)
         .setChoices(
-          { name: "Second(s)", value: "s" },
-          { name: "Minute(s)", value: "m" },
-          { name: "Hour(s)", value: "h" },
-          { name: "Day(s)", value: "d" },
-          { name: "Week(s)", value: "w" },
+          { name: "Second(s)", value: "second" },
+          { name: "Minute(s)", value: "minute" },
+          { name: "Hour(s)", value: "hour" },
+          { name: "Day(s)", value: "day" },
+          { name: "Week(s)", value: "week" },
         ),
     ),
   async execute(interaction) {
@@ -71,6 +73,8 @@ export default {
       await interaction.reply("Guild not cached. This error should not happen.");
       return;
     }
+    dayjs.extend(dayjsduration);
+    dayjs.extend(relativeTime);
     const client = interaction.client as KhaxyClient;
     const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild!.id]);
     if (rows.length === 0) {
@@ -111,21 +115,17 @@ export default {
     const duration = interaction.options.getNumber("duration");
     const time = interaction.options.getString("time");
     if (duration && time) {
-      const banDuration = ms(`${duration}${time}` as ms.StringValue);
-      let longDuration = ms(banDuration, { long: true });
-      if (rows[0].language === "tr") {
-        longDuration = longDuration
-          .replace(/minutes|minute/, "dakika")
-          .replace(/hours|hour/, "saat")
-          .replace(/days|day/, "gün");
-      }
+      const dayjsduration = dayjs.duration(duration, time as dayjsduration.DurationUnitType);
+      const long_duration = dayjs(dayjs().add(dayjsduration))
+        .locale(rows[0].language || "en")
+        .fromNow(true);
       try {
-        await user.send(t("message.dm.duration", { guild: interaction.guild!.name, reason, duration: longDuration }));
+        await user.send(t("message.dm.duration", { guild: interaction.guild!.name, reason, duration: long_duration }));
         await interaction.guild!.members.ban(user, { reason, deleteMessageSeconds: 604800 });
         await interaction.reply({
           content: t("message.success.duration", {
             user: user.tag,
-            duration: longDuration,
+            duration: long_duration,
             case: rows[0].case_id,
             confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
           }),
@@ -134,7 +134,7 @@ export default {
         await interaction.reply({
           content: t("message.fail.duration", {
             user: user.tag,
-            duration: longDuration,
+            duration: long_duration,
             case: rows[0].case_id,
             confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
           }),
@@ -151,7 +151,7 @@ export default {
           action: "TIMED_BAN",
           moderator: interaction.user,
           reason,
-          duration: dayjs(Date.now() + banDuration),
+          duration: dayjs(Date.now() + dayjsduration.asMilliseconds()),
           caseID: rows[0].case_id,
         },
         client,
@@ -162,7 +162,14 @@ export default {
       try {
         await (interaction.client as KhaxyClient).pgClient.query(
           "INSERT INTO punishments (expires, type, user_id, guild_id, staff_id, created_at) VALUES ($1, $2, $3, $4, $5, $6)",
-          [new Date(Date.now() + banDuration), "BAN", user.id, interaction.guild!.id, interaction.user.id, new Date()],
+          [
+            new Date(Date.now() + dayjsduration.asMilliseconds()),
+            "BAN",
+            user.id,
+            interaction.guild!.id,
+            interaction.user.id,
+            new Date(),
+          ],
         );
       } catch (e) {
         logger.error({

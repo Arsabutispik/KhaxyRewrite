@@ -60,7 +60,6 @@ export default async (
   let message = `<t:${Math.floor(Date.now() / 1000)}> \`[${caseNumber}]\``;
 
   dayjs.extend(relativeTime);
-  dayjs.locale(lang);
 
   // Construct the log message based on the action
   switch (action) {
@@ -79,14 +78,14 @@ export default async (
       message += t("mod_log.kick", { moderator, user, reason });
       break;
     case "MUTE":
-      message += t("mod_log.mute", { moderator, user, reason, duration: dayjs(duration).fromNow(true) });
+      message += t("mod_log.mute", { moderator, user, reason, duration: dayjs(duration).locale(lang).fromNow(true) });
       break;
     case "TIMED_BAN":
       message += t("mod_log.timed_ban", {
         moderator,
         user,
         reason,
-        duration: dayjs(duration).fromNow(true),
+        duration: dayjs(duration).locale(lang).fromNow(true),
         emoji: client.allEmojis.get(client.config.Emojis.ban)?.format,
       });
       break;
@@ -106,7 +105,12 @@ export default async (
       message += t("mod_log.ban_expired", { moderator, user, reason });
       break;
     case "TIMEOUT":
-      message += t("mod_log.timeout", { moderator, user, reason, duration: dayjs(duration).fromNow(true) });
+      message += t("mod_log.timeout", {
+        moderator,
+        user,
+        reason,
+        duration: dayjs(duration).locale(lang).fromNow(true),
+      });
       break;
     case "UNMUTE":
       message += t("mod_log.unmute", { moderator, user, reason });
