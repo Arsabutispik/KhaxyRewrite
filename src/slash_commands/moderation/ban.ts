@@ -69,10 +69,6 @@ export default {
         ),
     ),
   async execute(interaction) {
-    if (!interaction.inCachedGuild()) {
-      await interaction.reply("Guild not cached. This error should not happen.");
-      return;
-    }
     dayjs.extend(dayjsduration);
     dayjs.extend(relativeTime);
     const client = interaction.client as KhaxyClient;

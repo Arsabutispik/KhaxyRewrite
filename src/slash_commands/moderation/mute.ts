@@ -19,6 +19,7 @@ export default {
     .setDescriptionLocalizations({
       tr: "Bir kullanıcıyı susturur",
     })
+    .setContexts(0)
     .addUserOption((option) =>
       option
         .setName("user")
@@ -76,10 +77,6 @@ export default {
         }),
     ),
   async execute(interaction) {
-    if (!interaction.inCachedGuild()) {
-      await interaction.reply("Guild not cached. This error should not happen.");
-      return;
-    }
     dayjs.extend(dayjsduration);
     dayjs.extend(relativeTime);
     const client = interaction.client as KhaxyClient;

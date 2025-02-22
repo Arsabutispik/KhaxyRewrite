@@ -9,6 +9,7 @@ export default {
   async execute(interaction: Interaction) {
     // Check if the interaction is a chat input command
     if (!interaction.isChatInputCommand()) return;
+    if (!interaction.inCachedGuild()) return;
     // Check if the guild configuration exists in the database
     if (
       interaction.guildId &&

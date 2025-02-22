@@ -52,5 +52,13 @@
       "success": "{{confirm}} **{{user}}** has been muted for **{{duration}}** (Case #{{case}}) User has been notified with a DM.",
       "fail": "{{confirm}} **{{user}}** has been muted for **{{duration}}** (Case #{{case}}) User has not been notified with a DM."
     }
+  },
+  "register": {
+    "no_member": "Member not found.",
+    "no_register_channel": "Register channel not found.",
+    "wrong_channel": "You can only register in <#{{channel}}>.",
+    "no_member_role": "Member role not found.",
+    "no_male_role": "Male role not found.",
+    "success": "{{confirm}} **{{member}}** has been registered"
   }
 }

@@ -35,10 +35,10 @@ export type Infractions = {
 };
 
 export type Guilds = {
-  default_expiry: string;
-  case_id: number;
   mute_get_all_roles: boolean;
   days_to_kick: number;
+  default_expiry: string;
+  case_id: number;
   color_name_of_the_day: string;
   register_channel: string;
   member_role: string;
@@ -49,8 +49,10 @@ export type Guilds = {
   register_join_message: string;
   leave_channel: string;
   leave_message: string;
-  id: string;
   staff_role: string;
+  male_role: string;
+  id: string;
+  female_role: string;
   language: string;
   mod_log_channel: string;
   color_id_of_the_day: string;

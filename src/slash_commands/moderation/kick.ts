@@ -12,6 +12,7 @@ export default {
     .setDescriptionLocalizations({
       tr: "Sunucudan bir üyeyi atar",
     })
+    .setContexts(0)
     .addUserOption((option) =>
       option
         .setName("user")
@@ -47,10 +48,6 @@ export default {
         }),
     ),
   async execute(interaction) {
-    if (!interaction.inCachedGuild()) {
-      await interaction.reply("Guild not cached. This error should not happen.");
-      return;
-    }
     const client = interaction.client as KhaxyClient;
     const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
     const t = client.i18next.getFixedT(rows[0].language || "en", "commands", "kick");
