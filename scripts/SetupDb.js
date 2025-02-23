@@ -1,8 +1,7 @@
 import { execSync } from "child_process";
-import fs from "fs";
 import "dotenv/config.js";
 import path from "path";
-
+import process from "node:process";
 const DB_NAME = process.env.DB_NAME;
 const DB_USER = process.env.DB_USER;
 const DB_PASSWORD = process.env.DB_PASSWORD;
@@ -26,6 +25,7 @@ function runCommand(command) {
     execSync(command, { stdio: "inherit" });
   } catch (error) {
     console.error(`❌ Error running command: ${command}`);
+    console.error(error);
     process.exit(1);
   }
 }
@@ -72,7 +72,7 @@ function removeExistingContainer() {
   try {
     execSync(`docker rm -f ${CONTAINER_NAME}`, { stdio: "ignore" });
     console.log(`🗑️ Removed existing container: ${CONTAINER_NAME}`);
-  } catch (err) {
+  } catch {
     console.log("ℹ️ No existing container found.");
   }
 }
@@ -84,12 +84,13 @@ if (isDockerInstalled()) {
 
     runCommand(
       `docker run --name ${CONTAINER_NAME} \
-        -e POSTGRES_USER=${DB_USER} \
-        -e POSTGRES_PASSWORD=${DB_PASSWORD} \
-        -e POSTGRES_DB=${DB_NAME} \
-        -p ${PG_PORT}:5432 \
-        -v ${VOLUME_NAME}:/var/lib/postgresql/data \
-        -d postgres`,
+    -e POSTGRES_USER=${DB_USER} \
+    -e POSTGRES_PASSWORD=${DB_PASSWORD} \
+    -e POSTGRES_DB=${DB_NAME} \
+    -p ${PG_PORT}:5432 \
+    -v ${VOLUME_NAME}:/var/lib/postgresql/data \
+    -v ${INIT_SQL_PATH}:/docker-entrypoint-initdb.d/init.sql \
+    -d postgres`
     );
   } else {
     console.log("✅ PostgreSQL is already running in Docker.");
@@ -108,7 +109,7 @@ function waitForPostgres() {
       execSync(`docker exec ${CONTAINER_NAME} pg_isready -U ${DB_USER}`, { stdio: "ignore" });
       console.log("✅ PostgreSQL is ready!");
       return;
-    } catch (err) {
+    } catch {
       console.log("⏳ Waiting for PostgreSQL to start...");
       retries--;
       if (retries === 0) {

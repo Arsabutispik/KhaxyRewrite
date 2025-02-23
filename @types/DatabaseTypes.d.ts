@@ -7,7 +7,7 @@ export type Cronjobs = {
 };
 
 export type Punishments = {
-  previous_roles: any;
+  previous_roles: Record<string, unknown>;
   expires: string;
   created_at: string;
   staff_id: string;

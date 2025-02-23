@@ -30,7 +30,7 @@ const pgToTsMap = {
   char: 'string',
   uuid: 'string',
   json: 'any',
-  jsonb: 'any',
+  jsonb: 'Record<string, unknown>',
   date: 'string',
   timestamp: 'string',
   'timestamp without time zone': 'string',

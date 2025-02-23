@@ -1,5 +1,6 @@
 import { execSync } from "child_process";
 import "dotenv/config.js";
+import process from "node:process";
 const CONTAINER_NAME = process.env.DB_CONTAINER; // Same as in setup-db.js
 
 // Function to run shell commands
@@ -9,6 +10,7 @@ function runCommand(command) {
     execSync(command, { stdio: "inherit" });
   } catch (error) {
     console.error(`❌ Error running command: ${command}`);
+    console.error(error);
   }
 }
 

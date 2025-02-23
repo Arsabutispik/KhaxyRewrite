@@ -7,7 +7,7 @@ import logger from "../lib/Logger.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const commands: any[] = [];
+const commands: unknown[] = [];
 
 // Prevent manual execution
 if (import.meta.url === `file://${process.argv[1]}`) {
@@ -84,7 +84,7 @@ const rest = new REST().setToken(process.env.TOKEN);
       process.exit(1);
     }
 
-    //@ts-ignore
+    //@ts-expect-error - REST is unknown but due to our use case we can be sure it's going to be an array
     logger.info(`✅ Successfully deployed ${data.length} application (/) commands.`, { discord: false });
   } catch (error) {
     logger.log({

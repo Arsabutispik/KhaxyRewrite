@@ -195,9 +195,12 @@ export default {
       },
       client,
     );
-    if (result)
-      interaction.replied
-        ? await interaction.followUp({ content: result.message, flags: MessageFlagsBitField.Flags.Ephemeral })
-        : await interaction.reply({ content: result.message, flags: MessageFlagsBitField.Flags.Ephemeral });
+    if(result) {
+      if (interaction.replied) {
+        await interaction.followUp(result.message)
+      } else {
+        await interaction.reply(result.message)
+      }
+    }
   },
 } as SlashCommandBase;

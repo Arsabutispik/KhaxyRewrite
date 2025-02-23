@@ -1,6 +1,6 @@
 import "dotenv/config.js";
 const config = {
-  databaseUrl: process.env.DATABASE_URL, // Uses .env database URL
+  databaseUrl: `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@localhost:5432/${process.env.DB_NAME}`, // Uses .env database URL
   migrationsTable: "pgmigrations", // Where migration history is stored
   dir: "migrations", // Folder where migration files are stored
   schema: "public", // Target schema (default: public)

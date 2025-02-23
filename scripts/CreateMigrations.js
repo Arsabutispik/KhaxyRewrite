@@ -1,7 +1,7 @@
 import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
-
+import process from "node:process";
 const migrationName = process.argv[2];
 
 if (!migrationName) {

@@ -29,6 +29,7 @@ Sample Usage:
   </script>
 
 */
+/* eslint-disable */
 //@ts-nocheck
 const ntc = {
   init: function () {

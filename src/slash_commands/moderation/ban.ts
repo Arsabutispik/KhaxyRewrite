@@ -152,8 +152,12 @@ export default {
         },
         client,
       );
-      if (reply) {
-        interaction.replied ? await interaction.followUp(reply.message) : await interaction.reply(reply.message);
+      if(reply) {
+        if (interaction.replied) {
+          await interaction.followUp(reply.message)
+        } else {
+          await interaction.reply(reply.message)
+        }
       }
       try {
         await (interaction.client as KhaxyClient).pgClient.query(
@@ -208,8 +212,12 @@ export default {
         },
         client,
       );
-      if (reply) {
-        interaction.replied ? await interaction.followUp(reply.message) : await interaction.reply(reply.message);
+      if(reply) {
+        if (interaction.replied) {
+          await interaction.followUp(reply.message)
+        } else {
+          await interaction.reply(reply.message)
+        }
       }
     }
   },

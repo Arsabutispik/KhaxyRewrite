@@ -17,13 +17,13 @@ export interface SlashCommandBase {
   memberPermissions?: bigint[];
   clientPermissions?: bigint[];
   data?: SlashCommandBuilder;
-  execute(interaction: ChatInputCommandInteraction<"cached">): any;
+  execute(interaction: ChatInputCommandInteraction<"cached">): unknown;
 }
 
 export interface EventBase {
   name: string;
   once: boolean;
-  execute(...args: any[]): any;
+  execute(...args: unknown[]): unknown;
 }
 
 export interface GuildConfig {

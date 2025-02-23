@@ -16,7 +16,7 @@ function isDockerRunning(): boolean {
       .toString()
       .trim();
     return output === process.env.DB_CONTAINER;
-  } catch (error) {
+  } catch {
     return false;
   }
 }

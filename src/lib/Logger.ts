@@ -10,7 +10,7 @@ const logger = createLogger({
         format.colorize({ all: true }),
         format.printf(({ timestamp, level, message, metadata }) => {
           const copy = _.cloneDeep(metadata);
-          // @ts-ignore
+          // @ts-expect-error - Copy is known but ts doesn't
           delete copy.discord;
           return `[${timestamp}] ${level}: ${message}${copy && Object.keys(copy).length ? ` ${JSON.stringify(copy)}` : ""}`;
         }),
