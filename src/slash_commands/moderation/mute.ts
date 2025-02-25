@@ -20,6 +20,7 @@ export default {
       tr: "Bir kullanıcıyı susturur",
     })
     .setContexts(0)
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageRoles)
     .addUserOption((option) =>
       option
         .setName("user")
@@ -136,7 +137,7 @@ export default {
       .locale(rows[0].language || "en")
       .fromNow(true);
     try {
-      member.send(t("message.dm", { guild: interaction.guild.name, reason, duration: long_duration }));
+      await member.send(t("message.dm", { guild: interaction.guild.name, reason, duration: long_duration }));
       if (rows[0].mute_get_all_roles) {
         const filtered_roles = member.roles.cache
           .filter((role) => role.id !== interaction.guild!.id)
@@ -177,11 +178,23 @@ export default {
         }),
       });
     } catch (e) {
-      await interaction.reply({ content: t("message.fail", { user: member.user.tag, duration: long_duration }) });
-      await interaction.followUp({ content: `Error: ${e}` });
+      await interaction.reply({
+        content: t("message.fail", {
+          user: member.user.tag,
+          duration: long_duration,
+          case: rows[0].case_id,
+          confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
+        }),
+      });
+      await interaction.followUp({
+        content: t("error", { error: e.message }),
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+      });
       logger.error({
         message: `Error while muting user ${member.user.tag} from guild ${interaction.guild.name}`,
         error: e,
+        guild: interaction.guild.id,
+        user: interaction.user.id,
       });
     }
     const result = await modLog(
@@ -195,11 +208,11 @@ export default {
       },
       client,
     );
-    if(result) {
+    if (result) {
       if (interaction.replied) {
-        await interaction.followUp(result.message)
+        await interaction.followUp(result.message);
       } else {
-        await interaction.reply(result.message)
+        await interaction.reply(result.message);
       }
     }
   },

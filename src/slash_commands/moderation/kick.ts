@@ -1,5 +1,5 @@
 import { KhaxyClient, SlashCommandBase } from "../../../@types/types";
-import { PermissionsBitField, SlashCommandBuilder } from "discord.js";
+import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { Guilds } from "../../../@types/DatabaseTypes";
 import logger from "../../lib/Logger.js";
 
@@ -13,6 +13,7 @@ export default {
       tr: "Sunucudan bir üyeyi atar",
     })
     .setContexts(0)
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.KickMembers)
     .addUserOption((option) =>
       option
         .setName("user")
@@ -105,10 +106,15 @@ export default {
             confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
           }),
         );
-        logger.log({
-          level: "error",
+        await interaction.followUp({
+          content: t("error", { error: e.message }),
+          flags: MessageFlagsBitField.Flags.Ephemeral,
+        });
+        logger.error({
           message: `Error while kicking user ${member.user.tag} from guild ${interaction.guild.name}`,
           error: e,
+          guild: interaction.guild.id,
+          user: interaction.user.id,
         });
       }
     } else {
@@ -136,10 +142,11 @@ export default {
             confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
           }),
         );
-        logger.log({
-          level: "error",
+        logger.error({
           message: `Error while kicking user ${member.user.tag} from guild ${interaction.guild.name}`,
           error: e,
+          guild: interaction.guild.id,
+          user: interaction.user.id,
         });
       }
     }

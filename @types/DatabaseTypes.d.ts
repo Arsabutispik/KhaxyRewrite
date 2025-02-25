@@ -7,7 +7,9 @@ export type Cronjobs = {
 };
 
 export type Punishments = {
-  previous_roles: Record<string, unknown>;
+  /* eslint-disable */
+  previous_roles: any;
+  /* eslint-enable */
   expires: string;
   created_at: string;
   staff_id: string;
@@ -57,4 +59,3 @@ export type Guilds = {
   mod_log_channel: string;
   color_id_of_the_day: string;
 };
-

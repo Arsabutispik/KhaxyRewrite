@@ -51,6 +51,24 @@
       "dm": "**{{guild}}** sunucusunda **{{duration}}** boyunca susturuldunuz. Sebep:```{{reason}}```",
       "success": "{{confirm}} **{{user}}**, **{{duration}}** boyunca susturuldu (Vaka #{{case}}) Kullanıcıya DM ile bildirildi.",
       "fail": "{{confirm}} **{{user}}**, **{{duration}}** boyunca susturuldu (Vaka #{{case}}) Kullanıcıya DM ile bildirilmedi."
-    }
+    },
+    "error": "Kullanıcı susturulurken hata oluştu. {{error}}"
+  },
+  "register": {
+    "no_member": "Kullanıcı bulunamadı.",
+    "no_register_channel": "Kayıt kanalı bulunamadı.",
+    "wrong_channel": "Sadece <#{{channel}}> kanalında kayıt olabilirsiniz.",
+    "no_member_role": "Kayıt rolü bulunamadı.",
+    "no_male_role": "Erkek rolü bulunamadı.",
+    "success": "{{confirm}} **{{user}}**, başarıyla kayıt edildi",
+    "error": "Kullanıcı kayıt edilirken hata oluştu. {{error}}",
+    "no_female_role": "Kadın rolü bulunamadı.",
+    "not_valid": "Geçerli bir seçenek belirtmediniz. Lütfen geçerli bir seçenek belirtin."
+  },
+  "unban": {
+    "no_reason": "Sebep belirtilmedi.",
+    "no_user": "Kullanıcı bulunamadı.",
+    "success": "{{confirm}} **{{user}}** kullanıcısının yasağı kaldırıldı (Vaka #{{case}}).",
+    "error": "Kullanıcının yasağı kaldırılırken hata oluştu. {{error}}"
   }
 }

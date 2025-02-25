@@ -21,6 +21,7 @@ export default {
       tr: "Sunucudan bir kullanıcıyı yasaklar.",
     })
     .setContexts(0)
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.BanMembers)
     .addUserOption((option) =>
       option
         .setName("user")
@@ -138,6 +139,8 @@ export default {
         logger.error({
           message: `Error while banning user ${user.tag} from guild ${interaction.guild!.name}`,
           error: e,
+          guild: interaction.guild!.id,
+          user: interaction.user.id,
         });
       }
       const reply = await modLog(
@@ -152,11 +155,11 @@ export default {
         },
         client,
       );
-      if(reply) {
+      if (reply) {
         if (interaction.replied) {
-          await interaction.followUp(reply.message)
+          await interaction.followUp(reply.message);
         } else {
-          await interaction.reply(reply.message)
+          await interaction.reply(reply.message);
         }
       }
       try {
@@ -175,6 +178,8 @@ export default {
         logger.error({
           message: `Error while inserting punishment for user ${user.tag} from guild ${interaction.guild!.name}`,
           error: e,
+          guild: interaction.guild!.id,
+          user: interaction.user.id,
         });
       }
     } else {
@@ -199,6 +204,8 @@ export default {
         logger.error({
           message: `Error while banning user ${user.tag} from guild ${interaction.guild!.name}`,
           error: e,
+          guild: interaction.guild!.id,
+          user: interaction.user.id,
         });
       }
       const reply = await modLog(
@@ -212,11 +219,11 @@ export default {
         },
         client,
       );
-      if(reply) {
+      if (reply) {
         if (interaction.replied) {
-          await interaction.followUp(reply.message)
+          await interaction.followUp(reply.message);
         } else {
-          await interaction.reply(reply.message)
+          await interaction.reply(reply.message);
         }
       }
     }

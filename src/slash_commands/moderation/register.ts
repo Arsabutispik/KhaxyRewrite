@@ -1,7 +1,7 @@
 import { KhaxyClient, SlashCommandBase } from "../../../@types/types";
-import { PermissionsBitField, SlashCommandBuilder } from "discord.js";
+import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { Guilds } from "../../../@types/DatabaseTypes";
-import logger from "../../lib/Logger";
+import logger from "../../lib/Logger.js";
 
 export default {
   memberPermissions: [PermissionsBitField.Flags.ManageRoles],
@@ -16,6 +16,7 @@ export default {
       tr: "Kullanıcıyı sunucuya kayıt eder",
     })
     .setContexts(0)
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageRoles)
     .addUserOption((option) =>
       option
         .setName("user")
@@ -90,12 +91,64 @@ export default {
             t("success", { member, confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format }),
           );
         } catch (e) {
-          await interaction.reply(t("error"));
-          logger.log({
-            level: "error",
-            message: e,
+          await interaction.reply({
+            content: t("error", { error: e.message }),
+            flags: MessageFlagsBitField.Flags.Ephemeral,
+          });
+          logger.error({
+            message: `Error while registering user ${member.user.tag} from guild ${interaction.guild.name}`,
+            error: e,
+            guild: interaction.guild.id,
+            user: interaction.user.id,
           });
         }
+        break;
+      case "female":
+        if (!rows[0].female_role || !interaction.guild.roles.cache.has(rows[0].female_role)) {
+          await interaction.reply(t("no_female_role"));
+          return;
+        }
+        try {
+          await member.roles.add(rows[0].female_role);
+          await member.roles.add(rows[0].member_role);
+          await interaction.reply(
+            t("success", { member, confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format }),
+          );
+        } catch (e) {
+          await interaction.reply({
+            content: t("error", { error: e.message }),
+            flags: MessageFlagsBitField.Flags.Ephemeral,
+          });
+          logger.error({
+            message: `Error while registering user ${member.user.tag} from guild ${interaction.guild.name}`,
+            error: e,
+            guild: interaction.guild.id,
+            user: interaction.user.id,
+          });
+        }
+        break;
+      case "other":
+        try {
+          await member.roles.add(rows[0].member_role);
+          await interaction.reply(
+            t("success", { member, confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format }),
+          );
+        } catch (e) {
+          await interaction.reply({
+            content: t("error", { error: e.message }),
+            flags: MessageFlagsBitField.Flags.Ephemeral,
+          });
+          logger.error({
+            message: `Error while registering user ${member.user.tag} from guild ${interaction.guild.name}`,
+            error: e,
+            guild: interaction.guild.id,
+            user: interaction.user.id,
+          });
+        }
+        break;
+      default:
+        await interaction.reply(t("not_valid"));
+        break;
     }
   },
 } as SlashCommandBase;

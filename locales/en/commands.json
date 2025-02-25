@@ -51,7 +51,8 @@
       "dm": "You have been muted in **{{guild}}** for **{{duration}}**. Reason:```{{reason}}```",
       "success": "{{confirm}} **{{user}}** has been muted for **{{duration}}** (Case #{{case}}) User has been notified with a DM.",
       "fail": "{{confirm}} **{{user}}** has been muted for **{{duration}}** (Case #{{case}}) User has not been notified with a DM."
-    }
+    },
+    "error": "Error while muting the user. {{error}}"
   },
   "register": {
     "no_member": "Member not found.",
@@ -59,6 +60,15 @@
     "wrong_channel": "You can only register in <#{{channel}}>.",
     "no_member_role": "Member role not found.",
     "no_male_role": "Male role not found.",
-    "success": "{{confirm}} **{{member}}** has been registered"
+    "success": "{{confirm}} **{{member}}** has been registered",
+    "error": "Error while registering the user. {{error}}",
+    "no_female_role": "Female role not found.",
+    "not_valid": "The option you provided is not valid. Please provide a valid option."
+  },
+  "unban": {
+    "no_reason": "No reason provided.",
+    "no_user": "User not found.",
+    "success": "{{confirm}} **{{user}}** has been unbanned (Case #{{case}})",
+    "error": "Error while unbanning the user. {{error}}"
   }
 }
