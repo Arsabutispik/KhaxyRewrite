@@ -29,3 +29,6 @@ jobs:
 
       - name: Run ESLint
         run: pnpm eslint .
+
+      - name: Validate i18n keys
+        run: node scripts/ValidateI18nKeys.js
