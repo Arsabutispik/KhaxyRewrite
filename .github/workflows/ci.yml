@@ -17,7 +17,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '22.14.0'  # Adjust to your required Node.js version
-
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: '10.4.1'  # Specify the pnpm version you need
       - name: Install Dependencies
         run: pnpm install
 
