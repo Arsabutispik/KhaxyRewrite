@@ -41,7 +41,7 @@ export default [
       "i18n-json": i18nJson,
     },
     rules: {
-      "i18n-json/identical-keys": ["error", { filePath: "locales/en.json" }],
+      "i18n-json/identical-keys": ["error", { filePath: "locales/en/translation.json" }],
       "i18n-json/valid-message-syntax": "error",
     },
   },
