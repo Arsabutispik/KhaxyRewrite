@@ -26,7 +26,6 @@
   },
   "unregistered_people": {
     "kick_message": "You have failed to register in **{{server}}** server within **{{days}}** days. You have been kicked from the server.",
-    "initial": "Member failed to register within {{days}} days.",
-    "adding_this_for_no_reason": "Adding this for no reason."
+    "initial": "Member failed to register within {{days}} days."
   }
 }
