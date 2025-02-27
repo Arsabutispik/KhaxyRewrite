@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22.14.0'  # Adjust to your required Node.js version
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Run TypeScript type-checking
+        run: pnpm tsc --noEmit
+
+      - name: Run ESLint
+        run: pnpm eslint .
