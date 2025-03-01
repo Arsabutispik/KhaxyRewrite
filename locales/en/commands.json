@@ -1,12 +1,12 @@
 {
   "ban": {
     "expired": "Ban has been expired.",
-    "no_reason": "No reason provided.",
     "cant_ban_self": "You can't ban yourself.",
+    "cant_ban_bot": "You can't ban a bot.",
     "cant_ban_mod": "You can't ban a moderator.",
     "cant_ban_higher": "You can't ban a user with a higher role than you.",
-    "cant_ban_me": "You can't ban me.",
-    "cant_ban_bot": "You can't ban a bot.",
+    "no_reason": "No reason provided.",
+    "database_error": "Critical error while updating the database. Developers have been notified. Command has been cancelled.",
     "message": {
       "dm": {
         "duration": "You have been banned from **{{guild}}** for **{{duration}}**. Reason:```{{reason}}```",
@@ -14,7 +14,9 @@
       },
       "success": {
         "duration": "{{confirm}} **{{user}}** has been banned for **{{duration}}** (Case #{{case}}) User has been notified with a DM.",
-        "permanent": "{{confirm}} **{{user}}** has been permanently banned (Case #{{case}}). User has been notified with a DM."
+        "permanent": "{{confirm}} **{{user}}** has been permanently banned (Case #{{case}}). User has been notified with a DM.",
+        "duration_no_member": "{{confirm}} **{{user}}** has been banned for **{{duration}}** (Case #{{case}})",
+        "permanent_no_member": "{{confirm}} **{{user}}** has been permanently banned (Case #{{case}})"
       },
       "fail": {
         "duration": "{{confirm}} **{{user}}** has been banned for **{{duration}}** (Case #{{case}}) User has not been notified with a DM.",
@@ -23,9 +25,9 @@
     }
   },
   "kick": {
-    "no_reason": "No reason provided.",
+    "no_reason": "No reason provided for kicking.",
     "cant_kick_yourself": "You can't kick yourself.",
-    "no_member": "Member not found.",
+    "no_member": "Member not found in the server.",
     "cant_kick_bot": "You can't kick a bot.",
     "cant_kick_higher": "You can't kick a user with a higher role than you.",
     "cant_kick_mod": "You can't kick a moderator.",
@@ -34,7 +36,9 @@
       "dm": "You have been kicked from **{{guild}}**. Reason:```{{reason}}```",
       "success": "{{confirm}} **{{user}}** has been kicked (Case #{{case}}) User has been notified with a DM.",
       "fail": "{{confirm}} **{{user}}** has been kicked (Case #{{case}}) User has not been notified with a DM."
-    }
+    },
+    "clear_fail": "Failed to clear the messages.",
+    "fail": "Failed to kick the member."
   },
   "mute": {
     "no_reason": "No reason provided for muting.",
@@ -52,7 +56,8 @@
       "success": "{{confirm}} **{{user}}** has been muted for **{{duration}}** (Case #{{case}}) User has been notified with a DM.",
       "fail": "{{confirm}} **{{user}}** has been muted for **{{duration}}** (Case #{{case}}) User has not been notified with a DM."
     },
-    "error": "Error while muting the user. {{error}}"
+    "database_error": "Critical error while updating the database. Developers have been notified. Command has been cancelled.",
+    "role_error": "Error while removing/adding the roles. I might don't have the permission to remove/add them. Please check the role permissions. Command has been cancelled."
   },
   "register": {
     "no_member": "Member not found. Is the member still in the server?",
@@ -77,9 +82,9 @@
     "no_mute_role": "Mute role not found. Update the mute role in the settings.",
     "previous_roles_error": "Failed to add the previous roles. Here are the roles that couldn't be added:```{{roles}}```",
     "not_muted": "User is not muted. If the user is muted but the role is added, remove the role manually. Lost roles can't be added back automatically.",
-    "not_muted_no_punishments": "User is muted but no punishments were found. Removing the role. Lost roles can't be added back automatically.",
+    "muted_no_punishments": "User is muted but no punishments were found. Removing the role. Lost roles can't be added back automatically.",
     "success": "{{confirm}} **{{user}}** has been unmuted (Case #{{case}}). User has been notified with a DM.",
-    "database_error": "Critical error while updating the database. Developers have been notified. Operation has been cancelled.",
+    "database_error": "Critical error while updating the database. Developers have been notified. Command has been cancelled.",
     "role_error": "Error while removing the role. Role might be deleted or I don't have the permission to remove it.",
     "dm_error": "{{confirm}} **{{user}}** has been unmuted (Case #{{case}}). User has not been notified with a DM.",
     "dm": "You have been unmuted in **{{guild}}**."
@@ -89,9 +94,9 @@
     "self_warn": "You can't warn yourself.",
     "bot_warn": "You can't warn a bot.",
     "staff_warn": "You can't warn a staff member.",
-    "database_error": "Critical error while updating the database. Developers have been notified. Operation has been cancelled.",
+    "database_error": "Critical error while updating the database. Developers have been notified. Command has been cancelled.",
     "dm": "You have been warned in **{{guild}}**. Reason:```{{reason}}```",
     "success": "{{confirm}} **{{user}}** has been warned (Case #{{case}}). User has been notified with a DM.",
-    "dm_error": "{{confirm}} **{{user}}** has been warned (Case #{{case}}). User has not been notified with a DM.",
+    "dm_error": "{{confirm}} **{{user}}** has been warned (Case #{{case}}). User has not been notified with a DM."
   }
 }

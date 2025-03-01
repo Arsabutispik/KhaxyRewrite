@@ -1,5 +1,5 @@
 import { KhaxyClient, SlashCommandBase } from "../../../@types/types";
-import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
+import { PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { Guilds } from "../../../@types/DatabaseTypes";
 import logger from "../../lib/Logger.js";
 
@@ -82,73 +82,53 @@ export default {
     }
     if (clear) {
       try {
-        await member.send(
-          t("message.dm", {
-            confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
-            guild: interaction.guild.name,
-            reason,
-          }),
-        );
         await member.ban({ reason: `Softban- ${reason}`, deleteMessageSeconds: 604800 });
         await interaction.guild.members.unban(member, "softban");
-        await interaction.reply(
-          t("message.success", {
-            user: member.user.tag,
-            case: rows[0].case_id,
-            confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
-          }),
-        );
-      } catch (e) {
-        await interaction.reply(
-          t("message.fail", {
-            user: member.user.tag,
-            case: rows[0].case_id,
-            confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
-          }),
-        );
-        await interaction.followUp({
-          content: t("error", { error: e.message }),
-          flags: MessageFlagsBitField.Flags.Ephemeral,
-        });
+      } catch (error) {
+        await interaction.reply(t("clear_fail"));
         logger.error({
-          message: `Error while kicking user ${member.user.tag} from guild ${interaction.guild.name}`,
-          error: e,
-          guild: interaction.guild.id,
-          user: interaction.user.id,
+          message: `Error while banning user ${member.user.tag} from guild ${interaction.guild.name}`,
+          error,
+          guild: `${interaction.guild.name} (${interaction.guild.id})`,
+          user: `${interaction.user.tag} (${interaction.user.id})`,
         });
       }
     } else {
       try {
-        await member.send(
-          t("message.dm", {
-            confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
-            guild: interaction.guild.name,
-            reason,
-          }),
-        );
         await member.kick(reason);
-        await interaction.reply(
-          t("message.success", {
-            user: member.user.tag,
-            case: rows[0].case_id,
-            confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
-          }),
-        );
-      } catch (e) {
-        await interaction.reply(
-          t("message.fail", {
-            user: member.user.tag,
-            case: rows[0].case_id,
-            confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
-          }),
-        );
+      } catch (error) {
+        await interaction.reply(t("fail"));
         logger.error({
           message: `Error while kicking user ${member.user.tag} from guild ${interaction.guild.name}`,
-          error: e,
+          error,
           guild: interaction.guild.id,
           user: interaction.user.id,
         });
       }
+    }
+    try {
+      await member.send(
+        t("message.dm", {
+          confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
+          guild: interaction.guild.name,
+          reason,
+        }),
+      );
+      await interaction.reply(
+        t("message.success", {
+          user: member.user.tag,
+          case: rows[0].case_id,
+          confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
+        }),
+      );
+    } catch {
+      await interaction.reply(
+        t("message.fail", {
+          user: member.user.tag,
+          case: rows[0].case_id,
+          confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
+        }),
+      );
     }
   },
 } as SlashCommandBase;

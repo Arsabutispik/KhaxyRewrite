@@ -63,13 +63,13 @@ export default {
       "SELECT * FROM punishments WHERE guild_id = $1 AND user_id = $2 AND type = 'mute'",
       [interaction.guild.id, member.id],
     );
-    if (!punishment_rows[0]) {
-      await interaction.reply({ content: t("not_muted"), flags: MessageFlagsBitField.Flags.Ephemeral });
+    if (!punishment_rows[0] && member.roles.cache.has(rows[0].mute_role)) {
+      await interaction.reply({ content: t("muted_no_punishment"), flags: MessageFlagsBitField.Flags.Ephemeral });
+      await member.roles.remove(rows[0].mute_role);
       return;
     }
-    if (!punishment_rows[0] && member.roles.cache.has(rows[0].mute_role)) {
-      await interaction.reply({ content: t("not_muted_no_punishment"), flags: MessageFlagsBitField.Flags.Ephemeral });
-      await member.roles.remove(rows[0].mute_role);
+    if (!punishment_rows[0]) {
+      await interaction.reply({ content: t("not_muted"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
     if (rows[0].mute_get_all_roles) {

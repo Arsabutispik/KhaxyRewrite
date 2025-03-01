@@ -49,7 +49,7 @@ export default {
       return;
     }
     const t = client.i18next.getFixedT(rows[0].language, "commands", "unban");
-    const user = interaction.options.getUser("user");
+    const user = interaction.options.getUser("user", true);
     if (!user) {
       await interaction.reply({ content: t("no_user"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;

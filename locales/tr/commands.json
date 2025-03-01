@@ -1,11 +1,10 @@
 {
   "ban": {
     "expired": "Yasaklanma süresi doldu.",
-    "no_reason": "Sebep belirtilmedi.",
+    "no_reason": "Yasaklama sebebi belirtilmedi.",
     "cant_ban_self": "Kendini yasaklayamazsın.",
     "cant_ban_mod": "Moderatörü yasaklayamazsın.",
     "cant_ban_higher": "Senden daha yüksek bir role sahip kullanıcıyı yasaklayamazsın.",
-    "cant_ban_me": "Beni yasaklayamazsın.",
     "cant_ban_bot": "Botu yasaklayamazsın.",
     "message": {
       "dm": {
@@ -14,18 +13,21 @@
       },
       "success": {
         "duration": "{{confirm}} **{{user}}**, **{{duration}}** süreyle yasaklandı (Vaka #{{case}}) Kullanıcıya DM ile bildirildi.",
-        "permanent": "{{confirm}} **{{user}}**, kalıcı olarak yasaklandı (Vaka #{{case}}). Kullanıcıya DM ile bildirildi."
+        "duration_no_member": "{{confirm}} **{{user}}**, **{{duration}}** süreyle yasaklandı (Vaka #{{case}})",
+        "permanent": "{{confirm}} **{{user}}**, kalıcı olarak yasaklandı (Vaka #{{case}}). Kullanıcıya DM ile bildirildi.",
+        "permanent_no_member": "{{confirm}} **{{user}}**, kalıcı olarak yasaklandı (Vaka #{{case}})"
       },
       "fail": {
         "duration": "{{confirm}} **{{user}}**, **{{duration}}** süreyle yasaklandı (Vaka #{{case}}) Kullanıcıya DM ile bildirilmedi.",
         "permanent": "{{confirm}} **{{user}}**, kalıcı olarak yasaklandı (Vaka #{{case}}). Kullanıcıya DM ile bildirilmedi."
       }
-    }
+    },
+    "database_error": "Veritabanı güncellenirken kritik hata oluştu. Geliştiricilere bildirildi. Komut iptal edildi."
   },
   "kick": {
-    "no_reason": "Sebep belirtilmedi.",
+    "no_reason": "Atılma sebebi belirtilmedi.",
     "cant_kick_yourself": "Kendini atamazsın.",
-    "no_member": "Kullanıcı bulunamadı.",
+    "no_member": "Kullanıcı bulunamadı. Kullanıcı hala sunucuda mı?",
     "cant_kick_bot": "Botu atamazsın.",
     "cant_kick_higher": "Senden daha yüksek bir role sahip kullanıcıyı atamazsın.",
     "cant_kick_mod": "Moderatörü atamazsın.",
@@ -34,13 +36,15 @@
       "dm": "Sunucudan atıldınız. Sebep:```{{reason}}```",
       "success": "{{confirm}} **{{user}}**, atıldı (Vaka #{{case}}) Kullanıcıya DM ile bildirildi.",
       "fail": "{{confirm}} **{{user}}**, atıldı (Vaka #{{case}}) Kullanıcıya DM ile bildirilmedi."
-    }
+    },
+    "clear_fail": "Mesajlar temizlenirken hata oluştu.",
+    "fail": "Kullanıcı atılırken hata oluştu."
   },
   "mute": {
-    "no_reason": "Sebep belirtilmedi.",
-    "no_user": "Kullanıcı bulunamadı.",
-    "no_mute_role": "Susturma rolü bulunamadı.",
-    "already_muted": "Kullanıcı zaten susturulmuş.",
+    "no_reason": "Susturmanın sebebi belirtilmedi.",
+    "no_member": "Kullanıcı bulunamadı. Kullanıcı hala sunucuda mı?",
+    "no_mute_role": "Susturma rolü bulunamadı. Ayarlar kısmından susturma rolünü güncelleyin.",
+    "already_muted": "Kullanıcı zaten susturulmuş. Eğer susturma rolü yoksa ekleyiniz.",
     "already_muted_no_punishments": "Kullanıcı zaten susturulmuş ancak ceza bulunamadı. Rol kaldırılıyor.",
     "not_muted": "Kullanıcı susturulmuş ancak ceza bulunamadı. Rol ekleniyor.",
     "cant_mute_yourself": "Kendini susturamazsın.",
@@ -52,27 +56,47 @@
       "success": "{{confirm}} **{{user}}**, **{{duration}}** boyunca susturuldu (Vaka #{{case}}) Kullanıcıya DM ile bildirildi.",
       "fail": "{{confirm}} **{{user}}**, **{{duration}}** boyunca susturuldu (Vaka #{{case}}) Kullanıcıya DM ile bildirilmedi."
     },
-    "error": "Kullanıcı susturulurken hata oluştu. {{error}}"
+    "database_error": "Veritabanı güncellenirken kritik hata oluştu. Geliştiricilere bildirildi. Komut iptal edildi.",
+    "role_error": "Roller eklenirken/kaldırılırken hata oluştu. Rollerin eklenme/kaldırılma izinlerini kontrol edin. Komut iptal edildi."
   },
   "register": {
-    "no_member": "Kullanıcı bulunamadı.",
-    "no_register_channel": "Kayıt kanalı bulunamadı.",
+    "no_member": "Kullanıcı bulunamadı. Kullanıcı hala sunucuda mı?",
+    "no_register_channel": "Kayıt kanalı bulunamadı. Ayarlar kısmından kayıt kanalını güncelleyin.",
     "wrong_channel": "Sadece <#{{channel}}> kanalında kayıt olabilirsiniz.",
-    "no_member_role": "Kayıt rolü bulunamadı.",
-    "no_male_role": "Erkek rolü bulunamadı.",
+    "no_member_role": "Kayıt rolü bulunamadı. Ayarlar kısmından kayıt rolünü güncelleyin.",
+    "no_male_role": "Erkek rolü bulunamadı. Ayarlar kısmından erkek rolünü güncelleyin.",
     "success": "{{confirm}} **{{user}}**, başarıyla kayıt edildi",
     "error": "Kullanıcı kayıt edilirken hata oluştu. {{error}}",
-    "no_female_role": "Kadın rolü bulunamadı.",
+    "no_female_role": "Kadın rolü bulunamadı. Ayarlar kısmından kadın rolünü güncelleyin.",
     "not_valid": "Geçerli bir seçenek belirtmediniz. Lütfen geçerli bir seçenek belirtin."
   },
   "unban": {
-    "no_reason": "Sebep belirtilmedi.",
+    "no_reason": "Yasağın kaldırılma sebebi belirtilmedi.",
     "no_user": "Kullanıcı bulunamadı.",
     "success": "{{confirm}} **{{user}}** kullanıcısının yasağı kaldırıldı (Vaka #{{case}}).",
     "error": "Kullanıcının yasağı kaldırılırken hata oluştu. {{error}}"
   },
   "unmute": {
-    "no_member": "Kullanıcı bulunamadı.",
-    "no_reason": "Sebep belirtilmedi.",
+    "no_member": "Kullanıcı bulunamadı. Kullanıcı hala sunucuda mı?",
+    "no_reason": "Susturmanın kaldırılma sebebi belirtilmedi.",
+    "no_mute_role": "Susturma rolü bulunamadı. Ayarlar kısmından susturma rolünü güncelleyin.",
+    "not_muted": "Kullanıcı zaten susturulmamış. Eğer susturma rolü varsa kaldırınız.",
+    "muted_no_punishments": "Kullanıcı zaten susturulmuş ancak ceza bulunamadı. Rol kaldırılıyor. Kaybedilen roller geri verilemedi.",
+    "success": "{{confirm}} **{{user}}** kullanıcısının susturması kaldırıldı (Vaka #{{case}}).",
+    "database_error": "Veritabanı güncellenirken kritik hata oluştu. Geliştiricilere bildirildi. Komut iptal edildi.",
+    "role_error": "Roller eklenirken/kaldırılırken hata oluştu. Rollerin eklenme/kaldırılma izinlerini kontrol edin. Komut iptal edildi.",
+    "dm_error": "Kullanıcıya DM gönderilirken hata oluştu. Kullanıcıya DM gönderilemedi.",
+    "previous_roles_error": "Önceki roller eklenirken hata oluştu. Eklenemeyen roller:```{{roles}}```",
+    "dm": "**{{guild}}** sunucusunda susturmanız kaldırıldı."
+  },
+  "warn": {
+    "no_member": "Kullanıcı bulunamadı. Kullanıcı hala sunucuda mı?",
+    "self_warn": "Kendinizi uyaramazsınız.",
+    "bot_warn": "Botu uyaramazsınız.",
+    "staff_warn": "Yetkiliyi uyaramazsınız.",
+    "database_error": "Veritabanı güncellenirken kritik hata oluştu. Geliştiricilere bildirildi. Komut iptal edildi.",
+    "dm": "**{{guild}}** sunucusunda uyandınız. Sebep:```{{reason}}```",
+    "success": "{{confirm}} **{{user}}** kullanıcısına uyarı verildi (Vaka #{{case}}). Kullanıcı DM ile bildirildi.",
+    "dm_error": "{{confirm}} **{{user}}** kullanıcısına uyarı verildi (Vaka #{{case}}). Kullanıcıya DM gönderilemedi."
   }
 }

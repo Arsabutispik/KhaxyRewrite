@@ -136,14 +136,13 @@ export default {
     const long_duration = dayjs(dayjs().add(duration))
       .locale(rows[0].language || "en")
       .fromNow(true);
-    try {
-      await member.send(t("message.dm", { guild: interaction.guild.name, reason, duration: long_duration }));
-      if (rows[0].mute_get_all_roles) {
-        const filtered_roles = member.roles.cache
-          .filter((role) => role.id !== interaction.guild!.id)
-          .filter((role) => role.id !== interaction.guild!.roles.premiumSubscriberRole?.id)
-          .filter((role) => role.position < interaction.guild!.members.me!.roles.highest.position)
-          .map((role) => role.id);
+    if (rows[0].mute_get_all_roles) {
+      const filtered_roles = member.roles.cache
+        .filter((role) => role.id !== interaction.guild!.id)
+        .filter((role) => role.id !== interaction.guild!.roles.premiumSubscriberRole?.id)
+        .filter((role) => role.position < interaction.guild!.members.me!.roles.highest.position)
+        .map((role) => role.id);
+      try {
         await client.pgClient.query(
           "INSERT INTO punishments (user_id, guild_id, type, staff_id, expires, created_at, previous_roles) VALUES ($1, $2, 'mute', $3, $4, $5, $6)",
           [
@@ -155,8 +154,30 @@ export default {
             filtered_roles,
           ],
         );
+      } catch (error) {
+        await interaction.reply({ content: t("database_error"), flags: MessageFlagsBitField.Flags.Ephemeral });
+        logger.error({
+          message: `Error while putting punishments to database for user ${member.user.tag} from guild ${interaction.guild.name}`,
+          error,
+          guild: `${interaction.guild.name} (${interaction.guild.id})`,
+          user: `${interaction.user.tag} (${interaction.user.id})`,
+        });
+        return;
+      }
+      try {
         await member.roles.set([muteRole.id]);
-      } else {
+      } catch (error) {
+        await interaction.reply({ content: t("role_error"), flags: MessageFlagsBitField.Flags.Ephemeral });
+        logger.error({
+          message: `Error while setting roles for user ${member.user.tag} from guild ${interaction.guild.name}`,
+          error,
+          guild: `${interaction.guild.name} (${interaction.guild.id})`,
+          user: `${interaction.user.tag} (${interaction.user.id})`,
+        });
+        return;
+      }
+    } else {
+      try {
         await client.pgClient.query(
           "INSERT INTO punishments (user_id, guild_id, type, staff_id, expires, created_at) VALUES ($1, $2, 'mute', $3, $4, $5)",
           [
@@ -167,8 +188,31 @@ export default {
             new Date(),
           ],
         );
-        await member.roles.add(muteRole);
+      } catch (error) {
+        await interaction.reply({ content: t("database_error"), flags: MessageFlagsBitField.Flags.Ephemeral });
+        logger.error({
+          message: `Error while putting punishments to database for user ${member.user.tag} from guild ${interaction.guild.name}`,
+          error,
+          guild: `${interaction.guild.name} (${interaction.guild.id})`,
+          user: `${interaction.user.tag} (${interaction.user.id})`,
+        });
+        return;
       }
+      try {
+        await member.roles.add(muteRole);
+      } catch (error) {
+        await interaction.reply({ content: t("role_error"), flags: MessageFlagsBitField.Flags.Ephemeral });
+        logger.error({
+          message: `Error while setting roles for user ${member.user.tag} from guild ${interaction.guild.name}`,
+          error,
+          guild: `${interaction.guild.name} (${interaction.guild.id})`,
+          user: `${interaction.user.tag} (${interaction.user.id})`,
+        });
+        return;
+      }
+    }
+    try {
+      await member.send(t("message.dm", { guild: interaction.guild.name, reason, duration: long_duration }));
       await interaction.reply({
         content: t("message.success", {
           user: member.user.tag,
@@ -177,7 +221,7 @@ export default {
           case: rows[0].case_id,
         }),
       });
-    } catch (e) {
+    } catch {
       await interaction.reply({
         content: t("message.fail", {
           user: member.user.tag,
@@ -185,16 +229,6 @@ export default {
           case: rows[0].case_id,
           confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
         }),
-      });
-      await interaction.followUp({
-        content: t("error", { error: e.message }),
-        flags: MessageFlagsBitField.Flags.Ephemeral,
-      });
-      logger.error({
-        message: `Error while muting user ${member.user.tag} from guild ${interaction.guild.name}`,
-        error: e,
-        guild: interaction.guild.id,
-        user: interaction.user.id,
       });
     }
     const result = await modLog(
