@@ -70,5 +70,9 @@
     "no_user": "Kullanıcı bulunamadı.",
     "success": "{{confirm}} **{{user}}** kullanıcısının yasağı kaldırıldı (Vaka #{{case}}).",
     "error": "Kullanıcının yasağı kaldırılırken hata oluştu. {{error}}"
+  },
+  "unmute": {
+    "no_member": "Kullanıcı bulunamadı.",
+    "no_reason": "Sebep belirtilmedi.",
   }
 }

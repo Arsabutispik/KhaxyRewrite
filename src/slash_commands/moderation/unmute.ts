@@ -54,6 +54,10 @@ export default {
       await interaction.reply({ content: t("no_member"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
+    if (!interaction.guild.roles.cache.has(rows[0].mute_role)) {
+      await interaction.reply({ content: t("no_mute_role"), flags: MessageFlagsBitField.Flags.Ephemeral });
+      return;
+    }
     const reason = interaction.options.getString("reason") || t("no_reason");
     const { rows: punishment_rows } = await client.pgClient.query<Punishments>(
       "SELECT * FROM punishments WHERE guild_id = $1 AND user_id = $2 AND type = 'mute'",
@@ -68,28 +72,52 @@ export default {
       await member.roles.remove(rows[0].mute_role);
       return;
     }
+    if (rows[0].mute_get_all_roles) {
+      try {
+        await member.roles.set(punishment_rows[0].previous_roles);
+      } catch (error) {
+        await interaction.reply({ content: t("previous_roles_error"), flags: MessageFlagsBitField.Flags.Ephemeral });
+        logger.error({
+          message: "An error occurred while setting the previous roles of a user",
+          error,
+          guild: interaction.guild.id,
+        });
+        return;
+      }
+    }
     try {
       await client.pgClient.query("DELETE FROM punishments WHERE user_id = $1", [punishment_rows[0].user_id]);
+    } catch (error) {
+      await interaction.reply({ content: t("database_error"), flags: MessageFlagsBitField.Flags.Ephemeral });
+      logger.error({
+        message: "An error occurred while unmuting a user",
+        error,
+        guild: interaction.guild.id,
+      });
+      return;
+    }
+    try {
       await member.roles.remove(rows[0].mute_role);
-      await interaction.reply({
-        content: t("success", {
+    } catch (error) {
+      await interaction.reply({ content: t("role_error"), flags: MessageFlagsBitField.Flags.Ephemeral });
+      logger.error({
+        message: "An error occurred while removing the mute role from a user",
+        error,
+        guild: interaction.guild.id,
+      });
+      return;
+    }
+    try {
+      await member.send(t("dm", { guild: interaction.guild.name }));
+      await interaction.reply(
+        t("success", {
           user: member.user.tag,
           confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
           case: rows[0].case_id,
         }),
-        flags: MessageFlagsBitField.Flags.Ephemeral,
-      });
-    } catch (error) {
-      await interaction.reply({
-        content: t("error", { error: error.message }),
-        flags: MessageFlagsBitField.Flags.Ephemeral,
-      });
-      logger.error({
-        message: `An error occurred while unmuting a user. Error: ${error.message}`,
-        error,
-        guild: interaction.guild.id,
-        user: interaction.user.id,
-      });
+      );
+    } catch {
+      await interaction.reply(t("dm_error", { user: member.user.tag }));
     }
     const result = await modLog(
       {
