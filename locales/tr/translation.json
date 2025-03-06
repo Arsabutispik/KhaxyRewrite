@@ -27,5 +27,46 @@
   "unregistered_people": {
     "kick_message": "Verilen **{{days}}** gün içinde **{{server}}** sunucusunda kayıt olamadınız. Bu sebepten dolayı atıldınız.",
     "initial": "Üye **{{days}}** gün içinde kayıt olamadı."
+  },
+  "role_config": {
+    "initial": "Güncellemek istediğiniz ayarı seçin.",
+    "timeout": "Mesaj zaman aşımına uğradı. Lütfen komutu tekrar çalıştırın.",
+    "member": "Üye Rolünü Ayarla",
+    "member_description": "Üye kayıt olduğunda verilen rol",
+    "male": "Erkek Rolünü Ayarla",
+    "male_description": "Üye erkek olarak kayıt olduğunda verilen rol",
+    "female": "Kadın Rolünü Ayarla",
+    "female_description": "Üye kadın olarak kayıt olduğunda verilen rol",
+    "colour_of_the_day": "Günün Rengi Rolünü Ayarla",
+    "colour_of_the_day_description": "Her gün değişen bir rol.",
+    "mute": "Susturma Rolünü Ayarla",
+    "mute_description": "Üye susturulduğunda verilen rol",
+    "dj": "DJ Rolünü Ayarla",
+    "dj_description": "Müzik komutu kısıtlamalarını atlayan bir rol",
+    "role_initial": "Aşağıdaki rollerden birini seçin. Rolü kaldırmak istiyorsanız x'e basın ve başka bir yere basın",
+    "member_role": {
+      "unset": "Üye rolü kaldırıldı.",
+      "set": "Üye rolü {{role}} olarak ayarlandı."
+    },
+    "male_role": {
+      "unset": "Erkek rolü kaldırıldı.",
+      "set": "Erkek rolü {{role}} olarak ayarlandı."
+    },
+    "female_role": {
+      "unset": "Kadın rolü kaldırıldı.",
+      "set": "Kadın rolü {{role}} olarak ayarlandı."
+    },
+    "color_id_of_the_day": {
+      "unset": "Günün rengi rolü kaldırıldı.",
+      "set": "Günün rengi rolü {{role}} olarak ayarlandı."
+    },
+    "mute_role": {
+      "unset": "Susturma rolü kaldırıldı.",
+      "set": "Susturma rolü {{role}} olarak ayarlandı."
+    },
+    "dj_role": {
+      "unset": "DJ rolü kaldırıldı.",
+      "set": "DJ rolü {{role}} olarak ayarlandı."
+    }
   }
 }

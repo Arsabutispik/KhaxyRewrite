@@ -32,10 +32,7 @@ function validateKeys(baseLangFilePath, langFilePath, lang, file) {
   const missingKeys = baseKeys.filter((key) => !langKeys.includes(key));
   const extraKeys = langKeys.filter((key) => !baseKeys.includes(key));
 
-  if (missingKeys.length > 0 || extraKeys.length > 0) {
-    return { file, lang, missingKeys, extraKeys };
-  }
-  return null;
+  return { file, lang, missingKeys, extraKeys };
 }
 
 // Function to get all JSON files in a directory
@@ -48,6 +45,8 @@ const baseLangDir = path.join(localesDir, baseLang);
 const otherLangDirs = fs.readdirSync(localesDir).filter((lang) => lang !== baseLang);
 
 let allIssues = [];
+let totalMissingKeys = 0;
+let totalExtraKeys = 0;
 
 // Iterate through each language directory
 otherLangDirs.forEach((lang) => {
@@ -61,8 +60,10 @@ otherLangDirs.forEach((lang) => {
     if (fs.existsSync(baseLangFilePath)) {
       // Validate keys and collect issues
       const result = validateKeys(baseLangFilePath, langFilePath, lang, file);
-      if (result) {
+      if (result.missingKeys.length > 0 || result.extraKeys.length > 0) {
         allIssues.push(result);
+        totalMissingKeys += result.missingKeys.length;
+        totalExtraKeys += result.extraKeys.length;
       }
     } else {
       console.warn(chalk.yellow(`⚠️  Base file missing: ${baseLangFilePath}`));
@@ -87,6 +88,11 @@ if (allIssues.length > 0) {
       extraKeys.forEach((key) => console.error(`    ${chalk.yellow.bold("- " + key)}`));
     }
   });
+
+  // Summary Report
+  console.error(chalk.blue.bold(`\n📊 Summary:`));
+  console.error(chalk.red(`  ❌  Total missing keys: ${totalMissingKeys}`));
+  console.error(chalk.yellow(`  ⚠️ Total extra keys: ${totalExtraKeys}`));
 
   process.exit(1); // Fail the CI check
 } else {

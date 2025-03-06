@@ -98,5 +98,66 @@
     "dm": "**{{guild}}** sunucusunda uyandınız. Sebep:```{{reason}}```",
     "success": "{{confirm}} **{{user}}** kullanıcısına uyarı verildi (Vaka #{{case}}). Kullanıcı DM ile bildirildi.",
     "dm_error": "{{confirm}} **{{user}}** kullanıcısına uyarı verildi (Vaka #{{case}}). Kullanıcıya DM gönderilemedi."
+  },
+  "config": {
+    "select_menu": {
+      "moderation": "Moderasyon Ayarları",
+      "register": "Kayıt Ayarları",
+      "welcome_leave": "Gelen/Giden Ayarları",
+      "role": "Rol Ayarları",
+      "misc": "Diğer Ayarlar"
+    },
+    "no_setting": "Aşağıdaki menüyü kullanarak ayarlara göz atın. Her başlık dökümantasyonu görmek için tıklanabilir.",
+    "none": "Bulunamadı",
+    "times_up": "Süre doldu! Artık ayarlara bakamazsınız.",
+    "embed": {
+      "register": {
+        "title": "Kayıt Ayarları",
+        "fields": {
+          "register_join_channel": "Kayıt Gelen Kanalı",
+          "register_channel": "Kayıt Kanalı",
+          "register_join_message": "Kayıt Giriş Mesajı",
+          "register_channel_clear": "Kayıt Kanalını Temizle"
+        }
+      },
+      "welcome_leave": {
+        "title": "Gelen/Giden Ayarları",
+        "fields": {
+          "welcome_channel": "Gelen Kanalı",
+          "welcome_message": "Hoşgeldin Mesajı",
+          "leave_channel": "Giden Kanalı",
+          "leave_message": "Güle Güle Mesajı"
+        }
+      },
+      "moderation": {
+        "title": "Moderasyon Ayarları",
+        "fields": {
+          "mod_log_channel": "Moderasyon Log Kanalı",
+          "staff_role": "Yetkili Rolü",
+          "mod_mail_channel": "Mod Mail Kanalı",
+          "mute_get_all_roles": "Susturulduğunda Tüm Roller Alınsın",
+          "register_day_limit": "Kayıt Gün Limiti",
+          "default_expiry": "Varsayılan Süre"
+        }
+      },
+      "role": {
+        "title": "Rol Ayarları",
+        "fields": {
+          "color_of_the_day": "Günün Rengi",
+          "dj_role": "DJ Rolü",
+          "member_role": "Üye Rolü",
+          "male_role": "Erkek Rolü",
+          "female_role": "Kadın Rolü",
+          "mute_role": "Susturulmuş Rolü"
+        }
+      },
+      "misc": {
+        "title": "Diğer Ayarlar",
+        "fields": {
+          "language": "Dil",
+          "mod_mail_message": "Mod Mail Mesajı"
+        }
+      }
+    }
   }
 }

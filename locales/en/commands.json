@@ -108,15 +108,15 @@
       "misc": "Miscellaneous Settings"
     },
     "no_setting": "Use the menu below to go around the settings. Each title can be clicked to see the documentation.",
-    "none": "None",
+    "none": "N/A",
     "times_up": "Times up! You can't look at the settings anymore.",
     "embed": {
       "register": {
         "title": "Register Settings",
         "fields": {
-          "register_join_channel": "Register Welcome Channel",
+          "register_join_channel": "Register Join Channel",
           "register_channel": "Register Channel",
-          "register_join_message": "Register Welcome Message",
+          "register_join_message": "Register Join Message",
           "register_channel_clear": "Clear Register Channel"
         }
       },

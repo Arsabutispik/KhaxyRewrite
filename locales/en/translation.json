@@ -28,8 +28,9 @@
     "kick_message": "You have failed to register in **{{server}}** server within **{{days}}** days. You have been kicked from the server.",
     "initial": "Member failed to register within {{days}} days."
   },
-  "register_config": {
+  "role_config": {
     "initial": "Select the setting you want to update.",
+    "timeout": "Message timed out. Please run the command again.",
     "member": "Set Member Role",
     "member_description": "The role given when member registers.",
     "male": "Set Male Role",
@@ -41,6 +42,31 @@
     "mute": "Set Mute Role",
     "mute_description": "The role given when member gets muted.",
     "dj": "Set DJ Role",
-    "dj_description": "A role that bypasses the music command restrictions."
+    "dj_description": "A role that bypasses the music command restrictions.",
+    "role_initial": "Select a role below. If you want to remove the role, press x and press elsewhere",
+    "member_role": {
+      "unset": "Member role has been removed.",
+      "set": "Member role has been set to {{role}}."
+    },
+    "male_role": {
+      "unset": "Male role has been removed.",
+      "set": "Male role has been set to {{role}}."
+    },
+    "female_role": {
+      "unset": "Female role has been removed.",
+      "set": "Female role has been set to {{role}}."
+    },
+    "color_id_of_the_day": {
+      "unset": "Colour of the day role has been removed.",
+      "set": "Colour of the day role has been set to {{role}}."
+    },
+    "mute_role": {
+      "unset": "Mute role has been removed.",
+      "set": "Mute role has been set to {{role}}."
+    },
+    "dj_role": {
+      "unset": "DJ role has been removed.",
+      "set": "DJ role has been set to {{role}}."
+    }
   }
 }

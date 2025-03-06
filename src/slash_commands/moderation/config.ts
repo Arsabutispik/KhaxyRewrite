@@ -10,7 +10,7 @@ import {
   EmbedBuilder,
 } from "discord.js";
 import { Guilds } from "../../../@types/DatabaseTypes";
-import registerConfig from "../../config_functions/register-config.js";
+import roleConfig from "../../config_functions/role-config.js";
 export default {
   memberPermissions: [PermissionsBitField.Flags.Administrator],
   data: new SlashCommandBuilder()
@@ -47,7 +47,7 @@ export default {
             name: "Welcome-Leave Settings",
             value: "welcome-leave",
             name_localizations: {
-              tr: "Gelenler-Giden Ayarları",
+              tr: "Gelen-Giden Ayarları",
             },
           },
           {
@@ -109,7 +109,7 @@ export default {
         components: [actionRow],
       });
       const filter = (i: MessageComponentInteraction) => i.customId === "config" && i.user.id === interaction.user.id;
-      const collector = reply.resource?.message?.createMessageComponentCollector({
+      const collector = reply.resource!.message!.createMessageComponentCollector({
         filter,
         componentType: ComponentType.StringSelect,
         time: 1000 * 60 * 5,
@@ -301,8 +301,8 @@ export default {
       });
     }
     switch (setting) {
-      case "register":
-        await registerConfig(interaction);
+      case "role":
+        await roleConfig(interaction);
         break;
     }
   },
