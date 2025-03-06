@@ -27,5 +27,20 @@
   "unregistered_people": {
     "kick_message": "You have failed to register in **{{server}}** server within **{{days}}** days. You have been kicked from the server.",
     "initial": "Member failed to register within {{days}} days."
+  },
+  "register_config": {
+    "initial": "Select the setting you want to update.",
+    "member": "Set Member Role",
+    "member_description": "The role given when member registers.",
+    "male": "Set Male Role",
+    "male_description": "The role given when member registers as male.",
+    "female": "Set Female Role",
+    "female_description": "The role given when member registers as female.",
+    "colour_of_the_day": "Set Colour of the Day Role",
+    "colour_of_the_day_description": "A role that changes every day.",
+    "mute": "Set Mute Role",
+    "mute_description": "The role given when member gets muted.",
+    "dj": "Set DJ Role",
+    "dj_description": "A role that bypasses the music command restrictions."
   }
 }

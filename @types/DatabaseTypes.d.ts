@@ -7,15 +7,13 @@ export type Cronjobs = {
 };
 
 export type Punishments = {
-  /* eslint-disable */
-  previous_roles: any;
-  /* eslint-enable */
   expires: string;
   created_at: string;
+  user_id: string;
+  previous_roles: Array;
   staff_id: string;
   guild_id: string;
   type: string;
-  user_id: string;
 };
 
 export type Pgmigrations = {
@@ -25,23 +23,22 @@ export type Pgmigrations = {
 };
 
 export type Infractions = {
-  created_at: string;
   expires_at: string;
   case_id: number;
-  id: number;
+  created_at: string;
   reason: string;
-  type: string;
   guild_id: string;
+  type: string;
   user_id: string;
   moderator_id: string;
 };
 
 export type Guilds = {
+  case_id: number;
+  register_channel_clear: boolean;
   mute_get_all_roles: boolean;
   days_to_kick: number;
-  default_expiry: string;
-  case_id: number;
-  color_name_of_the_day: string;
+  default_expiry: {years?: number, months?: number, days?: number, hours?: number, minutes?: number, seconds?: number, milliseconds?: number};
   register_channel: string;
   member_role: string;
   mute_role: string;
@@ -53,9 +50,14 @@ export type Guilds = {
   leave_message: string;
   staff_role: string;
   male_role: string;
-  id: string;
   female_role: string;
+  mod_mail_channel: string;
+  dj_role: string;
+  id: string;
+  mod_mail_message: string;
   language: string;
   mod_log_channel: string;
   color_id_of_the_day: string;
+  color_name_of_the_day: string;
 };
+

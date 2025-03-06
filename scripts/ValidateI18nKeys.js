@@ -78,12 +78,12 @@ if (allIssues.length > 0) {
     console.error(`\n🌍 ${chalk.blue.bold(lang)} ➜ ${chalk.cyan.bold(file)}`);
 
     if (missingKeys.length > 0) {
-      console.error(chalk.red(`  ❌ Missing keys:`));
+      console.error(chalk.red(`  ❌  Missing keys (${missingKeys.length}):`));
       missingKeys.forEach((key) => console.error(`    ${chalk.red.bold("- " + key)}`));
     }
 
     if (extraKeys.length > 0) {
-      console.error(chalk.yellow(`  ⚠️ Extra keys:`));
+      console.error(chalk.yellow(`  ⚠️ Extra keys: (${extraKeys.length})`));
       extraKeys.forEach((key) => console.error(`    ${chalk.yellow.bold("- " + key)}`));
     }
   });

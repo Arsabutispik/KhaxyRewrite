@@ -21,10 +21,10 @@ const sleep = (seconds) => {
 
 function runCommand(command) {
   try {
-    console.log(`🟢 Running: ${command}`);
+    console.log(`🟢 Running...`);
     execSync(command, { stdio: "inherit" });
   } catch (error) {
-    console.error(`❌ Error running command: ${command}`);
+    console.error(`❌ Error running command.`);
     console.error(error);
     process.exit(1);
   }
@@ -90,7 +90,7 @@ if (isDockerInstalled()) {
     -p ${PG_PORT}:5432 \
     -v ${VOLUME_NAME}:/var/lib/postgresql/data \
     -v ${INIT_SQL_PATH}:/docker-entrypoint-initdb.d/init.sql \
-    -d postgres`
+    -d postgres`,
     );
   } else {
     console.log("✅ PostgreSQL is already running in Docker.");

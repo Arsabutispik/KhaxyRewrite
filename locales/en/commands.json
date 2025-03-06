@@ -98,5 +98,66 @@
     "dm": "You have been warned in **{{guild}}**. Reason:```{{reason}}```",
     "success": "{{confirm}} **{{user}}** has been warned (Case #{{case}}). User has been notified with a DM.",
     "dm_error": "{{confirm}} **{{user}}** has been warned (Case #{{case}}). User has not been notified with a DM."
+  },
+  "config": {
+    "select_menu": {
+      "moderation": "Moderation Settings",
+      "register": "Register Settings",
+      "welcome_leave": "Welcome/Leave Settings",
+      "role": "Role Settings",
+      "misc": "Miscellaneous Settings"
+    },
+    "no_setting": "Use the menu below to go around the settings. Each title can be clicked to see the documentation.",
+    "none": "None",
+    "times_up": "Times up! You can't look at the settings anymore.",
+    "embed": {
+      "register": {
+        "title": "Register Settings",
+        "fields": {
+          "register_join_channel": "Register Welcome Channel",
+          "register_channel": "Register Channel",
+          "register_join_message": "Register Welcome Message",
+          "register_channel_clear": "Clear Register Channel"
+        }
+      },
+      "welcome_leave": {
+        "title": "Welcome/Leave Settings",
+        "fields": {
+          "welcome_channel": "Welcome Channel",
+          "welcome_message": "Welcome Message",
+          "leave_channel": "Leave Channel",
+          "leave_message": "Leave Message"
+        }
+      },
+      "moderation": {
+        "title": "Moderation Settings",
+        "fields": {
+          "mod_log_channel": "Moderation Log Channel",
+          "staff_role": "Staff Role",
+          "mod_mail_channel": "Mod Mail Channel",
+          "mute_get_all_roles": "Mute Get All Roles",
+          "register_day_limit": "Register Day Limit",
+          "default_expiry": "Default Expiry"
+        }
+      },
+      "role": {
+        "title": "Role Settings",
+        "fields": {
+          "color_of_the_day": "Color of the Day",
+          "dj_role": "DJ Role",
+          "member_role": "Member Role",
+          "male_role": "Male Role",
+          "female_role": "Female Role",
+          "mute_role": "Mute Role"
+        }
+      },
+      "misc": {
+        "title": "Miscellaneous Settings",
+        "fields": {
+          "language": "Language",
+          "mod_mail_message": "Mod Mail Message"
+        }
+      }
+    }
   }
 }

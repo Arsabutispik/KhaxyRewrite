@@ -47,7 +47,9 @@ const pgToTsMap = {
   inet: "string",
   cidr: "string",
   macaddr: "string",
-  interval: "string",
+  interval:
+    "{years?: number, months?: number, days?: number, hours?: number, minutes?: number, seconds?: number, milliseconds?: number}",
+  ARRAY: "Array",
   "USER-DEFINED": "any",
 };
 
