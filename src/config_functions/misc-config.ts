@@ -65,9 +65,10 @@ export default async function miscConfig(interaction: ChatInputCommandInteractio
     });
     return;
   }
-  await message_component.deferUpdate();
+
   switch (message_component.values[0]) {
     case "language":
+      await message_component.deferUpdate();
       await languageConfig(message_component, rows[0], t);
       break;
     case "mod_mail_message":

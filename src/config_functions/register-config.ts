@@ -168,6 +168,7 @@ export async function dynamicMessage(
     .setCustomId(message)
     .setMaxLength(1500)
     .setLabel(t(`${message}.label`))
+    .setRequired(false)
     .setStyle(TextInputStyle.Paragraph);
   if (data[message]) {
     text_component.setPlaceholder(data[message]);
@@ -194,10 +195,16 @@ export async function dynamicMessage(
   }
   const client = message_component.client as KhaxyClient;
   await message_component.deferUpdate();
-  await client.pgClient.query(`UPDATE guilds SET ${message} = $1 WHERE id = $2`, [
-    message_component.fields.getTextInputValue(message),
-    message_component.guildId,
-  ]);
+  await client.pgClient.query(
+    `UPDATE guilds
+     SET ${message} = COALESCE(
+             NULLIF($1, ''),
+             (SELECT column_default FROM information_schema.columns
+              WHERE table_name = 'guilds' AND column_name = $2 LIMIT 1)
+                      )
+     WHERE id = $3`,
+    [message_component.fields.getTextInputValue(message), message, message_component.guildId],
+  );
   await message_component.editReply({
     content: t(`${message}.set`),
     components: [],
