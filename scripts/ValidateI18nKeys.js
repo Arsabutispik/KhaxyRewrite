@@ -96,5 +96,5 @@ if (allIssues.length > 0) {
 
   process.exit(1); // Fail the CI check
 } else {
-  console.log(chalk.green.bold("✅ All translation files are valid."));
+  console.log(chalk.green.bold("✅  All translation files are valid."));
 }

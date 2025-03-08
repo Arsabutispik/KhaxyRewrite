@@ -21,7 +21,7 @@
   "bump_leaderboard": {
     "initial": "This month's bump leaderboard:\n\n",
     "last_bump": "Last bump was made {{time}} by {{user}}.",
-    "last_winner":  "Last month's winner: {{user}} with `{{count}}` bump out of **{{totalBump}}** bumps.",
+    "last_winner": "Last month's winner: {{user}} with `{{count}}` bump out of **{{totalBump}}** bumps.",
     "message_not_sent_by_bot": "There are messages in the bump leaderboard channel that are not sent by the bot. Please remove them to avoid errors."
   },
   "unregistered_people": {
@@ -67,6 +67,141 @@
     "dj_role": {
       "unset": "DJ role has been removed.",
       "set": "DJ role has been set to {{role}}."
+    }
+  },
+  "register_config": {
+    "initial": "Select the setting you want to update.",
+    "timeout": "Message timed out. Please run the command again.",
+    "channel_initial": "Select a channel below. If you want to remove the channel, press x and press elsewhere",
+    "register_join_channel": {
+      "label": "Set Register Join Channel",
+      "description": "The channel is where the register message will be sent.",
+      "unset": "Register join channel has been removed.",
+      "set": "Register join channel has been set to {{channel}}."
+    },
+    "register_channel": {
+      "label": "Set Register Channel",
+      "description": "The channel where the register command will be used.",
+      "unset": "Register channel has been removed.",
+      "set": "Register channel has been set to {{channel}}."
+    },
+    "register_join_message": {
+      "label": "Set Register Message",
+      "description": "The message that will be sent when a member joins the server.",
+      "unset": "Register message has been removed.",
+      "set": "Register message has been set.",
+      "title": "Set Register Message"
+    },
+    "register_clear_channel": {
+      "label": "Set Register Clear Channel",
+      "description": "Clears the channel after user registers.",
+      "unset": "Register channel clear is disabled.",
+      "set": "Register channel clear is enabled."
+    }
+  },
+  "welcome_leave_config": {
+    "initial": "Select the setting you want to update.",
+    "timeout": "Message timed out. Please run the command again.",
+    "channel_initial": "Select a channel below. If you want to remove the channel, press x and press elsewhere",
+    "role_initial": "Select a role below. If you want to remove the role, press x and press elsewhere",
+    "join_channel": {
+      "label": "Set Welcome Channel",
+      "description": "The channel where the welcome message will be sent.",
+      "unset": "Welcome channel has been removed.",
+      "set": "Welcome channel has been set to {{channel}}."
+    },
+    "leave_channel": {
+      "label": "Set Leave Channel",
+      "description": "The channel where the leave message will be sent.",
+      "unset": "Leave channel has been removed.",
+      "set": "Leave channel has been set to {{channel}}."
+    },
+    "join_message": {
+      "label": "Set Welcome Message",
+      "description": "The message that will be sent when a member joins the server.",
+      "unset": "Welcome message has been removed.",
+      "set": "Welcome message has been set.",
+      "title": "Set Welcome Message"
+    },
+    "leave_message": {
+      "label": "Set Leave Message",
+      "description": "The message that will be sent when a member leaves the server.",
+      "unset": "Leave message has been removed.",
+      "set": "Leave message has been set.",
+      "title": "Set Leave Message"
+    }
+  },
+  "moderation_config": {
+    "initial": "Select the setting you want to update.",
+    "timeout": "Message timed out. Please run the command again.",
+    "channel_initial": "Select a channel below. If you want to remove the channel, press x and press elsewhere",
+    "mod_log_channel": {
+      "label": "Set Mod Log Channel",
+      "description": "The channel where the moderation logs will be sent.",
+      "unset": "Mod log channel has been removed.",
+      "set": "Mod log channel has been set to {{channel}}."
+    },
+    "staff_role": {
+      "initial": "Select a role below. If you want to remove the role, press x and press elsewhere",
+      "label": "Set Staff Role",
+      "description": "The role that is required to use moderation commands.",
+      "unset": "Staff role has been removed.",
+      "set": "Staff role has been set to {{role}}."
+    },
+    "mod_mail_channel": {
+      "label": "Set Mod Mail Channel",
+      "description": "The channel where the mod mail will be sent.",
+      "unset": "Mod mail channel has been removed.",
+      "set": "Mod mail channel has been set to {{channel}}."
+    },
+    "mute_get_all_roles": {
+      "label": "Mute Get All Roles",
+      "description": "Gives all roles to the muted user.",
+      "false": "Mute get all roles is disabled.",
+      "true": "Mute get all roles is enabled."
+    },
+    "register_day_limit": {
+      "label": "Set Register Day Limit",
+      "description": "The limit of days a user has to register.",
+      "label_zero": "Disable Register Day Limit",
+      "description_zero": "Disables the register day limit.",
+      "label_one": "Set Register Day Limit 1 Day",
+      "description_one": "Sets the register day limit to 1 day.",
+      "label_three": "Set Register Day Limit 3 Days",
+      "description_three": "Sets the register day limit to 3 days.",
+      "label_seven": "Set Register Day Limit 7 Days",
+      "description_seven": "Sets the register day limit to 7 days.",
+      "initial": "Select the one you want to set.",
+      "success": "Register day limit has been set to {{days}} days."
+    },
+    "default_expiry": {
+      "label": "Set Default Expiry",
+      "description": "The default expiry for the infractions.",
+      "label_zero": "Disable Default Expiry",
+      "description_zero": "Disables the default expiry.",
+      "label_seven": "Set Default Expiry 7 Days",
+      "description_seven": "Sets the default expiry to 7 days.",
+      "label_fourteen": "Set Default Expiry 14 Days",
+      "description_fourteen": "Sets the default expiry to 14 days.",
+      "label_thirty": "Set Default Expiry 30 Days",
+      "description_thirty": "Sets the default expiry to 30 days.",
+      "initial": "Select the one you want to set.",
+      "success": "Default expiry has been set to {{days}} days."
+    }
+  },
+  "misc_config": {
+    "initial": "Select the setting you want to update.",
+    "timeout": "Message timed out. Please run the command again.",
+    "language": {
+      "label": "Set Language",
+      "description": "The language the bot will use.",
+      "set": "Language has been set to {{language}}.",
+      "initial": "Select the language you want to set."
+    },
+    "mod_mail_message": {
+      "title": "Set Mod Mail Message",
+      "label": "Set Mod Mail Message",
+      "set": "Mod mail message has been set."
     }
   }
 }

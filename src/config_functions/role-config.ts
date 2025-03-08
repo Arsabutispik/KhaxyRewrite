@@ -12,9 +12,16 @@ import { KhaxyClient } from "../../@types/types";
 import { Guilds } from "../../@types/DatabaseTypes";
 import { TFunction } from "i18next";
 
-type RoleType = "member_role" | "male_role" | "female_role" | "color_id_of_the_day" | "mute_role" | "dj_role";
+type RoleType =
+  | "member_role"
+  | "male_role"
+  | "female_role"
+  | "color_id_of_the_day"
+  | "mute_role"
+  | "dj_role"
+  | "staff_role";
 
-export default async function roleConfig(interaction: ChatInputCommandInteraction) {
+export default async function roleConfig(interaction: ChatInputCommandInteraction<"cached">) {
   const client = interaction.client as KhaxyClient;
   const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guildId]);
   if (rows.length === 0) {
@@ -29,7 +36,7 @@ export default async function roleConfig(interaction: ChatInputCommandInteractio
     .setCustomId("role_config")
     .setMinValues(1)
     .setMaxValues(1)
-    .addOptions([
+    .setOptions([
       {
         label: t("member"),
         value: "member_role",
@@ -101,7 +108,7 @@ export default async function roleConfig(interaction: ChatInputCommandInteractio
   await dynamicRole(message_component.values[0] as RoleType, message_component, rows[0], t);
 }
 
-async function dynamicRole(
+export async function dynamicRole(
   role: RoleType,
   interaction: StringSelectMenuInteraction<"cached">,
   data: Guilds,
@@ -140,6 +147,17 @@ async function dynamicRole(
       components: [],
     });
   } else {
+    if (
+      message_component.values[0] !== "dj_role" &&
+      message_component.guild!.members.me!.roles.highest.position <
+        message_component.guild.roles.cache.get(message_component.values[0])!.position
+    ) {
+      await message_component.editReply({
+        content: t("role_too_high"),
+        components: [],
+      });
+      return;
+    }
     await client.pgClient.query(`UPDATE guilds SET ${role} = $1 WHERE id = $2`, [
       message_component.values[0],
       message_component.guildId,

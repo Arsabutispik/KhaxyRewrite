@@ -68,5 +68,140 @@
       "unset": "DJ rolü kaldırıldı.",
       "set": "DJ rolü {{role}} olarak ayarlandı."
     }
+  },
+  "register_config": {
+    "initial": "Güncellemek istediğiniz ayarı seçin.",
+    "timeout": "Mesaj zaman aşımına uğradı. Lütfen komutu tekrar çalıştırın.",
+    "channel_initial": "Aşağıdaki kanallardan birini seçin. Kanalı kaldırmak istiyorsanız x'e basın ve başka bir yere basın",
+    "register_join_channel": {
+      "label": "Kayıt Giriş Kanalını Ayarla",
+      "description": "Üye katıldığında kayıt mesajının gönderildiği kanal",
+      "unset": "Kayıt giriş kanalı kaldırıldı.",
+      "set": "Kayıt giriş kanalı {{channel}} olarak ayarlandı."
+    },
+    "register_channel": {
+        "label": "Kayıt Kanalını Ayarla",
+        "description": "Kayıt komutunun çalıştırıldığı kanal",
+        "unset": "Kayıt kanalı kaldırıldı.",
+        "set": "Kayıt kanalı {{channel}} olarak ayarlandı."
+    },
+    "register_join_message": {
+      "label": "Kayıt Giriş Mesajını Ayarla",
+      "description": "Üye katıldığında gönderilen mesaj",
+      "unset": "Kayıt giriş mesajı kaldırıldı.",
+      "set": "Kayıt giriş mesajı ayarlandı.",
+      "title": "Kayıt Giriş Mesajı"
+    },
+    "register_clear_channel": {
+        "label": "Kayıt Kanalını Temizle",
+        "description": "Kayıt kanalındaki mesajları temizler",
+        "unset": "Kayıt kanalı temizleme işlemi devre dışı bırakıldı.",
+        "set": "Kayıt kanalı temizleme işlemi etkinleştirildi."
+    }
+  },
+  "welcome_leave_config": {
+    "initial": "Güncellemek istediğiniz ayarı seçin.",
+    "timeout": "Mesaj zaman aşımına uğradı. Lütfen komutu tekrar çalıştırın.",
+    "channel_initial": "Aşağıdaki kanallardan birini seçin. Kanalı kaldırmak istiyorsanız x'e basın ve başka bir yere basın",
+    "role_initial": "Aşağıdaki rollerden birini seçin. Rolü kaldırmak istiyorsanız x'e basın ve başka bir yere basın",
+    "join_channel": {
+      "label": "Katılma Kanalını Ayarla",
+      "description": "Üye katıldığında gönderilen mesajın gönderildiği kanal",
+      "unset": "Katılma kanalı kaldırıldı.",
+      "set": "Katılma kanalı {{channel}} olarak ayarlandı."
+    },
+    "leave_channel": {
+      "label": "Ayrılma Kanalını Ayarla",
+      "description": "Üye ayrıldığında gönderilen mesajın gönderildiği kanal",
+      "unset": "Ayrılma kanalı kaldırıldı.",
+      "set": "Ayrılma kanalı {{channel}} olarak ayarlandı."
+    },
+    "join_message": {
+      "label": "Katılma Mesajını Ayarla",
+      "description": "Üye katıldığında gönderilen mesaj",
+      "unset": "Katılma mesajı kaldırıldı.",
+      "set": "Katılma mesajı ayarlandı.",
+      "title": "Katılma Mesajı"
+    },
+    "leave_message": {
+      "label": "Ayrılma Mesajını Ayarla",
+      "description": "Üye ayrıldığında gönderilen mesaj",
+      "unset": "Ayrılma mesajı kaldırıldı.",
+      "set": "Ayrılma mesajı ayarlandı.",
+      "title": "Ayrılma Mesajı"
+    }
+  },
+  "moderation_config": {
+    "initial": "Güncellemek istediğiniz ayarı seçin.",
+    "timeout": "Mesaj zaman aşımına uğradı. Lütfen komutu tekrar çalıştırın.",
+    "channel_initial": "Aşağıdaki kanallardan birini seçin. Kanalı kaldırmak istiyorsanız x'e basın ve başka bir yere basın",
+    "mod_log_channel": {
+      "label": "Moderasyon Log Kanalını Ayarla",
+      "description": "Moderasyon loglarının gönderildiği kanal",
+      "unset": "Moderasyon log kanalı kaldırıldı.",
+      "set": "Moderasyon log kanalı {{channel}} olarak ayarlandı."
+    },
+    "staff_role": {
+      "initial": "Aşağıdaki rollerden birini seçin. Rolü kaldırmak istiyorsanız x'e basın ve başka bir yere basın",
+      "label": "Yetkili Rolünü Ayarla",
+      "description": "Yetkililerin sahip olduğu rol",
+      "unset": "Yetkili rolü kaldırıldı.",
+      "set": "Yetkili rolü {{role}} olarak ayarlandı."
+    },
+    "mod_mail_channel": {
+      "label": "Mod Mail Kanalını Ayarla",
+      "description": "Mod mail mesajlarının gönderildiği kanal",
+      "unset": "Mod mail kanalı kaldırıldı.",
+      "set": "Mod mail kanalı {{channel}} olarak ayarlandı."
+    },
+    "mute_get_all_roles": {
+      "label": "Tüm Rolleri Al",
+      "description": "Kullanıcı susturulduğunda tüm rolleri alır ve susturma rolünü verir",
+      "false": "Tüm rolleri al işlemi devre dışı bırakıldı.",
+      "true": "Tüm rolleri al işlemi etkinleştirildi."
+    },
+    "register_day_limit": {
+      "label": "Kayıt Gün Sınırı",
+      "description": "Üye kayıt olurken belirli bir gün sınırı",
+      "label_zero": "Kayıt Gün Sınırını Kaldır",
+      "description_zero": "Kaytı gün sınırını kaldırır",
+      "label_one": "Kayıt Gün Sınırını 1 Gün Olarak Ayarla",
+      "description_one": "Kayıt gün sınırını 1 gün olarak ayarlar",
+      "label_three": "Kayıt Gün Sınırını 3 Gün Olarak Ayarla",
+      "description_three": "Kayıt gün sınırını 3 gün olarak ayarlar",
+      "label_seven": "Kayıt Gün Sınırını 7 Gün Olarak Ayarla",
+      "description_seven": "Kayıt gün sınırını 7 gün olarak ayarlar",
+      "initial": "Kayıt gün sınırını seçin",
+      "success": "Kayıt gün sınırı {{days}} olarak ayarlandı."
+    },
+    "default_expiry": {
+      "label": "Varsayılan Sona Erme Süresini Ayarla",
+      "description": "İhlallerin varsayılan sona erme süresi",
+      "label_zero": "Varsayılan Sona Erme Süresini Kaldır",
+      "description_zero": "İhlallerin varsayılan sona erme süresini kaldırır",
+      "label_seven": "Varsayılan Sona Erme Süresini 7 Gün Olarak Ayarla",
+      "description_seven": "İhlallerin varsayılan sona erme süresini 7 gün olarak ayarlar",
+      "label_fourteen": "Varsayılan Sona Erme Süresini 14 Gün Olarak Ayarla",
+      "description_fourteen": "İhlallerin varsayılan sona erme süresini 14 gün olarak ayarlar",
+      "label_thirty": "Varsayılan Sona Erme Süresini 30 Gün Olarak Ayarla",
+      "description_thirty": "İhlallerin varsayılan sona erme süresini 30 gün olarak ayarlar",
+      "initial": "Varsayılan süreyi seçin",
+      "success": "Varsayılan süre {{days}} olarak ayarlandı."
+    }
+  },
+  "misc_config": {
+    "initial": "Güncellemek istediğiniz ayarı seçin.",
+    "timeout": "Mesaj zaman aşımına uğradı. Lütfen komutu tekrar çalıştırın.",
+    "language": {
+      "label": "Dil Ayarla",
+      "description": "Botun dilini ayarlar",
+      "initial": "Ayarlamak istediğiniz dili seçin",
+      "set": "Dil ayarı {{language}} olarak ayarlandı."
+    },
+    "mod_mail_message": {
+      "label": "Mod Mail Mesajını Ayarla",
+      "set": "Mod mail mesajı ayarlandı.",
+      "title": "Mod Mail Mesajı"
+    }
   }
 }

@@ -11,6 +11,10 @@ import {
 } from "discord.js";
 import { Guilds } from "../../../@types/DatabaseTypes";
 import roleConfig from "../../config_functions/role-config.js";
+import registerConfig from "../../config_functions/register-config.js";
+import welcomeLeaveConfig from "../../config_functions/welcome-leave-config.js";
+import moderationConfig from "../../config_functions/moderation-config.js";
+import miscConfig from "../../config_functions/misc-config.js";
 export default {
   memberPermissions: [PermissionsBitField.Flags.Administrator],
   data: new SlashCommandBuilder()
@@ -303,6 +307,18 @@ export default {
     switch (setting) {
       case "role":
         await roleConfig(interaction);
+        break;
+      case "register":
+        await registerConfig(interaction);
+        break;
+      case "welcome-leave":
+        await welcomeLeaveConfig(interaction);
+        break;
+      case "moderation":
+        await moderationConfig(interaction);
+        break;
+      case "misc":
+        await miscConfig(interaction);
         break;
     }
   },
