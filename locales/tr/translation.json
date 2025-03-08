@@ -201,7 +201,8 @@
     "mod_mail_message": {
       "label": "Mod Mail Mesajını Ayarla",
       "set": "Mod mail mesajı ayarlandı.",
-      "title": "Mod Mail Mesajı"
+      "title": "Mod Mail Mesajı",
+      "description": "Mod mail alındığında botun gönderdiği mesaj"
     }
   }
 }

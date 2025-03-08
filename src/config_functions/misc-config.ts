@@ -138,9 +138,9 @@ async function languageConfig(interaction: MessageComponentInteraction, data: Gu
     message_component.values[0],
     message_component.guild.id,
   ]);
-  await client.i18next.changeLanguage(message_component.values[0]);
+  const new_t = client.i18next.getFixedT(message_component.values[0], null, "misc_config");
   await message_component.editReply({
-    content: t("language.set", { language: langs[message_component.values[0]] }),
+    content: new_t("language.set", { language: langs[message_component.values[0]] }),
     components: [],
   });
 }

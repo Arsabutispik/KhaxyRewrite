@@ -201,7 +201,8 @@
     "mod_mail_message": {
       "title": "Set Mod Mail Message",
       "label": "Set Mod Mail Message",
-      "set": "Mod mail message has been set."
+      "set": "Mod mail message has been set.",
+      "description": "The message that will be sent by the bot when a user sends a mod mail."
     }
   }
 }
