@@ -14,6 +14,7 @@ import { Guilds } from "../../@types/DatabaseTypes";
 import { dynamicChannel } from "./register-config.js";
 import { dynamicRole } from "./role-config.js";
 import { TFunction } from "i18next";
+import { toStringId } from "../utils/utils.js";
 
 export default async function moderationConfig(interaction: ChatInputCommandInteraction<"cached">) {
   const client = interaction.client as KhaxyClient;
@@ -98,11 +99,11 @@ export default async function moderationConfig(interaction: ChatInputCommandInte
   }
   switch (message_component.values[0]) {
     case "mod_log_channel":
-      await dynamicChannel("mod_log_channel", message_component, rows[0], t);
+      await dynamicChannel("mod_log_channel_id", message_component, rows[0], t);
       break;
     case "staff_role":
       await message_component.deferUpdate();
-      await dynamicRole("staff_role", message_component, rows[0], t);
+      await dynamicRole("staff_role_id", message_component, rows[0], t);
       break;
     case "mod_mail_channel":
       await modMailChannel(message_component, rows[0], t);
@@ -121,7 +122,7 @@ export default async function moderationConfig(interaction: ChatInputCommandInte
 
 async function modMailChannel(interaction: StringSelectMenuInteraction<"cached">, data: Guilds, t: TFunction) {
   const client = interaction.client as KhaxyClient;
-  if (interaction.guild.channels.cache.has(data.mod_mail_channel)) {
+  if (interaction.guild.channels.cache.has(toStringId(data.mod_mail_channel_id))) {
     await interaction.deferUpdate();
     await interaction.editReply({
       content: t("mod_mail_channel.already_set"),
@@ -139,9 +140,9 @@ async function modMailChannel(interaction: StringSelectMenuInteraction<"cached">
         allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages],
       },
     ];
-    if (interaction.guild.roles.cache.has(data.staff_role)) {
+    if (interaction.guild.roles.cache.has(toStringId(data.staff_role_id))) {
       permissions.push({
-        id: data.staff_role,
+        id: toStringId(data.staff_role_id),
         allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages],
       });
     }
@@ -155,10 +156,10 @@ async function modMailChannel(interaction: StringSelectMenuInteraction<"cached">
       type: ChannelType.GuildText,
       permissionOverwrites: permissions,
     });
-    await client.pgClient.query("UPDATE guilds SET mod_mail_channel = $1 WHERE id = $2", [
-      child.id,
-      interaction.guildId,
-    ]);
+    await client.pgClient.query(
+      "UPDATE guilds SET mod_mail_channel_id = $1, mod_mail_parent_channel_id = $2 WHERE id = $3",
+      [child.id, parent.id, interaction.guildId],
+    );
     await interaction.deferUpdate();
     await interaction.editReply({
       content: t("mod_mail_channel.set"),

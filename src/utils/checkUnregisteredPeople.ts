@@ -4,16 +4,17 @@ import modLog from "./modLog.js";
 import dayjs from "dayjs";
 import { Guilds } from "../../@types/DatabaseTypes";
 import logger from "../lib/Logger.js";
+import { toStringId } from "./utils.js";
 
 export default async (client: KhaxyClient) => {
   // Fetch guild configurations from the database
   const { rows } = await client.pgClient.query<Guilds>(
-    "SELECT id, days_to_kick, register_channel, member_role, mute_role, language from guilds",
+    "SELECT id, days_to_kick, register_channel_id, member_role_id, mute_role_id, language from guilds",
   );
 
   for (const row of rows) {
-    const { id, days_to_kick, register_channel, member_role, mute_role, language } = row;
-    const guild = client.guilds.cache.get(id);
+    const { id, days_to_kick, register_channel_id, member_role_id, mute_role_id, language } = row;
+    const guild = client.guilds.cache.get(toStringId(id));
     if (!guild) {
       logger.warn(`Guild with ID ${id} not found.`);
       continue;
@@ -32,13 +33,13 @@ export default async (client: KhaxyClient) => {
     }
 
     // Skip if register_channel is not configured or does not exist
-    if (!register_channel || !guild.channels.cache.has(register_channel)) {
+    if (!register_channel_id || !guild.channels.cache.has(toStringId(register_channel_id))) {
       logger.info(`Skipping guild ${guild.id} because register_channel is not configured or does not exist`);
       continue;
     }
 
     // Skip if member_role is not configured or does not exist
-    if (!member_role || !guild.roles.cache.has(member_role)) {
+    if (!member_role_id || !guild.roles.cache.has(toStringId(member_role_id))) {
       logger.info(`Skipping guild ${guild.id} because member_role is not configured or does not exist`);
       continue;
     }
@@ -50,8 +51,8 @@ export default async (client: KhaxyClient) => {
       // Filter members who should be kicked
       members
         .filter((member) => {
-          if (member.roles.cache.has(member_role)) return false;
-          if (mute_role && member.roles.cache.has(mute_role)) return false;
+          if (member.roles.cache.has(toStringId(member_role_id))) return false;
+          if (mute_role_id && member.roles.cache.has(toStringId(mute_role_id))) return false;
           if (member.user.bot) return false;
           if (!member.kickable) return false;
           return member.joinedTimestamp! + (days_to_kick || 0) * 86400000 < Date.now();
@@ -91,14 +92,14 @@ export default async (client: KhaxyClient) => {
 export async function specificGuildUnregisteredPeopleUpdate(client: KhaxyClient, guildId: string) {
   // Fetch guild configuration for the specific guild
   const { rows } = await client.pgClient.query<Guilds>(
-    "SELECT days_to_kick, register_channel, member_role, mute_role, language from guilds WHERE id = $1",
+    "SELECT days_to_kick, register_channel_id, member_role_id, mute_role_id, language from guilds WHERE id = $1",
     [guildId],
   );
   if (rows.length === 0) {
     logger.warn(`Guild config for ${guildId} not found.`);
     return;
   }
-  const { days_to_kick, register_channel, member_role, mute_role, language } = rows[0];
+  const { days_to_kick, register_channel_id, member_role_id, mute_role_id, language } = rows[0];
   const guild = client.guilds.cache.get(guildId);
   if (!guild) {
     logger.warn(`Guild ${guildId} not found.`);
@@ -118,13 +119,13 @@ export async function specificGuildUnregisteredPeopleUpdate(client: KhaxyClient,
   }
 
   // Skip if register_channel is not configured or does not exist
-  if (!register_channel || !guild.channels.cache.has(register_channel)) {
+  if (!register_channel_id || !guild.channels.cache.has(toStringId(register_channel_id))) {
     logger.info(`Skipping guild ${guild.id} because register_channel is not configured or does not exist`);
     return;
   }
 
   // Skip if member_role is not configured or does not exist
-  if (!member_role || !guild.roles.cache.has(member_role)) {
+  if (!member_role_id || !guild.roles.cache.has(toStringId(member_role_id))) {
     logger.info(`Skipping guild ${guild.id} because member_role is not configured or does not exist`);
     return;
   }
@@ -136,8 +137,8 @@ export async function specificGuildUnregisteredPeopleUpdate(client: KhaxyClient,
     // Filter members who should be kicked
     members
       .filter((member) => {
-        if (member.roles.cache.has(member_role)) return false;
-        if (mute_role && member.roles.cache.has(mute_role)) return false;
+        if (member.roles.cache.has(toStringId(member_role_id))) return false;
+        if (mute_role_id && member.roles.cache.has(toStringId(mute_role_id))) return false;
         if (member.user.bot) return false;
         if (!member.kickable) return false;
         return member.joinedTimestamp! + (days_to_kick || 0) * 86400000 < Date.now();

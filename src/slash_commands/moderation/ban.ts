@@ -7,6 +7,7 @@ import relativeTime from "dayjs/plugin/relativeTime.js";
 import modLog from "../../utils/modLog.js";
 import "dayjs/locale/tr.js";
 import logger from "../../lib/Logger.js";
+import { toStringId } from "../../utils/utils.js";
 
 export default {
   memberPermissions: [PermissionsBitField.Flags.BanMembers],
@@ -94,7 +95,8 @@ export default {
     const member = interaction.guild!.members.cache.get(user.id);
     if (
       member &&
-      (member.permissions.has(PermissionsBitField.Flags.BanMembers) || member.roles.cache.has(rows[0].staff_role))
+      (member.permissions.has(PermissionsBitField.Flags.BanMembers) ||
+        member.roles.cache.has(toStringId(rows[0].staff_role_id)))
     ) {
       await interaction.reply({ content: t("cant_ban_mod"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;

@@ -16,7 +16,7 @@ const pool = new pg.Pool({
 const pgToTsMap = {
   integer: "number",
   smallint: "number",
-  bigint: "number",
+  bigint: "bigint",
   numeric: "number",
   real: "number",
   double: "number",

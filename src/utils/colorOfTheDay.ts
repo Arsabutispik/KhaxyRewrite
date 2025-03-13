@@ -4,6 +4,7 @@ import ntc from "./ntc.js";
 import dayjs from "dayjs";
 import { Guilds } from "../../@types/DatabaseTypes";
 import logger from "../lib/Logger.js";
+import { toStringId } from "./utils.js";
 
 export default async (client: KhaxyClient) => {
   // Fetch guild configurations from the database
@@ -13,12 +14,12 @@ export default async (client: KhaxyClient) => {
   const rows = result.rows;
   for (const row of rows) {
     const { color_id_of_the_day, color_name_of_the_day, id } = row;
-    const guild = client.guilds.cache.get(id);
+    const guild = client.guilds.cache.get(toStringId(id));
     if (!guild) continue;
     if (!guild.members.me) continue;
     // Check if the bot has permission to manage roles
     if (!guild.members.me.permissions.has(PermissionsBitField.Flags.ManageRoles)) continue;
-    const role = guild.roles.cache.find((role) => role.id === color_id_of_the_day);
+    const role = guild.roles.cache.find((role) => role.id === toStringId(color_id_of_the_day));
     if (!role) continue;
     // Check if the bot's highest role is higher than the target role
     if (role.position >= guild.members.me.roles.highest.position) continue;
@@ -70,7 +71,7 @@ export async function specificGuildColorUpdate(client: KhaxyClient, guildId: str
     return;
   }
   const { color_id_of_the_day, color_name_of_the_day, id } = rows[0];
-  const guild = client.guilds.cache.get(id);
+  const guild = client.guilds.cache.get(toStringId(id));
   if (!guild) {
     logger.warn(`Guild ${id} not found.`);
     return;
@@ -84,7 +85,7 @@ export async function specificGuildColorUpdate(client: KhaxyClient, guildId: str
     logger.warn(`Bot doesn't have permission to manage roles in guild ${id}.`);
     return;
   }
-  const role = guild.roles.cache.find((role) => role.id === color_id_of_the_day);
+  const role = guild.roles.cache.find((role) => role.id === toStringId(color_id_of_the_day));
   if (!role) {
     logger.warn(`Role ${color_id_of_the_day} not found in guild ${id}.`);
     return;

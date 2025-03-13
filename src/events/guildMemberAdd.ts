@@ -1,7 +1,7 @@
 import { EventBase, KhaxyClient } from "../../@types/types";
 import { ChannelType, Events, GuildMember, PermissionsBitField } from "discord.js";
 import { Guilds, Punishments } from "../../@types/DatabaseTypes";
-import { replacePlaceholders } from "../utils/utils.js";
+import { replacePlaceholders, toStringId } from "../utils/utils.js";
 import logger from "../lib/Logger.js";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime.js";
@@ -24,9 +24,13 @@ export default {
     );
 
     // If punishment data exists and the mute role is present, assign the mute role to the member
-    if (punishment_rows.length > 0 && rows[0].mute_role && member.guild.roles.cache.has(rows[0].mute_role)) {
+    if (
+      punishment_rows.length > 0 &&
+      rows[0].mute_role_id &&
+      member.guild.roles.cache.has(toStringId(rows[0].mute_role_id))
+    ) {
       try {
-        await member.roles.add(rows[0].mute_role);
+        await member.roles.add(toStringId(rows[0].mute_role_id));
       } catch (error) {
         logger.log({
           level: "error",
@@ -50,8 +54,12 @@ export default {
       "{createdAgo}": dayjs(member.user.createdAt).fromNow(),
     };
     // If a welcome message and channel are configured, send the welcome message to the channel
-    if (rows[0].join_message && rows[0].join_channel && member.guild.channels.cache.has(rows[0].join_channel)) {
-      const welcome_channel = member.guild.channels.cache.get(rows[0].join_channel)!;
+    if (
+      rows[0].join_message &&
+      rows[0].join_channel_id &&
+      member.guild.channels.cache.has(toStringId(rows[0].join_channel_id))
+    ) {
+      const welcome_channel = member.guild.channels.cache.get(toStringId(rows[0].join_channel_id))!;
       if (!welcome_channel.isTextBased()) return;
       if (welcome_channel.type !== ChannelType.GuildText) return;
       if (!welcome_channel.permissionsFor(member.guild.members.me!)?.has(PermissionsBitField.Flags.SendMessages))
@@ -60,10 +68,10 @@ export default {
     }
 
     // If no register channel is configured, assign the member role if present and exit the function
-    if (!rows[0].register_channel) {
-      if (rows[0].member_role && member.guild.roles.cache.has(rows[0].member_role)) {
+    if (!rows[0].register_channel_id) {
+      if (rows[0].member_role_id && member.guild.roles.cache.has(toStringId(rows[0].member_role_id))) {
         try {
-          await member.roles.add(rows[0].member_role);
+          await member.roles.add(toStringId(rows[0].member_role_id));
         } catch (error) {
           logger.log({
             level: "error",
@@ -81,11 +89,11 @@ export default {
 
     // If a register welcome message and channel are configured, send the register welcome message to the channel
     if (
-      rows[0].register_join_channel &&
+      rows[0].register_join_channel_id &&
       rows[0].register_join_message &&
-      member.guild.channels.cache.has(rows[0].register_join_channel)
+      member.guild.channels.cache.has(toStringId(rows[0].register_join_channel_id))
     ) {
-      const register_welcome_channel = member.guild.channels.cache.get(rows[0].register_join_channel)!;
+      const register_welcome_channel = member.guild.channels.cache.get(toStringId(rows[0].register_join_channel_id))!;
       if (!register_welcome_channel.isTextBased()) return;
       if (register_welcome_channel.type !== ChannelType.GuildText) return;
       if (

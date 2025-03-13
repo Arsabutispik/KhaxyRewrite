@@ -16,6 +16,7 @@ import {
 import { KhaxyClient } from "../../@types/types";
 import { Guilds } from "../../@types/DatabaseTypes";
 import { TFunction } from "i18next";
+import { toStringId } from "../utils/utils.js";
 
 export default async function registerConfig(interaction: ChatInputCommandInteraction<"cached">) {
   const client = interaction.client as KhaxyClient;
@@ -88,10 +89,10 @@ export default async function registerConfig(interaction: ChatInputCommandIntera
   }
   switch (message_component.values[0]) {
     case "register_join_channel":
-      await dynamicChannel("register_join_channel", message_component, rows[0], t);
+      await dynamicChannel("register_join_channel_id", message_component, rows[0], t);
       break;
     case "register_channel":
-      await dynamicChannel("register_channel", message_component, rows[0], t);
+      await dynamicChannel("register_channel_id", message_component, rows[0], t);
       break;
     case "register_join_message":
       await dynamicMessage("register_join_message", message_component, rows[0], t);
@@ -102,7 +103,12 @@ export default async function registerConfig(interaction: ChatInputCommandIntera
   }
 }
 export async function dynamicChannel(
-  channel: "register_join_channel" | "register_channel" | "join_channel" | "leave_channel" | "mod_log_channel",
+  channel:
+    | "register_join_channel_id"
+    | "register_channel_id"
+    | "join_channel_id"
+    | "leave_channel_id"
+    | "mod_log_channel_id",
   interaction: StringSelectMenuInteraction<"cached">,
   data: Guilds,
   t: TFunction,
@@ -114,7 +120,7 @@ export async function dynamicChannel(
     .setMinValues(0)
     .setChannelTypes(ChannelType.GuildText);
   if (data[channel]) {
-    select_menu.setDefaultChannels(data[channel]);
+    select_menu.setDefaultChannels(toStringId(data[channel]));
   }
   const action_row = new ActionRowBuilder<ChannelSelectMenuBuilder>().setComponents(select_menu);
   const result = await interaction.editReply({

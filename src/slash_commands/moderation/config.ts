@@ -135,12 +135,12 @@ export default {
             .addFields(
               {
                 name: t("embed.register.fields.register_join_channel"),
-                value: rows[0].register_join_channel ? `<#${rows[0].register_join_channel}>` : t("none"),
+                value: rows[0].register_join_channel_id ? `<#${rows[0].register_join_channel_id}>` : t("none"),
                 inline: true,
               },
               {
                 name: t("embed.register.fields.register_channel"),
-                value: rows[0].register_channel ? `<#${rows[0].register_channel}>` : t("none"),
+                value: rows[0].register_channel_id ? `<#${rows[0].register_channel_id}>` : t("none"),
                 inline: true,
               },
               {
@@ -169,7 +169,7 @@ export default {
             .addFields(
               {
                 name: t("embed.welcome_leave.fields.welcome_channel"),
-                value: rows[0].join_channel ? `<#${rows[0].join_channel}>` : t("none"),
+                value: rows[0].join_channel_id ? `<#${rows[0].join_channel_id}>` : t("none"),
                 inline: true,
               },
               {
@@ -181,7 +181,7 @@ export default {
               },
               {
                 name: t("embed.welcome_leave.fields.leave_channel"),
-                value: rows[0].leave_channel ? `<#${rows[0].leave_channel}>` : t("none"),
+                value: rows[0].leave_channel_id ? `<#${rows[0].leave_channel_id}>` : t("none"),
                 inline: true,
               },
               {
@@ -203,17 +203,17 @@ export default {
             .addFields(
               {
                 name: t("embed.moderation.fields.mod_log_channel"),
-                value: rows[0].mod_log_channel ? `<#${rows[0].mod_log_channel}>` : t("none"),
+                value: rows[0].mod_log_channel_id ? `<#${rows[0].mod_log_channel_id}>` : t("none"),
                 inline: true,
               },
               {
                 name: t("embed.moderation.fields.staff_role"),
-                value: rows[0].staff_role ? `<@&${rows[0].staff_role}>` : t("none"),
+                value: rows[0].staff_role_id ? `<@&${rows[0].staff_role_id}>` : t("none"),
                 inline: true,
               },
               {
                 name: t("embed.moderation.fields.mod_mail_channel"),
-                value: rows[0].mod_mail_channel ? `<#${rows[0].mod_mail_channel}>` : t("none"),
+                value: rows[0].mod_mail_channel_id ? `<#${rows[0].mod_mail_channel_id}>` : t("none"),
                 inline: true,
               },
               {
@@ -246,27 +246,27 @@ export default {
               },
               {
                 name: t("embed.role.fields.dj_role"),
-                value: rows[0].dj_role ? `<@&${rows[0].dj_role}>` : t("none"),
+                value: rows[0].dj_role_id ? `<@&${rows[0].dj_role_id}>` : t("none"),
                 inline: true,
               },
               {
                 name: t("embed.role.fields.member_role"),
-                value: rows[0].member_role ? `<@&${rows[0].member_role}>` : t("none"),
+                value: rows[0].member_role_id ? `<@&${rows[0].member_role_id}>` : t("none"),
                 inline: true,
               },
               {
                 name: t("embed.role.fields.male_role"),
-                value: rows[0].male_role ? `<@&${rows[0].male_role}>` : t("none"),
+                value: rows[0].male_role_id ? `<@&${rows[0].male_role_id}>` : t("none"),
                 inline: true,
               },
               {
                 name: t("embed.role.fields.female_role"),
-                value: rows[0].female_role ? `<@&${rows[0].female_role}>` : t("none"),
+                value: rows[0].female_role_id ? `<@&${rows[0].female_role_id}>` : t("none"),
                 inline: true,
               },
               {
                 name: t("embed.role.fields.mute_role"),
-                value: rows[0].mute_role ? `<@&${rows[0].mute_role}>` : t("none"),
+                value: rows[0].mute_role_id ? `<@&${rows[0].mute_role_id}>` : t("none"),
                 inline: true,
               },
             );

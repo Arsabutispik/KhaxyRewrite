@@ -31,5 +31,7 @@ function missingPermissionsAsString(client: KhaxyClient, missing: string[], lang
   const t = client.i18next.getFixedT(language);
   return missing.map((perm) => t(`permissions:${perm}`)).join(", ");
 }
-
-export { sleep, missingPermissionsAsString, replacePlaceholders };
+function toStringId(id: bigint | string): string {
+  return id.toString();
+}
+export { sleep, missingPermissionsAsString, replacePlaceholders, toStringId };

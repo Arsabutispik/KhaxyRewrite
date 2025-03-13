@@ -2,6 +2,7 @@ import { KhaxyClient, SlashCommandBase } from "../../../@types/types";
 import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { Guilds } from "../../../@types/DatabaseTypes";
 import logger from "../../lib/Logger.js";
+import { toStringId } from "../../utils/utils.js";
 
 export default {
   memberPermissions: [PermissionsBitField.Flags.ManageRoles],
@@ -65,8 +66,8 @@ export default {
       return;
     }
     const gender = interaction.options.getString("gender", true);
-    const registerChannel = interaction.guild.channels.cache.get(rows[0].register_channel);
-    if (!rows[0].register_channel || !registerChannel) {
+    const registerChannel = interaction.guild.channels.cache.get(toStringId(rows[0].register_channel_id));
+    if (!rows[0].register_channel_id || !registerChannel) {
       await interaction.reply(t("no_register_channel"));
       return;
     }
@@ -74,19 +75,19 @@ export default {
       await interaction.reply(t("wrong_channel", { channel: registerChannel.id }));
       return;
     }
-    if (!rows[0].member_role || !interaction.guild.roles.cache.has(rows[0].member_role)) {
+    if (!rows[0].member_role_id || !interaction.guild.roles.cache.has(toStringId(rows[0].member_role_id))) {
       await interaction.reply(t("no_member_role"));
       return;
     }
     switch (gender) {
       case "male":
-        if (!rows[0].male_role || !interaction.guild.roles.cache.has(rows[0].male_role)) {
+        if (!rows[0].male_role_id || !interaction.guild.roles.cache.has(toStringId(rows[0].male_role_id))) {
           await interaction.reply(t("no_male_role"));
           return;
         }
         try {
-          await member.roles.add(rows[0].male_role);
-          await member.roles.add(rows[0].member_role);
+          await member.roles.add(toStringId(rows[0].male_role_id));
+          await member.roles.add(toStringId(rows[0].member_role_id));
           await interaction.reply(
             t("success", { member, confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format }),
           );
@@ -104,13 +105,13 @@ export default {
         }
         break;
       case "female":
-        if (!rows[0].female_role || !interaction.guild.roles.cache.has(rows[0].female_role)) {
+        if (!rows[0].female_role_id || !interaction.guild.roles.cache.has(toStringId(rows[0].female_role_id))) {
           await interaction.reply(t("no_female_role"));
           return;
         }
         try {
-          await member.roles.add(rows[0].female_role);
-          await member.roles.add(rows[0].member_role);
+          await member.roles.add(toStringId(rows[0].female_role_id));
+          await member.roles.add(toStringId(rows[0].member_role_id));
           await interaction.reply(
             t("success", { member, confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format }),
           );
@@ -129,7 +130,7 @@ export default {
         break;
       case "other":
         try {
-          await member.roles.add(rows[0].member_role);
+          await member.roles.add(toStringId(rows[0].member_role_id));
           await interaction.reply(
             t("success", { member, confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format }),
           );

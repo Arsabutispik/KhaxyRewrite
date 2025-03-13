@@ -3,6 +3,7 @@ import { specificGuildColorUpdate } from "./colorOfTheDay.js";
 import logger from "../lib/Logger.js";
 import { specificGuildUnregisteredPeopleUpdate } from "./checkUnregisteredPeople.js";
 import { Cronjobs } from "../../@types/DatabaseTypes";
+import { toStringId } from "./utils.js";
 
 export default async (client: KhaxyClient) => {
   // Fetch all cron jobs from the database
@@ -17,7 +18,7 @@ export default async (client: KhaxyClient) => {
         discord: false,
       });
       // Recover the missed color cron job
-      await specificGuildColorUpdate(client, cronjob.id);
+      await specificGuildColorUpdate(client, toStringId(cronjob.id));
     }
     if (new Date(cronjob.unregistered_people_time ?? new Date()).getTime() < Date.now()) {
       logger.log({
@@ -26,7 +27,7 @@ export default async (client: KhaxyClient) => {
         discord: false,
       });
       // Recover the missed unregistered people cron job
-      await specificGuildUnregisteredPeopleUpdate(client, cronjob.id);
+      await specificGuildUnregisteredPeopleUpdate(client, toStringId(cronjob.id));
     }
   }
 };

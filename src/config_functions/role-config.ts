@@ -11,15 +11,16 @@ import {
 import { KhaxyClient } from "../../@types/types";
 import { Guilds } from "../../@types/DatabaseTypes";
 import { TFunction } from "i18next";
+import { toStringId } from "../utils/utils.js";
 
 type RoleType =
-  | "member_role"
-  | "male_role"
-  | "female_role"
+  | "member_role_id"
+  | "male_role_id"
+  | "female_role_id"
   | "color_id_of_the_day"
-  | "mute_role"
-  | "dj_role"
-  | "staff_role";
+  | "mute_role_id"
+  | "dj_role_id"
+  | "staff_role_id";
 
 export default async function roleConfig(interaction: ChatInputCommandInteraction<"cached">) {
   const client = interaction.client as KhaxyClient;
@@ -116,7 +117,7 @@ export async function dynamicRole(
 ) {
   const select_menu = new RoleSelectMenuBuilder().setCustomId(role).setMaxValues(1).setMinValues(0);
   if (data[role]) {
-    select_menu.setDefaultRoles(data[role]);
+    select_menu.setDefaultRoles(toStringId(data[role]));
   }
   const action_row = new ActionRowBuilder<RoleSelectMenuBuilder>().setComponents(select_menu);
   const result = await interaction.editReply({

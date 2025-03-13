@@ -3,6 +3,7 @@ import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "
 import { Guilds, Punishments } from "../../../@types/DatabaseTypes";
 import logger from "../../lib/Logger.js";
 import modLog from "../../utils/modLog.js";
+import { toStringId } from "../../utils/utils.js";
 
 export default {
   memberPermissions: [PermissionsBitField.Flags.ManageRoles],
@@ -54,7 +55,7 @@ export default {
       await interaction.reply({ content: t("no_member"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
-    if (!interaction.guild.roles.cache.has(rows[0].mute_role)) {
+    if (!interaction.guild.roles.cache.has(toStringId(rows[0].mute_role_id))) {
       await interaction.reply({ content: t("no_mute_role"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
@@ -63,9 +64,9 @@ export default {
       "SELECT * FROM punishments WHERE guild_id = $1 AND user_id = $2 AND type = 'mute'",
       [interaction.guild.id, member.id],
     );
-    if (!punishment_rows[0] && member.roles.cache.has(rows[0].mute_role)) {
+    if (!punishment_rows[0] && member.roles.cache.has(toStringId(rows[0].mute_role_id))) {
       await interaction.reply({ content: t("muted_no_punishment"), flags: MessageFlagsBitField.Flags.Ephemeral });
-      await member.roles.remove(rows[0].mute_role);
+      await member.roles.remove(toStringId(rows[0].mute_role_id));
       return;
     }
     if (!punishment_rows[0]) {
@@ -97,7 +98,7 @@ export default {
       return;
     }
     try {
-      await member.roles.remove(rows[0].mute_role);
+      await member.roles.remove(toStringId(rows[0].mute_role_id));
     } catch (error) {
       await interaction.reply({ content: t("role_error"), flags: MessageFlagsBitField.Flags.Ephemeral });
       logger.error({

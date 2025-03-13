@@ -2,6 +2,7 @@ import { KhaxyClient, SlashCommandBase } from "../../../@types/types";
 import { PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { Guilds } from "../../../@types/DatabaseTypes";
 import logger from "../../lib/Logger.js";
+import { toStringId } from "../../utils/utils.js";
 
 export default {
   memberPermissions: [PermissionsBitField.Flags.KickMembers],
@@ -72,7 +73,10 @@ export default {
       await interaction.reply(t("cant_kick_higher"));
       return;
     }
-    if (member.permissions.has(PermissionsBitField.Flags.KickMembers) || member.roles.cache.has(rows[0].staff_role)) {
+    if (
+      member.permissions.has(PermissionsBitField.Flags.KickMembers) ||
+      member.roles.cache.has(toStringId(rows[0].staff_role_id))
+    ) {
       await interaction.reply(t("cant_kick_mod"));
       return;
     }

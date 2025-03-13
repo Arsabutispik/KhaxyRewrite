@@ -7,6 +7,7 @@ import relativeTime from "dayjs/plugin/relativeTime.js";
 import logger from "../../lib/Logger.js";
 import "dayjs/locale/tr.js";
 import modLog from "../../utils/modLog.js";
+import { toStringId } from "../../utils/utils.js";
 export default {
   memberPermissions: [PermissionsBitField.Flags.ManageRoles],
   clientPermissions: [PermissionsBitField.Flags.ManageRoles],
@@ -100,7 +101,10 @@ export default {
       await interaction.reply({ content: t("cant_mute_yourself"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
-    if (member.permissions.has(PermissionsBitField.Flags.ManageRoles) || member.roles.cache.has(rows[0].staff_role)) {
+    if (
+      member.permissions.has(PermissionsBitField.Flags.ManageRoles) ||
+      member.roles.cache.has(toStringId(rows[0].staff_role_id))
+    ) {
       await interaction.reply({ content: t("cant_mute_mod"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
@@ -108,7 +112,7 @@ export default {
       await interaction.reply({ content: t("cant_mute_higher"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
-    const muteRole = interaction.guild.roles.cache.get(rows[0].mute_role);
+    const muteRole = interaction.guild.roles.cache.get(toStringId(rows[0].mute_role_id));
     if (!muteRole) {
       await interaction.reply({ content: t("no_mute_role"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;

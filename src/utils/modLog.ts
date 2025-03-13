@@ -33,9 +33,10 @@ export default async (
 ) => {
   const { guild, user, action, moderator, reason, duration, caseID } = data;
   // Fetch guild configuration from the database
-  const { rows } = (await client.pgClient.query("SELECT language, mod_log_channel, case_id FROM guilds WHERE id = $1", [
-    guild.id,
-  ])) as { rows: GuildConfig[] };
+  const { rows } = (await client.pgClient.query(
+    "SELECT language, mod_log_channel_id, case_id FROM guilds WHERE id = $1",
+    [guild.id],
+  )) as { rows: GuildConfig[] };
   const lang = rows[0].language || "en";
   const t = client.i18next.getFixedT(lang);
 
@@ -129,7 +130,7 @@ export default async (
       `Modlog channel for ${guild.name} (${guild.id}) not found. Deleting the modlog channel id from the database...`,
     );
     try {
-      await client.pgClient.query("UPDATE guilds SET mod_log_channel = NULL WHERE id = $1", [guild.id]);
+      await client.pgClient.query("UPDATE guilds SET mod_log_channel_id = NULL WHERE id = $1", [guild.id]);
       logger.info(`Modlog channel id for ${guild.id} deleted successfully.`);
     } catch (error) {
       logger.error(error);

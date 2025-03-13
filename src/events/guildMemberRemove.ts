@@ -1,6 +1,6 @@
 import { EventBase, KhaxyClient } from "../../@types/types";
 import { AuditLogEvent, Events, GuildMember, PermissionsBitField } from "discord.js";
-import { replacePlaceholders } from "../utils/utils.js";
+import { replacePlaceholders, toStringId } from "../utils/utils.js";
 import dayjs from "dayjs";
 import { Guilds } from "../../@types/DatabaseTypes";
 import modLog from "../utils/modLog.js";
@@ -28,15 +28,19 @@ export default {
     if (rows.length === 0) return;
 
     // If a goodbye message and channel are configured, send the goodbye message to the channel
-    if (rows[0].leave_message && rows[0].leave_channel && member.guild.channels.cache.has(rows[0].leave_channel)) {
-      const goodbye_channel = member.guild.channels.cache.get(rows[0].leave_channel)!;
+    if (
+      rows[0].leave_message &&
+      rows[0].leave_channel_id &&
+      member.guild.channels.cache.has(toStringId(rows[0].leave_channel_id))
+    ) {
+      const goodbye_channel = member.guild.channels.cache.get(toStringId(rows[0].leave_channel_id))!;
       if (!goodbye_channel.isTextBased()) return;
       if (!goodbye_channel.permissionsFor(member.guild.members.me!)?.has(PermissionsBitField.Flags.SendMessages))
         return;
       goodbye_channel.send(replacePlaceholders(rows[0].leave_message, replacements));
     }
 
-    if (rows[0].mod_log_channel && member.guild.channels.cache.has(rows[0].mod_log_channel)) {
+    if (rows[0].mod_log_channel_id && member.guild.channels.cache.has(toStringId(rows[0].mod_log_channel_id))) {
       if (!member.guild.members.me?.permissions.has("ViewAuditLog")) return;
       const auditLogs = await member.guild.fetchAuditLogs({ type: AuditLogEvent.MemberKick, limit: 1 });
       const log = auditLogs.entries.first();

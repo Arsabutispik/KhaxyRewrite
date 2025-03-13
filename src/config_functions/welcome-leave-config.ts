@@ -81,13 +81,13 @@ export default async function welcomeLeaveConfig(interaction: ChatInputCommandIn
   }
   switch (message_component.values[0]) {
     case "join_channel":
-      await dynamicChannel("join_channel", message_component, rows[0], t);
+      await dynamicChannel("join_channel_id", message_component, rows[0], t);
       break;
     case "join_message":
       await dynamicMessage("join_message", message_component, rows[0], t);
       break;
     case "leave_channel":
-      await dynamicChannel("leave_channel", message_component, rows[0], t);
+      await dynamicChannel("leave_channel_id", message_component, rows[0], t);
       break;
     case "leave_message":
       await dynamicMessage("leave_message", message_component, rows[0], t);

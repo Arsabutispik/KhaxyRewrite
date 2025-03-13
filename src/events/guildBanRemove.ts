@@ -3,6 +3,7 @@ import { AuditLogEvent, Events, GuildBan, PermissionsBitField } from "discord.js
 import modLog from "../utils/modLog.js";
 import { Guilds } from "../../@types/DatabaseTypes";
 import logger from "../lib/Logger.js";
+import { toStringId } from "../utils/utils.js";
 
 export default {
   name: Events.GuildBanRemove,
@@ -17,7 +18,7 @@ export default {
     if (rows.length === 0) return;
 
     // If mod log channel is configured but does not exist, exit the function
-    if (rows[0].mod_log_channel && !ban.guild.channels.cache.has(rows[0].mod_log_channel)) return;
+    if (rows[0].mod_log_channel_id && !ban.guild.channels.cache.has(toStringId(rows[0].mod_log_channel_id))) return;
 
     // If the bot does not have permission to view audit logs, log the unban without audit log details
     if (!ban.guild.members.me?.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
