@@ -159,5 +159,14 @@
         }
       }
     }
+  },
+  "close": {
+    "no_thread": "This is not a mod mail thread.",
+    "no_time": "A time unit has not been provided.",
+    "no_duration": "A duration has not been provided.",
+    "error": "Error while closing the thread.",
+    "close_duration": "Thread will be closed in **{{duration}}**.",
+    "close": "Thread is being closed...",
+    "thread_closed_dm": "Your thread in {{guild}} has been closed."
   }
 }

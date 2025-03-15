@@ -1,5 +1,5 @@
 //TODO: Handle emojis
-import { Client, Collection, EmbedBuilder, IntentsBitField, PermissionsBitField } from "discord.js";
+import { Client, Collection, EmbedBuilder, IntentsBitField, Partials, PermissionsBitField } from "discord.js";
 import { KhaxyClient } from "../@types/types";
 import "dotenv/config.js";
 import path from "path";
@@ -13,6 +13,10 @@ import logger from "./lib/Logger.js";
 import { Player } from "discord-player";
 import { DefaultExtractors } from "@discord-player/extractor";
 import process from "node:process";
+import { CronJob } from "cron";
+import checkPunishments from "./utils/checkPunishments.js";
+import listenForNotifications from "./utils/listenForNotifications.js";
+import recoverMissedCronjob from "./utils/recoverMissedCronjob.js";
 
 const { Client: PgClient } = pg;
 const __filename = fileURLToPath(import.meta.url);
@@ -26,7 +30,10 @@ const client = new Client({
     IntentsBitField.Flags.GuildModeration,
     IntentsBitField.Flags.GuildVoiceStates,
     IntentsBitField.Flags.DirectMessages,
+    IntentsBitField.Flags.MessageContent,
+    IntentsBitField.Flags.DirectMessages,
   ],
+  partials: [Partials.Channel],
 }) as KhaxyClient;
 const player = new Player(client);
 await player.extractors.loadMulti(DefaultExtractors);
@@ -136,3 +143,34 @@ player.events.on("emptyChannel", async (queue) => {
 });
 
 await client.login(process.env.TOKEN);
+CronJob.from({
+  cronTime: "0 0 0 * * *",
+  onTick: () => checkPunishments(client),
+  start: true,
+  timeZone: "UTC",
+});
+await listenForNotifications(client);
+async function closeExpiredThreads() {
+  try {
+    await pgClient.query(
+      `UPDATE mod_mail_threads 
+       SET status = 'closed', closed_at = NOW()
+       WHERE close_date <= NOW() AND status != 'closed';`,
+    );
+  } catch (error) {
+    console.error("Error closing expired threads:", error);
+  }
+}
+
+// Run every minute
+CronJob.from({
+  cronTime: "* * * * *",
+  onTick: async () => await closeExpiredThreads(),
+  start: true,
+});
+CronJob.from({
+  cronTime: "* * * * *",
+  onTick: async () => await recoverMissedCronjob(client),
+  start: true,
+  timeZone: "UTC",
+});

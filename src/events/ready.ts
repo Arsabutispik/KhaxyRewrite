@@ -4,8 +4,6 @@ import { loadEmojis } from "../lib/PlayerConfig.js";
 import { CronJob } from "cron";
 import colorOfTheDay from "../utils/colorOfTheDay.js";
 import logger from "../lib/Logger.js";
-import checkPunishments from "../utils/checkPunishments.js";
-import recoverMissedCronjob from "../utils/recoverMissedCronjob.js";
 
 export default {
   name: Events.ClientReady,
@@ -57,22 +55,6 @@ export default {
       start: true,
       timeZone: "UTC",
     });
-    CronJob.from({
-      cronTime: "0 0 0 * * *",
-      onTick: () => checkPunishments(client),
-      onComplete: () => {
-        logger.log({
-          level: "info",
-          message: "Check punishments cronjob has been completed.",
-          discord: false,
-        });
-      },
-      start: true,
-      timeZone: "UTC",
-    });
-    await checkPunishments(client);
-    await recoverMissedCronjob(client);
-
     const messages: { message: string; type: ActivityType.Custom | undefined }[] = [
       {
         message: `Use /invite to add me!`,

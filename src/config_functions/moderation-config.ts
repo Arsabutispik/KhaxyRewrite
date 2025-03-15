@@ -122,7 +122,7 @@ export default async function moderationConfig(interaction: ChatInputCommandInte
 
 async function modMailChannel(interaction: StringSelectMenuInteraction<"cached">, data: Guilds, t: TFunction) {
   const client = interaction.client as KhaxyClient;
-  if (interaction.guild.channels.cache.has(toStringId(data.mod_mail_channel_id))) {
+  if (data.mod_mail_channel_id && interaction.guild.channels.cache.has(toStringId(data.mod_mail_channel_id))) {
     await interaction.deferUpdate();
     await interaction.editReply({
       content: t("mod_mail_channel.already_set"),
