@@ -34,5 +34,24 @@
   },
   "guildMemberRemove": {
     "noReason": "Sebep belirtilmedi."
+  },
+  "messageCreate": {
+    "mod_mail": {
+      "initial": "`Hesap Yaşı:` **{{account_age}}**, `ID:` **{{user.id}}**\n`Kullanıcı Adı:` **{{user.username}}** (<@{{user.id}}>), `Katılma Tarihi:` **{{join_date}}**\n**»»----------------------------¤----------------------------««**",
+      "not_member": "Sunucunun bir üyesi değilsiniz.",
+      "confirm": "Evet",
+      "cancel": "Hayır",
+      "confirm_title": "Mod Mail Onaylama Düğmesi",
+      "confirm_description": "{{guild}} için mod mail konuşmasını onaylamak için aşağıdaki düğmeye tıklayın veya konuşmayı iptal etmek için iptal düğmesine tıklayın.",
+      "cancelled_title": "Mod Mail Konuşması İptal Edildi",
+      "cancelled_description": "{{guild}} için mod mail konuşması iptal edildi.",
+      "confirmed_title": "Mod Mail Konuşması Onaylandı",
+      "confirmed_description": "{{guild}} için mod mail konuşması onaylandı ve konuşma başladı.",
+      "parent_channel_missing": "Üst kanal eksik. Modlar mod mail'in çalışması için üst kanalı ayarlamalıdır.",
+      "channel_missing": "Kanal eksik. Modlar mod mail'in çalışması için kanalı ayarlamalıdır.",
+      "topic": "{{user}} ile Mod Mail konuşması",
+      "error_sending": "Mesaj göndermeye çalışırken bir hata oluştu.",
+      "error_inserting": "Mesajı veritabanına eklemeye çalışırken bir hata oluştu."
+    }
   }
 }

@@ -205,9 +205,6 @@
       "description": "The message that will be sent by the bot when a user sends a mod mail."
     }
   },
-  "mod_mail": {
-    "initial": "`Account Age:` **{{account_age}}**, `ID:` **{{user.id}}**\\n`Username:` **{{user.username}}** ({{user.toString()}}), `Join Date:` **{{join_date}}**\\n**»»----------------------------¤----------------------------««**"
-  },
   "listen_for_notifications": {
     "preparing_close": "Thread is being closed...",
     "thread_closed_dm": "Your thread in {{guild}} has been closed."

@@ -32,6 +32,8 @@ const client = new Client({
     IntentsBitField.Flags.DirectMessages,
     IntentsBitField.Flags.MessageContent,
     IntentsBitField.Flags.DirectMessages,
+    IntentsBitField.Flags.DirectMessageTyping,
+    IntentsBitField.Flags.GuildMessageTyping,
   ],
   partials: [Partials.Channel],
 }) as KhaxyClient;
@@ -167,6 +169,7 @@ CronJob.from({
   cronTime: "* * * * *",
   onTick: async () => await closeExpiredThreads(),
   start: true,
+  timeZone: "UTC",
 });
 CronJob.from({
   cronTime: "* * * * *",

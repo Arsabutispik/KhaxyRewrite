@@ -84,9 +84,10 @@ export default {
       }
       await interaction.reply(t("close_duration", { duration: long_duration }));
     } else {
-      await client.pgClient.query("UPDATE mod_mail_threads SET status = 'closed' WHERE channel_id = $1", [
-        interaction.channel!.id,
-      ]);
+      await client.pgClient.query(
+        "UPDATE mod_mail_threads SET status = 'closed' WHERE channel_id = $1 AND status <> 'closed'",
+        [interaction.channel!.id],
+      );
       await interaction.reply(t("close"));
       await interaction.channel!.delete();
       try {

@@ -159,5 +159,14 @@
         }
       }
     }
+  },
+  "close" : {
+    "no_thread": "Bu bir mod mail kanalı değil.",
+    "no_time": "Bir zaman birimi belirtilmedi.",
+    "no_duration": "Bir süre belirtilmedi.",
+    "error": "Kanal kapatılırken hata oluştu.",
+    "close_duration": "Kanal **{{duration}}** sonra kapatılacak.",
+    "close": "Kapatılıyor...",
+    "thread_closed_dm": "{{guild}} sunucusundaki mod mail konuşmanız kapatıldı."
   }
 }

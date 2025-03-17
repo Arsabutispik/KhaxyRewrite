@@ -204,5 +204,9 @@
       "title": "Mod Mail Mesajı",
       "description": "Mod mail alındığında botun gönderdiği mesaj"
     }
+  },
+  "listen_for_notifications": {
+    "preparing_close": "Kapatılıyor...",
+    "thread_closed_dm": "{{guild}} sunucusundaki mod mail konuşmanız kapatıldı."
   }
 }
