@@ -12,13 +12,11 @@ try {
 
   // Run `pg_dump` inside the container, but write output to the local machine
   execSync(
-    `docker exec -t ${CONTAINER_NAME} pg_dump -U ${DB_USER} -s ${DB_NAME} --encoding=UTF8 --no-owner --no-acl > init.sql`,
+    `docker exec ${CONTAINER_NAME} pg_dump -U ${DB_USER} -s ${DB_NAME} --encoding=UTF8 --no-owner --no-acl > init.sql`,
     {
-      shell: "powershell.exe",
       stdio: "inherit",
-    }
+    },
   );
-
 
   console.log(`✅ Schema exported to init.sql`);
 } catch (error) {
