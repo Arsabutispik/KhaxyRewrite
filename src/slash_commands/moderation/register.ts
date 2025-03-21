@@ -45,14 +45,23 @@ export default {
           {
             name: "Male 👨",
             value: "male",
+            name_localizations: {
+              tr: "Erkek 👨",
+            },
           },
           {
             name: "Female 👩",
             value: "female",
+            name_localizations: {
+              tr: "Kadın 👩",
+            },
           },
           {
             name: "Other 🧑",
             value: "other",
+            name_localizations: {
+              tr: "Diğer 🧑",
+            },
           },
         ),
     ),

@@ -60,11 +60,11 @@ export default {
         })
         .setRequired(true)
         .setChoices(
-          { name: "Second(s)", value: "second" },
-          { name: "Minute(s)", value: "minute" },
-          { name: "Hour(s)", value: "hour" },
-          { name: "Day(s)", value: "day" },
-          { name: "Week(s)", value: "week" },
+          { name: "Second(s)", value: "second", name_localizations: { tr: "Saniye" } },
+          { name: "Minute(s)", value: "minute", name_localizations: { tr: "Dakika" } },
+          { name: "Hour(s)", value: "hour", name_localizations: { tr: "Saat" } },
+          { name: "Day(s)", value: "day", name_localizations: { tr: "Gün" } },
+          { name: "Week(s)", value: "week", name_localizations: { tr: "Hafta" } },
         ),
     )
     .addStringOption((option) =>
