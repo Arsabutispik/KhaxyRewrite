@@ -1,5 +1,11 @@
 // Auto-generated types from PostgreSQL
 
+export type Cronjobs = {
+  id: bigint;
+  color_time: string;
+  unregistered_people_time: string;
+};
+
 export type Pgmigrations = {
   id: number;
   run_on: string;
@@ -16,10 +22,26 @@ export type Punishments = {
   type: string;
 };
 
-export type Cronjobs = {
-  id: bigint;
-  color_time: string;
-  unregistered_people_time: string;
+export type Infractions = {
+  guild_id: bigint;
+  moderator_id: bigint;
+  case_id: number;
+  user_id: bigint;
+  created_at: string;
+  expires_at: string;
+  reason: string;
+  type: string;
+};
+
+export type Mod_mail_threads = {
+  thread_id: bigint;
+  guild_id: bigint;
+  user_id: bigint;
+  channel_id: bigint;
+  close_date: string;
+  created_at: string;
+  closed_at: string;
+  status: string;
 };
 
 export type Guilds = {
@@ -51,34 +73,14 @@ export type Guilds = {
   mod_mail_message: string;
 };
 
-export type Infractions = {
-  guild_id: bigint;
-  moderator_id: bigint;
-  case_id: number;
-  user_id: bigint;
-  created_at: string;
-  expires_at: string;
-  reason: string;
-  type: string;
-};
-
-export type Mod_mail_threads = {
-  channel_id: bigint;
-  guild_id: bigint;
-  user_id: bigint;
-  thread_id: number;
-  closed_at: string;
-  created_at: string;
-  status: string;
-};
-
 export type Mod_mail_messages = {
-  thread_id: number;
+  thread_id: bigint;
   author_id: bigint;
   sent_at: string;
-  message_id: number;
+  first_message: boolean;
+  attachments: Array;
+  send_to: string;
   author_type: string;
   content: string;
-  attachments: Array;
 };
 

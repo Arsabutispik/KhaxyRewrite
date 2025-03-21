@@ -1,5 +1,13 @@
 import { KhaxyClient, SlashCommandBase } from "../../../@types/types";
-import { PermissionsBitField, SlashCommandBuilder } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ComponentType,
+  MessageComponentInteraction,
+  PermissionsBitField,
+  SlashCommandBuilder,
+} from "discord.js";
 import dayjs from "dayjs";
 import dayjsduration from "dayjs/plugin/duration.js";
 import relativeTime from "dayjs/plugin/relativeTime.js";
@@ -58,6 +66,40 @@ export default {
       [interaction.channel!.id],
     );
     if (rows.length === 0) return interaction.reply(t("no_thread"));
+    if (rows[0].close_date) {
+      const close_date = dayjs(rows[0].close_date)
+        .locale(guild_rows[0].language || "en")
+        .fromNow(true);
+      const acceptButton = new ButtonBuilder()
+        .setCustomId("accept")
+        .setLabel(t("accept"))
+        .setStyle(ButtonStyle.Success);
+      const rejectButton = new ButtonBuilder().setCustomId("reject").setLabel(t("reject")).setStyle(ButtonStyle.Danger);
+      const row = new ActionRowBuilder<ButtonBuilder>().addComponents(acceptButton, rejectButton);
+      const message = await interaction.reply({
+        content: t("thread_close_date", { date: close_date }),
+        components: [row],
+        withResponse: true,
+      });
+      const filter = (i: MessageComponentInteraction) => i.user.id === interaction.user.id;
+      let component;
+      try {
+        component = await message.resource!.message!.awaitMessageComponent({
+          filter,
+          time: 60000,
+          componentType: ComponentType.Button,
+        });
+      } catch {
+        await interaction.editReply({ content: t("timeout"), components: [] });
+      }
+      if (!component) return;
+      if (component.customId === "reject") {
+        await interaction.editReply({ content: t("thread_close_date_rejected"), components: [] });
+        return;
+      } else {
+        await interaction.editReply({ content: t("thread_close_date_accepted"), components: [] });
+      }
+    }
     const duration = interaction.options.getNumber("duration");
     const time = interaction.options.getString("time");
     if (duration && !time) return interaction.reply(t("no_time"));
@@ -82,13 +124,21 @@ export default {
         });
         return;
       }
-      await interaction.reply(t("close_duration", { duration: long_duration }));
+      if (interaction.replied) {
+        await interaction.editReply(t("close_duration", { duration: long_duration }));
+      } else {
+        await interaction.reply(t("close_duration", { duration: long_duration }));
+      }
     } else {
       await client.pgClient.query(
         "UPDATE mod_mail_threads SET status = 'closed' WHERE channel_id = $1 AND status <> 'closed'",
         [interaction.channel!.id],
       );
-      await interaction.reply(t("close"));
+      if (interaction.replied) {
+        await interaction.editReply(t("close"));
+      } else {
+        await interaction.reply(t("close"));
+      }
       await interaction.channel!.delete();
       try {
         await interaction.guild.members.cache

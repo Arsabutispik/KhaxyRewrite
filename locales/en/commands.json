@@ -167,6 +167,19 @@
     "error": "Error while closing the thread.",
     "close_duration": "Thread will be closed in **{{duration}}**.",
     "close": "Thread is being closed...",
-    "thread_closed_dm": "Your thread in {{guild}} has been closed."
+    "thread_closed_dm": "Your thread in {{guild}} has been closed.",
+    "thread_close_date": "Thread is scheduled to be closed on **{{date}}**. Would you like to override it?",
+    "accept": "Override",
+    "reject": "Cancel",
+    "timeout": "Timeout. Thread will be closed on **{{date}}**.",
+    "thread_close_date_rejected": "Thread will be closed on **{{date}}**.",
+    "thread_close_date_accepted": "Continuing override..."
+  },
+  "reply": {
+    "no_thread": "This is not a mod mail thread.",
+    "member_not_found": "Member not found. Is the member still in the server?",
+    "error": "Error occurred on database.",
+    "success": "Message has been sent to the user.",
+    "suspended": "This mod mail thread has been suspended. Unsuspend the thread to reply."
   }
 }

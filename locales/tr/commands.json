@@ -167,6 +167,19 @@
     "error": "Kanal kapatılırken hata oluştu.",
     "close_duration": "Kanal **{{duration}}** sonra kapatılacak.",
     "close": "Kapatılıyor...",
-    "thread_closed_dm": "{{guild}} sunucusundaki mod mail konuşmanız kapatıldı."
+    "thread_closed_dm": "{{guild}} sunucusundaki mod mail konuşmanız kapatıldı.",
+    "thread_close_date": "Mod mail konuşmanız **{{date}}** sonra kapatılacak. Geçersiz kılmak ister misiniz?",
+    "accept": "Geçersiz Kıl",
+    "reject": "Kapat",
+    "timeout": "Zaman aşımı. Konuşma **{{date}}** sonra kapatılacak.",
+    "thread_close_date_accepted": "Devam ediliyor...",
+    "thread_close_date_rejected": "Konuşma **{{date}}** sonra kapatılacak."
+  },
+  "reply": {
+    "no_thread": "Bu bir mod mail kanalı değil.",
+    "member_not_found": "Kullanıcı bulunamadı. Kullanıcı hala sunucuda mı?",
+    "error": "Veritabanı güncellenirken hata oluştu.",
+    "success": "Mesaj kullanıcıya gönderildi.",
+    "suspended": "Bu mod mail konuşması askıya alındı. Cevaplamak için tekrar açın."
   }
 }

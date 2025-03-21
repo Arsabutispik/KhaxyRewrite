@@ -80,5 +80,10 @@ export default {
       const status = messages[Math.floor(Math.random() * messages.length)];
       client.user!.setActivity(status.message, { type: status.type });
     }, 60000);
+    logger.log({
+      level: "info",
+      message: `Logged in as ${client.user!.tag}`,
+      discord: false,
+    });
   },
 } as EventBase;

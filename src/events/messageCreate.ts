@@ -13,7 +13,7 @@ import {
   ButtonStyle,
   EmbedBuilder,
 } from "discord.js";
-import { Guilds, Mod_mail_messages, Mod_mail_threads } from "../../@types/DatabaseTypes";
+import { Guilds, Mod_mail_threads } from "../../@types/DatabaseTypes";
 import dayjs from "dayjs";
 import logger from "../lib/Logger.js";
 import { toStringId } from "../utils/utils.js";
@@ -87,7 +87,6 @@ export default {
             .setTitle(t("confirmed_title"))
             .setDescription(t("confirmed_description", { guild: guild.name }))
             .setColor("Green");
-          await prompt.edit({ embeds: [confirmed_embed], components: [] });
           const mod_mail_parent_channel = guild.channels.cache.get(
             toStringId(guild_data[0].mod_mail_parent_channel_id),
           );
@@ -140,14 +139,10 @@ export default {
             logger.error({ message: "Error inserting mod mail thread", error: e });
             return message.reply(t("error_inserting"));
           }
-          await message.reply(guild_data[0].mod_mail_message);
-          await channel.send(
-            `**[${message.author.tag}]**: ${message.content}\n${message.attachments?.map((a) => a.url).join("\n")}`,
-          );
 
           try {
             await client.pgClient.query(
-              "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, send_to, message_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+              "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, send_to) VALUES ($1, $2, $3, $4, $5, $6, $7)",
               [
                 message.author.id,
                 new Date().toISOString(),
@@ -156,12 +151,11 @@ export default {
                 message.attachments?.map((a) => a.url),
                 thread_rows.rows[0].thread_id,
                 "thread",
-                message.id,
               ],
             );
 
             await client.pgClient.query(
-              "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, send_to, message_id, first_message) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true)",
+              "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, send_to, first_message) VALUES ($1, $2, $3, $4, $5, $6, $7, true)",
               [
                 client.user!.id,
                 new Date().toISOString(),
@@ -170,14 +164,19 @@ export default {
                 bot_message.attachments?.map((a) => a.url),
                 thread_rows.rows[0].thread_id,
                 "thread",
-                bot_message.id,
               ],
             );
           } catch (e) {
             logger.error({ message: "Error inserting mod mail message", error: e });
             return message.reply(t("error_inserting"));
           }
-
+          await prompt.edit({ content: guild_data[0].mod_mail_message, embeds: [confirmed_embed], components: [] });
+          await channel.send(
+            `**[${message.author.tag}]**: ${message.content}\n${message.attachments?.map((a) => a.url).join("\n")}`,
+          );
+          await channel.send(
+            `${client.allEmojis.get(client.config.Emojis.gearSpinning)?.format} **(${client.user!.username})** ${guild_data[0].mod_mail_message}`,
+          );
           return;
         }
         const string_selection = new StringSelectMenuBuilder()
@@ -301,7 +300,7 @@ export default {
         );
         try {
           await client.pgClient.query(
-            "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, send_to, message_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+            "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, send_to) VALUES ($1, $2, $3, $4, $5, $6, $7)",
             [
               message.author.id,
               new Date().toISOString(),
@@ -310,11 +309,10 @@ export default {
               message.attachments?.map((attachment) => attachment.url),
               thread_rows.rows[0].thread_id,
               "thread",
-              message.id,
             ],
           );
           await client.pgClient.query(
-            "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, send_to, message_id, first_message) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true)",
+            "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, send_to, first_message) VALUES ($1, $2, $3, $4, $5, $6, $7, true)",
             [
               client.user!.id,
               new Date().toISOString(),
@@ -323,7 +321,6 @@ export default {
               bot_message.attachments?.map((attachment) => attachment.url),
               thread_rows.rows[0].thread_id,
               "thread",
-              bot_message.id,
             ],
           );
         } catch (e) {
@@ -357,7 +354,7 @@ export default {
             `**[${message.author.tag}]**: ${message.content}\n${message.attachments?.map((attachment) => attachment.url).join("\n")}`,
           );
           await client.pgClient.query(
-            "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, send_to, message_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+            "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, send_to) VALUES ($1, $2, $3, $4, $5, $6, $7)",
             [
               message.author.id,
               new Date().toISOString(),
@@ -366,7 +363,6 @@ export default {
               message.attachments?.map((attachment) => attachment.url),
               rows[0].thread_id,
               "thread",
-              message.id,
             ],
           );
         } catch (e) {
@@ -387,11 +383,6 @@ export default {
         return await message.reply("This server is not in the database.");
       }
       const t = client.i18next.getFixedT(guild_rows[0].language, "events", "messageCreate.mod_mail");
-      const { rows: message_rows } = await client.pgClient.query<Mod_mail_messages>(
-        "SELECT message_id FROM mod_mail_messages WHERE message_id = $1",
-        [message.id],
-      );
-      if (message_rows.length) return;
       const { rows } = await client.pgClient.query<Mod_mail_threads>(
         "SELECT * FROM mod_mail_threads WHERE channel_id = $1",
         [message.channel.id],
@@ -399,7 +390,7 @@ export default {
       if (!rows[0]) return;
       try {
         await client.pgClient.query(
-          "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, send_to, message_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+          "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, send_to) VALUES ($1, $2, $3, $4, $5, $6, $7)",
           [
             message.author.id,
             new Date().toISOString(),
@@ -408,7 +399,6 @@ export default {
             message.attachments?.map((attachment) => attachment.url),
             rows[0].thread_id,
             "thread",
-            message.id,
           ],
         );
       } catch (e) {

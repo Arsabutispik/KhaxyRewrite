@@ -5,8 +5,8 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "deploy-commands": "tsc && node dist/utils/deploy-commands.js",
-    "start": "tsc && pnpm db-setup && node .",
+    "deploy-commands": "npx tsc && node dist/utils/deploy-commands.js",
+    "start": "npx tsc && pnpm db-setup && node .",
     "generate-types": "node scripts/GenerateTypes.js",
     "generate-schema": "node scripts/GenerateSchema.js",
     "db-migrate": "node scripts/migrate.js",
@@ -14,7 +14,8 @@
     "db-stop": "node scripts/StopDb.js",
     "migrate-create": "node scripts/CreateMigrations.js",
     "migrate-up": "node-pg-migrate up",
-    "migrate-down": "node-pg-migrate down"
+    "migrate-down": "node-pg-migrate down",
+    "validate-translations": "node scripts/ValidateI18nKeys.js"
   },
   "dependencies": {
     "@discord-player/extractor": "^7.1.0",
