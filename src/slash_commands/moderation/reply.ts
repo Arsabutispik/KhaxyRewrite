@@ -73,7 +73,7 @@ export default {
     if (!member) return interaction.reply(t("member_not_found"));
     try {
       await client.pgClient.query(
-        "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, send_to) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+        "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, sent_to, channel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
         [
           interaction.member.id,
           new Date(),
@@ -84,6 +84,7 @@ export default {
             : [],
           threads_rows[0].thread_id,
           "user",
+          interaction.channel!.id,
         ],
       );
     } catch (e) {

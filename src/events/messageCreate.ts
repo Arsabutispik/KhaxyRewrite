@@ -142,7 +142,7 @@ export default {
 
           try {
             await client.pgClient.query(
-              "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, send_to) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+              "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, sent_to, channel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
               [
                 message.author.id,
                 new Date().toISOString(),
@@ -151,11 +151,12 @@ export default {
                 message.attachments?.map((a) => a.url),
                 thread_rows.rows[0].thread_id,
                 "thread",
+                channel.id,
               ],
             );
 
             await client.pgClient.query(
-              "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, send_to, first_message) VALUES ($1, $2, $3, $4, $5, $6, $7, true)",
+              "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, sent_to, channel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
               [
                 client.user!.id,
                 new Date().toISOString(),
@@ -164,6 +165,7 @@ export default {
                 bot_message.attachments?.map((a) => a.url),
                 thread_rows.rows[0].thread_id,
                 "thread",
+                channel.id,
               ],
             );
           } catch (e) {
@@ -300,7 +302,7 @@ export default {
         );
         try {
           await client.pgClient.query(
-            "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, send_to) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+            "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, sent_to, channel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
             [
               message.author.id,
               new Date().toISOString(),
@@ -309,10 +311,11 @@ export default {
               message.attachments?.map((attachment) => attachment.url),
               thread_rows.rows[0].thread_id,
               "thread",
+              channel.id,
             ],
           );
           await client.pgClient.query(
-            "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, send_to, first_message) VALUES ($1, $2, $3, $4, $5, $6, $7, true)",
+            "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, sent_to, channel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
             [
               client.user!.id,
               new Date().toISOString(),
@@ -321,6 +324,7 @@ export default {
               bot_message.attachments?.map((attachment) => attachment.url),
               thread_rows.rows[0].thread_id,
               "thread",
+              channel.id,
             ],
           );
         } catch (e) {
@@ -354,7 +358,7 @@ export default {
             `**[${message.author.tag}]**: ${message.content}\n${message.attachments?.map((attachment) => attachment.url).join("\n")}`,
           );
           await client.pgClient.query(
-            "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, send_to) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+            "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, sent_to, channel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
             [
               message.author.id,
               new Date().toISOString(),
@@ -363,6 +367,7 @@ export default {
               message.attachments?.map((attachment) => attachment.url),
               rows[0].thread_id,
               "thread",
+              channel.id,
             ],
           );
         } catch (e) {
@@ -390,15 +395,16 @@ export default {
       if (!rows[0]) return;
       try {
         await client.pgClient.query(
-          "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, send_to) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+          "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, sent_to, channel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
           [
             message.author.id,
             new Date().toISOString(),
-            message.author.bot ? "client" : "user",
+            message.author.bot ? "client" : "staff",
             message.content,
             message.attachments?.map((attachment) => attachment.url),
             rows[0].thread_id,
             "thread",
+            message.channel.id,
           ],
         );
       } catch (e) {

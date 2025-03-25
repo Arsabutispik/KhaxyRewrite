@@ -208,5 +208,13 @@
   "listen_for_notifications": {
     "preparing_close": "Thread is being closed...",
     "thread_closed_dm": "Your thread in {{guild}} has been closed."
+  },
+  "mod_mail_log": {
+    "initial": "# Modmail thread #{{thread_id}} with {{user.tag}} {{user.id}} has started at {{time}}. All times are in UTC.\n",
+    "bot_to_user": "[BOT TO USER]",
+    "command": "[COMMAND]",
+    "to_user": "[TO USER]",
+    "from_user": "[FROM USER]",
+    "close_message": "Modmail thread #{{thread_id}} with {{user.tag}} ({{user.id}}) was closed by {{closer.tag}}.\n**{{messages.user}}** messages from the user, **{{messages.staff}}** messages to the user and **{{messages.internal}}** internal chat messages"
   }
 }

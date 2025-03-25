@@ -3,6 +3,7 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  ChannelType,
   ComponentType,
   MessageComponentInteraction,
   PermissionsBitField,
@@ -14,6 +15,7 @@ import relativeTime from "dayjs/plugin/relativeTime.js";
 import "dayjs/locale/tr.js";
 import logger from "../../lib/Logger.js";
 import { Guilds, Mod_mail_threads } from "../../../@types/DatabaseTypes";
+import { modMailLog, toStringId } from "../../utils/utils.js";
 export default {
   memberPermissions: [PermissionsBitField.Flags.ModerateMembers],
   data: new SlashCommandBuilder()
@@ -61,6 +63,7 @@ export default {
     ]);
     if (guild_rows.length === 0) return interaction.reply("This guild is not in the database");
     const t = client.i18next.getFixedT(guild_rows[0].language, "commands", "close");
+    if (interaction.channel?.type !== ChannelType.GuildText) return interaction.reply(t("not_text_channel"));
     const { rows } = await client.pgClient.query<Mod_mail_threads>(
       "SELECT * FROM mod_mail_threads WHERE channel_id = $1",
       [interaction.channel!.id],
@@ -134,6 +137,11 @@ export default {
         "UPDATE mod_mail_threads SET status = 'closed' WHERE channel_id = $1 AND status <> 'closed'",
         [interaction.channel!.id],
       );
+      const modmail_log_channel = interaction.guild.channels.cache.get(toStringId(guild_rows[0].mod_mail_channel_id));
+      if (modmail_log_channel) {
+        const user = await client.users.fetch(toStringId(rows[0].user_id)).catch(() => null);
+        await modMailLog(client, interaction.channel!, user, interaction.user);
+      }
       if (interaction.replied) {
         await interaction.editReply(t("close"));
       } else {
@@ -142,7 +150,7 @@ export default {
       await interaction.channel!.delete();
       try {
         await interaction.guild.members.cache
-          .get(rows[0].user_id.toString())
+          .get(toStringId(rows[0].user_id))
           ?.send(t("thread_closed_dm", { guild: interaction.guild!.name }));
       } catch {
         return;

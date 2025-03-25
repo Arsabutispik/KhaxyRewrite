@@ -77,10 +77,11 @@ export type Mod_mail_messages = {
   thread_id: bigint;
   author_id: bigint;
   sent_at: string;
-  first_message: boolean;
-  attachments: Array;
-  send_to: string;
+  message_id: bigint;
+  channel_id: bigint;
+  sent_to: string;
   author_type: string;
   content: string;
+  attachments: Array;
 };
 

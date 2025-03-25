@@ -208,5 +208,12 @@
   "listen_for_notifications": {
     "preparing_close": "Kapatılıyor...",
     "thread_closed_dm": "{{guild}} sunucusundaki mod mail konuşmanız kapatıldı."
+  },
+  "mod_mail_log": {
+    "initial": "{{user.tag}} ({{user.id}}) ile olan modmail konuşması #{{thread_id}} {{time}} tarihinde başladı. Bütün zamanlar UTC+0'dır.",
+    "bot_to_user": "[BOTTAN KULLANICIYA]",
+    "command": "[KOMUT]",
+    "to_user": "[KULLANICIYA]",
+    "close_message": "{{user.tag}} ({{user.id}}) ile olan modmail konuşması #{{thread_id}} {{closer.tag}} tarafından kapatıldı.\n Kullanıcı tarafından **{{messages.user}}** mesaj, kullanıcıya **{{messages.staff}}**, **{{messages.internal}}** iç mesaj gönderildi."
   }
 }
