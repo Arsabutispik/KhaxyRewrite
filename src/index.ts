@@ -1,6 +1,5 @@
 //TODO: Handle emojis
 import { Client, Collection, EmbedBuilder, IntentsBitField, Partials, PermissionsBitField } from "discord.js";
-import { KhaxyClient } from "../@types/types";
 import "dotenv/config.js";
 import path from "path";
 import fs from "fs";
@@ -31,12 +30,9 @@ const client = new Client({
     IntentsBitField.Flags.GuildVoiceStates,
     IntentsBitField.Flags.DirectMessages,
     IntentsBitField.Flags.MessageContent,
-    IntentsBitField.Flags.DirectMessages,
-    IntentsBitField.Flags.DirectMessageTyping,
-    IntentsBitField.Flags.GuildMessageTyping,
   ],
   partials: [Partials.Channel],
-}) as KhaxyClient;
+});
 const player = new Player(client);
 await player.extractors.loadMulti(DefaultExtractors);
 const pgClient = new PgClient({

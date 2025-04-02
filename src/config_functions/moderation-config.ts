@@ -9,7 +9,6 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
 } from "discord.js";
-import { KhaxyClient } from "../../@types/types";
 import { Guilds } from "../../@types/DatabaseTypes";
 import { dynamicChannel } from "./register-config.js";
 import { dynamicRole } from "./role-config.js";
@@ -17,7 +16,7 @@ import { TFunction } from "i18next";
 import { toStringId } from "../utils/utils.js";
 
 export default async function moderationConfig(interaction: ChatInputCommandInteraction<"cached">) {
-  const client = interaction.client as KhaxyClient;
+  const client = interaction.client;
   const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guildId]);
   if (rows.length === 0) {
     await interaction.reply({
@@ -121,7 +120,7 @@ export default async function moderationConfig(interaction: ChatInputCommandInte
 }
 
 async function modMailChannel(interaction: StringSelectMenuInteraction<"cached">, data: Guilds, t: TFunction) {
-  const client = interaction.client as KhaxyClient;
+  const client = interaction.client;
   if (data.mod_mail_channel_id && interaction.guild.channels.cache.has(toStringId(data.mod_mail_channel_id))) {
     await interaction.deferUpdate();
     await interaction.editReply({
@@ -169,7 +168,7 @@ async function modMailChannel(interaction: StringSelectMenuInteraction<"cached">
 }
 
 async function muteGetAllRoles(interaction: StringSelectMenuInteraction<"cached">, data: Guilds, t: TFunction) {
-  const client = interaction.client as KhaxyClient;
+  const client = interaction.client;
   if (data.mute_get_all_roles) {
     await client.pgClient.query("UPDATE guilds SET mute_get_all_roles = FALSE WHERE id = $1", [interaction.guildId]);
     await interaction.deferUpdate();
@@ -188,7 +187,7 @@ async function muteGetAllRoles(interaction: StringSelectMenuInteraction<"cached"
 }
 
 async function registerDayLimit(interaction: StringSelectMenuInteraction<"cached">, data: Guilds, t: TFunction) {
-  const client = interaction.client as KhaxyClient;
+  const client = interaction.client;
   const string_select = new StringSelectMenuBuilder()
     .setCustomId("register_day_limit")
     .setMinValues(1)
@@ -258,7 +257,7 @@ async function registerDayLimit(interaction: StringSelectMenuInteraction<"cached
 }
 
 async function defaultExpiry(interaction: StringSelectMenuInteraction<"cached">, data: Guilds, t: TFunction) {
-  const client = interaction.client as KhaxyClient;
+  const client = interaction.client;
   const string_select = new StringSelectMenuBuilder()
     .setCustomId("default_expiry")
     .setMinValues(1)

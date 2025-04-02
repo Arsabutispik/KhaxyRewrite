@@ -1,4 +1,4 @@
-import { KhaxyClient, SlashCommandBase } from "../../../@types/types";
+import { SlashCommandBase } from "../../../@types/types";
 import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { Guilds } from "../../../@types/DatabaseTypes";
 import dayjs from "dayjs";
@@ -73,7 +73,7 @@ export default {
   async execute(interaction) {
     dayjs.extend(dayjsduration);
     dayjs.extend(relativeTime);
-    const client = interaction.client as KhaxyClient;
+    const client = interaction.client;
     const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild!.id]);
     if (rows.length === 0) {
       await interaction.reply({
@@ -115,7 +115,7 @@ export default {
         .locale(rows[0].language || "en")
         .fromNow(true);
       try {
-        await (interaction.client as KhaxyClient).pgClient.query(
+        await interaction.client.pgClient.query(
           "INSERT INTO punishments (expires, type, user_id, guild_id, staff_id, created_at) VALUES ($1, $2, $3, $4, $5, $6)",
           [
             new Date(Date.now() + dayjsduration.asMilliseconds()),
@@ -205,7 +205,7 @@ export default {
       }
     } else {
       try {
-        await (interaction.client as KhaxyClient).pgClient.query(
+        await interaction.client.pgClient.query(
           "INSERT INTO punishments (type, user_id, guild_id, staff_id, created_at) VALUES ($1, $2, $3, $4, $5)",
           ["BAN", user.id, interaction.guild!.id, interaction.user.id, new Date()],
         );

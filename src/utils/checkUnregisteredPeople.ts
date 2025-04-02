@@ -1,12 +1,11 @@
-import { KhaxyClient } from "../../@types/types";
-import { PermissionsBitField } from "discord.js";
+import { Client, PermissionsBitField } from "discord.js";
 import modLog from "./modLog.js";
 import dayjs from "dayjs";
 import { Guilds } from "../../@types/DatabaseTypes";
 import logger from "../lib/Logger.js";
 import { toStringId } from "./utils.js";
 
-export default async (client: KhaxyClient) => {
+export default async (client: Client) => {
   // Fetch guild configurations from the database
   const { rows } = await client.pgClient.query<Guilds>(
     "SELECT id, days_to_kick, register_channel_id, member_role_id, mute_role_id, language from guilds",
@@ -89,7 +88,7 @@ export default async (client: KhaxyClient) => {
   }
 };
 
-export async function specificGuildUnregisteredPeopleUpdate(client: KhaxyClient, guildId: string) {
+export async function specificGuildUnregisteredPeopleUpdate(client: Client, guildId: string) {
   // Fetch guild configuration for the specific guild
   const { rows } = await client.pgClient.query<Guilds>(
     "SELECT days_to_kick, register_channel_id, member_role_id, mute_role_id, language from guilds WHERE id = $1",

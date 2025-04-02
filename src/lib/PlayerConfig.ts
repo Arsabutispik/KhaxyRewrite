@@ -1,6 +1,6 @@
 import "dotenv/config.js";
-import { KhaxyClient } from "../../@types/types";
 import logger from "./Logger.js";
+import { Client } from "discord.js";
 
 export default {
   IconURL: "https://cdn.discordapp.com/attachments/933095626844037224/1016257179872923708/music-disc.gif",
@@ -29,7 +29,7 @@ export default {
 };
 
 export async function loadEmojis(
-  client: KhaxyClient,
+  client: Client,
   emojiObject: Array<{ name: string; id: string; fallBack: string }>,
 ): Promise<void> {
   try {

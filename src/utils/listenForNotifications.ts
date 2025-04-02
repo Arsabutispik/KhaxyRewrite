@@ -1,11 +1,10 @@
-import { KhaxyClient } from "../../@types/types";
 import logger from "../lib/Logger.js";
-import { TextChannel } from "discord.js";
+import { Client, TextChannel } from "discord.js";
 import { Guilds } from "../../@types/DatabaseTypes";
 import { toStringId } from "./utils.js";
 
 // Function to listen for notifications from PostgreSQL
-export default async function listenForNotifications(client: KhaxyClient) {
+export default async function listenForNotifications(client: Client) {
   logger.info({
     message: "Listening for database notifications...",
     discord: false,
@@ -46,7 +45,7 @@ export default async function listenForNotifications(client: KhaxyClient) {
 }
 
 // Function to handle thread closure logic
-async function threadClosed(client: KhaxyClient, payload: { channel_id: bigint; user_id: bigint; guild_id: bigint }) {
+async function threadClosed(client: Client, payload: { channel_id: bigint; user_id: bigint; guild_id: bigint }) {
   const guild = client.guilds.cache.get(toStringId(payload.guild_id)); // Convert BigInt to string
   if (!guild) return;
 

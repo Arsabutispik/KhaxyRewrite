@@ -13,13 +13,12 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
-import { KhaxyClient } from "../../@types/types";
 import { Guilds } from "../../@types/DatabaseTypes";
 import { TFunction } from "i18next";
 import { toStringId } from "../utils/utils.js";
 
 export default async function registerConfig(interaction: ChatInputCommandInteraction<"cached">) {
-  const client = interaction.client as KhaxyClient;
+  const client = interaction.client;
   const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guildId]);
   if (rows.length === 0) {
     await interaction.reply({
@@ -142,7 +141,7 @@ export async function dynamicChannel(
     });
     return;
   }
-  const client = message_component.client as KhaxyClient;
+  const client = message_component.client;
   await message_component.deferUpdate();
   if (message_component.values.length === 0) {
     await client.pgClient.query(`UPDATE guilds SET ${channel} = NULL WHERE id = $1`, [message_component.guildId]);
@@ -199,7 +198,7 @@ export async function dynamicMessage(
     });
     return;
   }
-  const client = message_component.client as KhaxyClient;
+  const client = message_component.client;
   await message_component.deferUpdate();
   await client.pgClient.query(
     `UPDATE guilds
@@ -219,7 +218,7 @@ export async function dynamicMessage(
 
 async function registerClearChannel(interaction: StringSelectMenuInteraction<"cached">, data: Guilds, t: TFunction) {
   await interaction.deferUpdate();
-  const client = interaction.client as KhaxyClient;
+  const client = interaction.client;
   if (data.register_channel_clear) {
     await client.pgClient.query(`UPDATE guilds SET register_channel_clear = FALSE WHERE id = $1`, [
       interaction.guildId,

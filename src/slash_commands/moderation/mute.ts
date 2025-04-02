@@ -1,4 +1,4 @@
-import { KhaxyClient, SlashCommandBase } from "../../../@types/types";
+import { SlashCommandBase } from "../../../@types/types";
 import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { Guilds, Punishments } from "../../../@types/DatabaseTypes";
 import dayjs from "dayjs";
@@ -81,7 +81,7 @@ export default {
   async execute(interaction) {
     dayjs.extend(dayjsduration);
     dayjs.extend(relativeTime);
-    const client = interaction.client as KhaxyClient;
+    const client = interaction.client;
     const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
     const { rows: punishment_rows } = await client.pgClient.query<Punishments>(
       "SELECT * FROM punishments WHERE guild_id = $1 AND user_id = $2 AND type = 'mute'",

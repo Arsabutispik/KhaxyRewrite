@@ -1,5 +1,5 @@
-import { EventBase, KhaxyClient } from "../../@types/types";
-import { AuditLogEvent, Events, GuildMember, PermissionsBitField } from "discord.js";
+import { EventBase } from "../../@types/types";
+import { AuditLogEvent, Events, PermissionsBitField } from "discord.js";
 import { replacePlaceholders, toStringId } from "../utils/utils.js";
 import dayjs from "dayjs";
 import { Guilds } from "../../@types/DatabaseTypes";
@@ -9,9 +9,9 @@ import relativeTime from "dayjs/plugin/relativeTime.js";
 export default {
   name: Events.GuildMemberRemove,
   once: false,
-  async execute(member: GuildMember) {
+  async execute(member) {
     // Fetch guild data from the database
-    const { rows } = await (member.client as KhaxyClient).pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
+    const { rows } = await member.client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
       member.guild.id,
     ]);
     dayjs.extend(relativeTime);
@@ -55,12 +55,10 @@ export default {
           action: "KICK",
           user: member.user,
           moderator: executor!,
-          reason:
-            reason ??
-            (member.client as KhaxyClient).i18next.getFixedT(rows[0].language)("events:guildMemberRemove.noReason"),
+          reason: reason ?? member.client.i18next.getFixedT(rows[0].language)("events:guildMemberRemove.noReason"),
         },
-        member.client as KhaxyClient,
+        member.client,
       );
     }
   },
-} as EventBase;
+} satisfies EventBase<Events.GuildMemberRemove>;

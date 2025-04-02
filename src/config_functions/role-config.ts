@@ -8,7 +8,6 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
 } from "discord.js";
-import { KhaxyClient } from "../../@types/types";
 import { Guilds } from "../../@types/DatabaseTypes";
 import { TFunction } from "i18next";
 import { toStringId } from "../utils/utils.js";
@@ -23,7 +22,7 @@ type RoleType =
   | "staff_role_id";
 
 export default async function roleConfig(interaction: ChatInputCommandInteraction<"cached">) {
-  const client = interaction.client as KhaxyClient;
+  const client = interaction.client;
   const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guildId]);
   if (rows.length === 0) {
     await interaction.reply({
@@ -139,7 +138,7 @@ export async function dynamicRole(
     });
     return;
   }
-  const client = message_component.client as KhaxyClient;
+  const client = message_component.client;
   await message_component.deferUpdate();
   if (message_component.values.length === 0) {
     await client.pgClient.query(`UPDATE guilds SET ${role} = NULL WHERE id = $1`, [message_component.guildId]);

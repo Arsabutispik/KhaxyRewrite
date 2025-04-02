@@ -1,5 +1,5 @@
-import { EventBase, KhaxyClient } from "../../@types/types";
-import { ChannelType, Events, GuildMember, PermissionsBitField } from "discord.js";
+import { EventBase } from "../../@types/types";
+import { ChannelType, Events, PermissionsBitField } from "discord.js";
 import { Guilds, Punishments } from "../../@types/DatabaseTypes";
 import { replacePlaceholders, toStringId } from "../utils/utils.js";
 import logger from "../lib/Logger.js";
@@ -8,9 +8,9 @@ import relativeTime from "dayjs/plugin/relativeTime.js";
 
 export default {
   name: Events.GuildMemberAdd,
-  async execute(member: GuildMember) {
+  async execute(member) {
     // Fetch guild data from the database
-    const { rows } = await (member.client as KhaxyClient).pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
+    const { rows } = await member.client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
       member.guild.id,
     ]);
 
@@ -18,7 +18,7 @@ export default {
     if (rows.length === 0) return;
 
     // Fetch punishment data for the member from the database
-    const { rows: punishment_rows } = await (member.client as KhaxyClient).pgClient.query<Punishments>(
+    const { rows: punishment_rows } = await member.client.pgClient.query<Punishments>(
       "SELECT * FROM punishments WHERE guild_id = $1 AND user_id = $2 AND type = $3",
       [member.guild.id, member.id, "mute"],
     );
@@ -103,4 +103,4 @@ export default {
       register_welcome_channel.send(replacePlaceholders(rows[0].register_join_message, replacements));
     }
   },
-} as EventBase;
+} satisfies EventBase<Events.GuildMemberAdd>;

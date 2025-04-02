@@ -1,4 +1,4 @@
-import { KhaxyClient, SlashCommandBase } from "../../../@types/types";
+import { SlashCommandBase } from "../../../@types/types";
 import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { Guilds } from "../../../@types/DatabaseTypes";
 import logger from "../../lib/Logger.js";
@@ -42,7 +42,7 @@ export default {
         }),
     ),
   async execute(interaction) {
-    const client = interaction.client as KhaxyClient;
+    const client = interaction.client;
     const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
     if (!rows[0]) {
       await interaction.reply("An error occurred while fetching the guild data.");

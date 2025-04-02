@@ -1,11 +1,11 @@
-import { KhaxyClient } from "../../@types/types";
 import { specificGuildColorUpdate } from "./colorOfTheDay.js";
 import logger from "../lib/Logger.js";
 import { specificGuildUnregisteredPeopleUpdate } from "./checkUnregisteredPeople.js";
 import { Cronjobs } from "../../@types/DatabaseTypes";
 import { toStringId } from "./utils.js";
+import { Client } from "discord.js";
 
-export default async (client: KhaxyClient) => {
+export default async (client: Client) => {
   // Fetch all cron jobs from the database
   const { rows } = await client.pgClient.query<Cronjobs>("SELECT * FROM cronjobs");
 

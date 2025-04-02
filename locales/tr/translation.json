@@ -215,6 +215,7 @@
     "command": "[KOMUT]",
     "to_user": "[KULLANICIYA]",
     "from_user": "[KULLANICIDAN]",
+    "to_thread": "[KONUŞMAYA]",
     "close_message": "{{user.tag}} ({{user.id}}) ile olan modmail konuşması #{{thread_id}} {{closer.tag}} tarafından kapatıldı.\n Kullanıcı tarafından **{{messages.user}}** mesaj, kullanıcıya **{{messages.staff}}**, **{{messages.internal}}** iç mesaj gönderildi."
   }
 }

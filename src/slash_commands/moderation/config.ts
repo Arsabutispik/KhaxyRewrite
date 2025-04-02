@@ -1,4 +1,4 @@
-import { KhaxyClient, SlashCommandBase } from "../../../@types/types";
+import { SlashCommandBase } from "../../../@types/types";
 import {
   MessageFlagsBitField,
   PermissionsBitField,
@@ -78,7 +78,7 @@ export default {
         ),
     ),
   async execute(interaction) {
-    const client = interaction.client as KhaxyClient;
+    const client = interaction.client;
     const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
     if (rows.length === 0) {
       await interaction.reply({

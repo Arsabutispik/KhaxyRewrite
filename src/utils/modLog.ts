@@ -2,8 +2,8 @@ import dayjs, { Dayjs } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime.js";
 import "dayjs/locale/en.js";
 import "dayjs/locale/tr.js";
-import { ChannelType, Guild, User } from "discord.js";
-import { GuildConfig, KhaxyClient } from "../../@types/types";
+import { ChannelType, Client, Guild, User } from "discord.js";
+import { GuildConfig } from "../../@types/types";
 import logger from "../lib/Logger.js";
 
 // Define the possible actions for the mod log
@@ -29,7 +29,7 @@ export default async (
     duration?: Dayjs;
     caseID?: number;
   },
-  client: KhaxyClient,
+  client: Client,
 ) => {
   const { guild, user, action, moderator, reason, duration, caseID } = data;
   // Fetch guild configuration from the database

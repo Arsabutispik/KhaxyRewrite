@@ -1,12 +1,12 @@
-import { EventBase, KhaxyClient } from "../../@types/types";
-import { Events, GuildMember, Interaction, MessageFlagsBitField } from "discord.js";
+import { EventBase } from "../../@types/types";
+import { Events, GuildMember, MessageFlagsBitField } from "discord.js";
 import { missingPermissionsAsString } from "../utils/utils.js";
 import logger from "../lib/Logger.js";
 
 export default {
   name: Events.InteractionCreate,
   once: false,
-  async execute(interaction: Interaction) {
+  async execute(interaction) {
     // Check if the interaction is a chat input command
     if (!interaction.isChatInputCommand()) return;
     if (!interaction.inCachedGuild()) return;
@@ -14,7 +14,7 @@ export default {
     if (
       interaction.guildId &&
       !(
-        await (interaction.client as KhaxyClient).pgClient.query("SELECT EXISTS (SELECT 1 FROM guilds WHERE id = $1)", [
+        await interaction.client.pgClient.query("SELECT EXISTS (SELECT 1 FROM guilds WHERE id = $1)", [
           interaction.guildId,
         ])
       ).rows[0].exists
@@ -22,7 +22,7 @@ export default {
       logger.warn(`Guild config for ${interaction.guildId} not found. Creating...`);
       try {
         // Insert a new guild configuration into the database
-        await (interaction.client as KhaxyClient).pgClient.query("INSERT INTO guilds (id, language) VALUES ($1, $2)", [
+        await interaction.client.pgClient.query("INSERT INTO guilds (id, language) VALUES ($1, $2)", [
           interaction.guildId,
           "en",
         ]);
@@ -34,19 +34,17 @@ export default {
     }
 
     // Retrieve the command from the client's slash commands collection
-    const command = (interaction.client as KhaxyClient).slashCommands.get(interaction.commandName);
+    const command = interaction.client.slashCommands.get(interaction.commandName);
     if (!command) {
       logger.error(`No command matching ${interaction.commandName} was found.`);
       return;
     }
     // Retrieve the language from the guild configuration
     const language = (
-      await (interaction.client as KhaxyClient).pgClient.query("SELECT language FROM guilds WHERE id = $1", [
-        interaction.guildId,
-      ])
+      await interaction.client.pgClient.query("SELECT language FROM guilds WHERE id = $1", [interaction.guildId])
     ).rows[0].language;
     // Retrieve the translation function
-    const t = (interaction.client as KhaxyClient).i18next.getFixedT(language);
+    const t = interaction.client.i18next.getFixedT(language);
     // Check if the member has the required permissions to execute the command
     if (
       command.memberPermissions &&
@@ -54,7 +52,7 @@ export default {
       !interaction.member.permissions.has(command.memberPermissions)
     ) {
       const missingPermissions = missingPermissionsAsString(
-        interaction.client as KhaxyClient,
+        interaction.client,
         interaction.member.permissions.missing(command.memberPermissions),
         language,
       );
@@ -71,7 +69,7 @@ export default {
       !interaction.guild.members.me!.permissions.has(command.clientPermissions)
     ) {
       const missingPermissions = missingPermissionsAsString(
-        interaction.client as KhaxyClient,
+        interaction.client,
         interaction.guild.members.me!.permissions.missing(command.clientPermissions),
         language,
       );
@@ -110,4 +108,4 @@ export default {
       }
     }
   },
-} as EventBase;
+} satisfies EventBase<Events.InteractionCreate>;

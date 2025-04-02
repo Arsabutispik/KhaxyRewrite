@@ -1,5 +1,5 @@
 import { ActivityType, Events } from "discord.js";
-import { EventBase, KhaxyClient } from "../../@types/types";
+import { EventBase } from "../../@types/types";
 import { loadEmojis } from "../lib/PlayerConfig.js";
 import { CronJob } from "cron";
 import colorOfTheDay from "../utils/colorOfTheDay.js";
@@ -8,7 +8,7 @@ import logger from "../lib/Logger.js";
 export default {
   name: Events.ClientReady,
   once: true,
-  async execute(client: KhaxyClient) {
+  async execute(client) {
     const emojis: Array<{ name: string; id: string; fallBack: string }> = [
       {
         name: "searchEmoji",
@@ -86,4 +86,4 @@ export default {
       discord: false,
     });
   },
-} as EventBase;
+} satisfies EventBase<Events.ClientReady>;

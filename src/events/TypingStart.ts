@@ -1,13 +1,12 @@
-import { EventBase, KhaxyClient } from "../../@types/types";
-import { ChannelType, Events, Typing } from "discord.js";
+import { EventBase } from "../../@types/types";
+import { ChannelType, Events } from "discord.js";
 import { Mod_mail_threads } from "../../@types/DatabaseTypes";
 import { toStringId } from "../utils/utils.js";
 
 export default {
   name: Events.TypingStart,
-  once: false,
-  async execute(typing: Typing) {
-    const client = typing.client as KhaxyClient;
+  async execute(typing) {
+    const client = typing.client;
     if (typing.channel.type === ChannelType.DM) {
       const { rows } = await client.pgClient.query<Mod_mail_threads>(
         "SELECT * FROM mod_mail_threads WHERE user_id = $1 and status = 'open'",
@@ -23,4 +22,4 @@ export default {
       channel.sendTyping();
     }
   },
-} as EventBase;
+} satisfies EventBase<Events.TypingStart>;

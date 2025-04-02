@@ -1,12 +1,11 @@
-import { KhaxyClient } from "../../@types/types";
-import { ColorResolvable, PermissionsBitField } from "discord.js";
+import { Client, ColorResolvable, PermissionsBitField } from "discord.js";
 import ntc from "./ntc.js";
 import dayjs from "dayjs";
 import { Guilds } from "../../@types/DatabaseTypes";
 import logger from "../lib/Logger.js";
 import { toStringId } from "./utils.js";
 
-export default async (client: KhaxyClient) => {
+export default async (client: Client) => {
   // Fetch guild configurations from the database
   const result = await client.pgClient.query<Guilds>(
     "SELECT color_id_of_the_day, color_name_of_the_day, id FROM guilds",
@@ -60,7 +59,7 @@ export default async (client: KhaxyClient) => {
   }
 };
 
-export async function specificGuildColorUpdate(client: KhaxyClient, guildId: string) {
+export async function specificGuildColorUpdate(client: Client, guildId: string) {
   // Fetch guild configuration for the specific guild
   const { rows } = await client.pgClient.query<Guilds>(
     "SELECT color_id_of_the_day, color_name_of_the_day, id FROM guilds WHERE id = $1",

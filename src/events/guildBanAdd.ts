@@ -1,5 +1,5 @@
-import { EventBase, KhaxyClient } from "../../@types/types";
-import { AuditLogEvent, Events, GuildBan, PermissionsBitField } from "discord.js";
+import { EventBase } from "../../@types/types";
+import { AuditLogEvent, Events, PermissionsBitField } from "discord.js";
 import { Guilds } from "../../@types/DatabaseTypes";
 import modLog from "../utils/modLog.js";
 import logger from "../lib/Logger.js";
@@ -7,12 +7,9 @@ import { toStringId } from "../utils/utils.js";
 
 export default {
   name: Events.GuildBanAdd,
-  once: false,
-  async execute(ban: GuildBan) {
+  async execute(ban) {
     // Fetch guild data from the database
-    const { rows } = await (ban.client as KhaxyClient).pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
-      ban.guild.id,
-    ]);
+    const { rows } = await ban.client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [ban.guild.id]);
 
     // If no guild data is found, exit the function
     if (rows.length === 0) return;
@@ -28,9 +25,9 @@ export default {
           action: "BAN",
           user: ban.user,
           moderator: ban.client.user,
-          reason: (ban.client as KhaxyClient).i18next.getFixedT(rows[0].language)("events:guildBanAdd.noPermission"),
+          reason: ban.client.i18next.getFixedT(rows[0].language)("events:guildBanAdd.noPermission"),
         },
-        ban.client as KhaxyClient,
+        ban.client,
       );
       return;
     }
@@ -51,11 +48,9 @@ export default {
             action: "BAN",
             user: ban.user,
             moderator: ban.client.user,
-            reason: (ban.client as KhaxyClient).i18next.getFixedT(rows[0].language)(
-              "events:guildBanAdd.executorNotMatch",
-            ),
+            reason: ban.client.i18next.getFixedT(rows[0].language)("events:guildBanAdd.executorNotMatch"),
           },
-          ban.client as KhaxyClient,
+          ban.client,
         );
         return;
       }
@@ -67,11 +62,9 @@ export default {
           action: "BAN",
           user: ban.user,
           moderator: entry.executor!,
-          reason:
-            entry.reason ||
-            (ban.client as KhaxyClient).i18next.getFixedT(rows[0].language)("events:guildBanAdd.noReason"),
+          reason: entry.reason || ban.client.i18next.getFixedT(rows[0].language)("events:guildBanAdd.noReason"),
         },
-        ban.client as KhaxyClient,
+        ban.client,
       );
     } catch (error) {
       // If an error occurs while fetching audit logs, log the ban with an error reason
@@ -81,11 +74,9 @@ export default {
           action: "BAN",
           user: ban.user,
           moderator: ban.client.user,
-          reason: (ban.client as KhaxyClient).i18next.getFixedT(rows[0].language)(
-            "events:guildBanAdd.errorOnFetchAuditLogs",
-          ),
+          reason: ban.client.i18next.getFixedT(rows[0].language)("events:guildBanAdd.errorOnFetchAuditLogs"),
         },
-        ban.client as KhaxyClient,
+        ban.client,
       );
       logger.log({
         level: "error",
@@ -98,4 +89,4 @@ export default {
       });
     }
   },
-} as EventBase;
+} satisfies EventBase<Events.GuildBanAdd>;

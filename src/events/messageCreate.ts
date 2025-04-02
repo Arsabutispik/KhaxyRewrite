@@ -1,11 +1,10 @@
-import { EventBase, KhaxyClient } from "../../@types/types";
+import { EventBase } from "../../@types/types";
 import {
   ActionRowBuilder,
   ButtonBuilder,
   ChannelType,
   ComponentType,
   Events,
-  Message,
   PermissionsBitField,
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
@@ -20,11 +19,10 @@ import { toStringId } from "../utils/utils.js";
 import relativeTime from "dayjs/plugin/relativeTime.js";
 export default {
   name: Events.MessageCreate,
-  once: false,
-  async execute(message: Message) {
+  async execute(message) {
     if (message.author.bot) return;
     if (message.channel.type === ChannelType.DM) {
-      const client = message.client as KhaxyClient;
+      const client = message.client;
       const { rows } = await client.pgClient.query<Mod_mail_threads>(
         "SELECT * FROM mod_mail_threads WHERE user_id = $1",
         [message.author.id],
@@ -46,10 +44,16 @@ export default {
           const { rows: guild_data } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
             guild.id,
           ]);
-          if (!guild_data.length) return message.reply("The server data is unavailable.");
+          if (!guild_data.length) {
+            await message.reply("The server data is unavailable.");
+            return;
+          }
           const t = client.i18next.getFixedT(guild_data[0].language, "events", "messageCreate.mod_mail");
           const member = await guild.members.fetch(message.author.id).catch(() => null);
-          if (!member) return message.reply(t("not_member"));
+          if (!member) {
+            await message.reply(t("not_member"));
+            return;
+          }
 
           const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
             new ButtonBuilder().setCustomId("modmail_confirm").setLabel(t("confirm")).setStyle(ButtonStyle.Success),
@@ -90,10 +94,16 @@ export default {
           const mod_mail_parent_channel = guild.channels.cache.get(
             toStringId(guild_data[0].mod_mail_parent_channel_id),
           );
-          if (!mod_mail_parent_channel) return message.reply(t("parent_channel_missing"));
+          if (!mod_mail_parent_channel) {
+            await message.reply(t("parent_channel_missing"));
+            return;
+          }
 
           const mod_mail_channel = guild.channels.cache.get(toStringId(guild_data[0].mod_mail_channel_id));
-          if (!mod_mail_channel) return message.reply(t("channel_missing"));
+          if (!mod_mail_channel) {
+            await message.reply(t("channel_missing"));
+            return;
+          }
 
           const permission_overwrites = [{ id: guild.id, deny: [PermissionsBitField.Flags.ViewChannel] }];
 
@@ -124,7 +134,8 @@ export default {
               }),
             );
           } catch {
-            return message.reply(t("error_sending"));
+            await message.reply(t("error_sending"));
+            return;
           }
 
           let thread_rows;
@@ -137,7 +148,8 @@ export default {
             );
           } catch (e) {
             logger.error({ message: "Error inserting mod mail thread", error: e });
-            return message.reply(t("error_inserting"));
+            await message.reply(t("error_inserting"));
+            return;
           }
 
           try {
@@ -170,7 +182,8 @@ export default {
             );
           } catch (e) {
             logger.error({ message: "Error inserting mod mail message", error: e });
-            return message.reply(t("error_inserting"));
+            await message.reply(t("error_inserting"));
+            return;
           }
           await prompt.edit({ content: guild_data[0].mod_mail_message, embeds: [confirmed_embed], components: [] });
           await channel.send(
@@ -350,7 +363,8 @@ export default {
           guild.id,
         ]);
         if (!guild_data.length) {
-          return await message.reply("The server data is unavailable.");
+          await message.reply("The server data is unavailable.");
+          return;
         }
         const t = client.i18next.getFixedT(guild_data[0].language, "events", "messageCreate.mod_mail");
         try {
@@ -375,17 +389,19 @@ export default {
             message: "Error upon inserting mod mail message",
             error: e,
           });
-          return await message.reply(t("error_inserting"));
+          await message.reply(t("error_inserting"));
+          return;
         }
         await message.react(client.allEmojis.get(client.config.Emojis.confirm)!.format);
       }
     } else if (message.channel.type === ChannelType.GuildText) {
-      const client = message.client as KhaxyClient;
+      const client = message.client;
       const { rows: guild_rows } = await client.pgClient.query<Guilds>("SELECT language FROM guilds WHERE id = $1", [
         message.guild!.id,
       ]);
       if (!guild_rows.length) {
-        return await message.reply("This server is not in the database.");
+        await message.reply("This server is not in the database.");
+        return;
       }
       const t = client.i18next.getFixedT(guild_rows[0].language, "events", "messageCreate.mod_mail");
       const { rows } = await client.pgClient.query<Mod_mail_threads>(
@@ -412,8 +428,9 @@ export default {
           message: "Error upon inserting mod mail message",
           error: e,
         });
-        return await message.reply(t("error_inserting"));
+        await message.reply(t("error_inserting"));
+        return;
       }
     }
   },
-} as EventBase;
+} satisfies EventBase<Events.MessageCreate>;

@@ -1,15 +1,14 @@
-import { EventBase, KhaxyClient } from "../../@types/types";
-import { AutoModerationActionExecution, AutoModerationActionType, Events } from "discord.js";
+import { EventBase } from "../../@types/types";
+import { AutoModerationActionType, Events } from "discord.js";
 import modlog from "../utils/modLog.js";
 import dayjs from "dayjs";
 
 export default {
   name: Events.AutoModerationActionExecution,
-  once: false,
-  async execute(execution: AutoModerationActionExecution) {
+  async execute(execution) {
     // Get the client instance from the guild member
-    const client = execution.guild.members.me?.client as KhaxyClient;
-
+    const client = execution.guild.members.me?.client;
+    if (!client) return;
     // Check if the action type is Timeout
     if (execution.action.type === AutoModerationActionType.Timeout) {
       // Log the timeout action using the modlog utility
@@ -26,4 +25,4 @@ export default {
       );
     }
   },
-} as EventBase;
+} satisfies EventBase<Events.AutoModerationActionExecution>;

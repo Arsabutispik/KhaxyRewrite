@@ -1,17 +1,17 @@
-import { EventBase, KhaxyClient } from "../../@types/types";
-import { AuditLogEvent, Events, GuildMember } from "discord.js";
+import { EventBase } from "../../@types/types";
+import { AuditLogEvent, Events } from "discord.js";
 import { sleep } from "../utils/utils.js";
 import modlog from "../utils/modLog.js";
 import dayjs from "dayjs";
+import { Guilds } from "../../@types/DatabaseTypes";
 
 export default {
   name: Events.GuildMemberUpdate,
   once: false,
-  async execute(oldMember: GuildMember, newMember: GuildMember) {
-    const { rows } = (await (oldMember.client as KhaxyClient).pgClient.query(
-      "SELECT language FROM guilds WHERE id = $1",
-      [oldMember.guild.id],
-    )) as { rows: { language: string }[] };
+  async execute(oldMember, newMember) {
+    const { rows } = await oldMember.client.pgClient.query<Guilds>("SELECT language FROM guilds WHERE id = $1", [
+      oldMember.guild.id,
+    ]);
     if (!oldMember.isCommunicationDisabled() && newMember.isCommunicationDisabled()) {
       await sleep(1000);
       const fetchedLogs = await oldMember.guild.fetchAuditLogs({
@@ -26,12 +26,10 @@ export default {
             user: newMember.user,
             action: "TIMEOUT",
             moderator: oldMember.client.user!,
-            reason: (oldMember.client as KhaxyClient).i18next.getFixedT(rows[0].language)(
-              "events:guildMemberUpdate.noReason",
-            ),
+            reason: oldMember.client.i18next.getFixedT(rows[0].language)("events:guildMemberUpdate.noReason"),
             duration: dayjs(newMember.communicationDisabledUntilTimestamp! - Date.now()),
           },
-          oldMember.client as KhaxyClient,
+          oldMember.client,
         );
       } else {
         await modlog(
@@ -41,15 +39,12 @@ export default {
             action: "TIMEOUT",
             moderator: log.executor!,
             reason:
-              log.reason ||
-              (oldMember.client as KhaxyClient).i18next.getFixedT(rows[0].language)(
-                "events:guildMemberUpdate.noReason",
-              ),
+              log.reason || oldMember.client.i18next.getFixedT(rows[0].language)("events:guildMemberUpdate.noReason"),
             duration: dayjs(newMember.communicationDisabledUntilTimestamp! - Date.now()),
           },
-          oldMember.client as KhaxyClient,
+          oldMember.client,
         );
       }
     }
   },
-} as EventBase;
+} satisfies EventBase<Events.GuildMemberUpdate>;

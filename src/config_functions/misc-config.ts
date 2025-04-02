@@ -6,13 +6,12 @@ import {
   MessageFlagsBitField,
   StringSelectMenuBuilder,
 } from "discord.js";
-import { KhaxyClient } from "../../@types/types";
 import { Guilds } from "../../@types/DatabaseTypes";
 import { TFunction } from "i18next";
 import { dynamicMessage } from "./register-config.js";
 
 export default async function miscConfig(interaction: ChatInputCommandInteraction<"cached">) {
-  const client = interaction.client as KhaxyClient;
+  const client = interaction.client;
   const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guildId]);
   if (rows.length === 0) {
     await interaction.reply({
@@ -82,7 +81,7 @@ async function languageConfig(interaction: MessageComponentInteraction, data: Gu
     en: "English",
     tr: "Türkçe",
   };
-  const client = interaction.client as KhaxyClient;
+  const client = interaction.client;
   const select_menu = new StringSelectMenuBuilder()
     .setCustomId("language")
     .setMinValues(1)

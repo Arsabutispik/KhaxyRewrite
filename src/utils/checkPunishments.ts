@@ -1,11 +1,11 @@
-import { KhaxyClient } from "../../@types/types";
 import modlog from "./modLog.js";
 import dayjs from "dayjs";
 import { Guilds, Punishments } from "../../@types/DatabaseTypes";
 import logger from "../lib/Logger.js";
 import { toStringId } from "./utils.js";
+import { Client } from "discord.js";
 
-export default async (client: KhaxyClient) => {
+export default async (client: Client) => {
   const check = async () => {
     // Fetch punishments that have expired
     const { rows } = await client.pgClient.query<Punishments>("SELECT * FROM punishments WHERE expires < $1", [

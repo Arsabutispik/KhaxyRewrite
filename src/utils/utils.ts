@@ -1,5 +1,4 @@
-import { KhaxyClient } from "../../@types/types";
-import { AttachmentBuilder, ChannelType, TextChannel, User } from "discord.js";
+import { AttachmentBuilder, ChannelType, Client, TextChannel, User } from "discord.js";
 import { Guilds, Mod_mail_messages } from "../../@types/DatabaseTypes";
 import { Buffer } from "node:buffer";
 import crypto from "crypto";
@@ -28,12 +27,12 @@ function replacePlaceholders(template: string, replacements: Record<string, stri
 
 /**
  * Returns a string of missing permissions in a human-readable format.
- * @param client - KhaxyClient instance
+ * @param client - Client instance
  * @param missing - Array of missing permissions
  * @param language - The language code
  * @returns A string of missing permissions in a human-readable format.
  */
-function missingPermissionsAsString(client: KhaxyClient, missing: string[], language: string) {
+function missingPermissionsAsString(client: Client, missing: string[], language: string) {
   const t = client.i18next.getFixedT(language);
   return missing.map((perm) => t(`permissions:${perm}`)).join(", ");
 }
@@ -47,7 +46,7 @@ function toStringId(id: bigint | string | null): string | "0" {
   return id.toString();
 }
 
-async function modMailLog(client: KhaxyClient, channel: TextChannel, user: User | null, closer: User) {
+async function modMailLog(client: Client, channel: TextChannel, user: User | null, closer: User) {
   const { rows: guild_rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
     channel.guild.id,
   ]);
@@ -85,6 +84,10 @@ async function modMailLog(client: KhaxyClient, channel: TextChannel, user: User 
     }
     if (row.author_type === "user" && row.sent_to === "thread") {
       messages.push(`[${dayjs(row.sent_at)}] ${t("from_user")} ${row.content}`);
+    }
+    if (row.author_type === "staff" && row.sent_to === "thread") {
+      const author = await client.users.fetch(toStringId(row.author_id)).catch(() => null);
+      messages.push(`[${dayjs(row.sent_at)}] ${t("to_thread")} [${author ? author.tag : "Unknown"}] ${row.content}`);
     }
   }
   const buffer = Buffer.from(messages.join("\n"), "utf-8");

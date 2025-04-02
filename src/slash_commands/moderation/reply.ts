@@ -1,4 +1,4 @@
-import { KhaxyClient, SlashCommandBase } from "../../../@types/types";
+import { SlashCommandBase } from "../../../@types/types";
 import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { Guilds, Mod_mail_messages, Mod_mail_threads } from "../../../@types/DatabaseTypes";
 import { toStringId } from "../../utils/utils.js";
@@ -55,7 +55,7 @@ export default {
         .setRequired(false),
     ),
   async execute(interaction) {
-    const client = interaction.client as KhaxyClient;
+    const client = interaction.client;
     const { rows: threads_rows } = await client.pgClient.query<Mod_mail_threads>(
       "SELECT * FROM mod_mail_threads WHERE channel_id = $1",
       [interaction.channel!.id],
