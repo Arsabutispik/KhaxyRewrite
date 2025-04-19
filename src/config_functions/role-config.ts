@@ -11,6 +11,7 @@ import {
 import { Guilds } from "../../@types/DatabaseTypes";
 import { TFunction } from "i18next";
 import { toStringId } from "../utils/utils.js";
+import process from "node:process";
 
 type RoleType =
   | "member_role_id"
@@ -141,7 +142,13 @@ export async function dynamicRole(
   const client = message_component.client;
   await message_component.deferUpdate();
   if (message_component.values.length === 0) {
-    await client.pgClient.query(`UPDATE guilds SET ${role} = NULL WHERE id = $1`, [message_component.guildId]);
+    await client.pgClient.query(
+      `UPDATE guilds SET ${role} = pgp_sym_encrypt(NULL, $2) WHERE pgp_sym_decrypt(id, $2) = $1`,
+      [message_component.guildId, process.env.PASSPHRASE],
+    );
+    await client.setGuildConfig(message_component.guildId, {
+      [role]: null,
+    });
     await message_component.editReply({
       content: t(`${role}.unset`),
       components: [],
@@ -158,10 +165,13 @@ export async function dynamicRole(
       });
       return;
     }
-    await client.pgClient.query(`UPDATE guilds SET ${role} = $1 WHERE id = $2`, [
-      message_component.values[0],
-      message_component.guildId,
-    ]);
+    await client.pgClient.query(
+      `UPDATE guilds SET ${role} = pgp_sym_encrypt($1, $3) WHERE pgp_sym_decrypt(id, $3) = $2`,
+      [message_component.values[0], message_component.guildId, process.env.PASSPHRASE],
+    );
+    await client.setGuildConfig(message_component.guildId, {
+      [role]: message_component.values[0],
+    });
     await message_component.editReply({
       content: t(`${role}.set`, {
         role: message_component.guild!.roles.cache.get(message_component.values[0])!.toString(),

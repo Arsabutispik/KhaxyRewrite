@@ -2,18 +2,31 @@ import modlog from "./modLog.js";
 import dayjs from "dayjs";
 import { Guilds, Punishments } from "../../@types/DatabaseTypes";
 import logger from "../lib/Logger.js";
-import { toStringId } from "./utils.js";
+import { decryptValue, toStringId } from "./utils.js";
 import { Client } from "discord.js";
 
 export default async (client: Client) => {
   const check = async () => {
     // Fetch punishments that have expired
-    const { rows } = await client.pgClient.query<Punishments>("SELECT * FROM punishments WHERE expires < $1", [
-      new Date(),
-    ]);
+    const { rows } = await client.pgClient.query<Punishments>(
+      "SELECT * FROM punishments WHERE pgp_sym_decrypt(expires, $2)::timestamp < $1",
+      [new Date(), process.env.PASSPHRASE],
+    );
     for (const result of rows) {
       // Destructure punishment details
-      const { user_id, type, previous_roles, staff_id, expires, created_at, guild_id } = result;
+      const user_id = await decryptValue(result.user_id, client.pgClient);
+      const type = await decryptValue(result.type, client.pgClient);
+      const previous_roles = result.previous_roles
+        ? JSON.parse(await decryptValue(result.previous_roles, client.pgClient))
+        : null;
+      const staff_id = await decryptValue(result.staff_id, client.pgClient);
+      const expires = await decryptValue(result.expires, client.pgClient);
+      const created_at = await decryptValue(result.created_at, client.pgClient);
+      const guild_id = await decryptValue(result.guild_id, client.pgClient);
+      if (!user_id || !type || !expires || !guild_id) {
+        logger.error("Failed to decrypt necessary fields for punishment:", result);
+        continue;
+      }
       const guild = client.guilds.cache.get(toStringId(guild_id));
       if (!guild) {
         logger.info(`Guild ${guild_id} not found`);

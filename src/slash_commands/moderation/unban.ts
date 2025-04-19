@@ -1,6 +1,5 @@
 import { SlashCommandBase } from "../../../@types/types";
 import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
-import { Guilds } from "../../../@types/DatabaseTypes";
 import logger from "../../lib/Logger.js";
 import modLog from "../../utils/modLog.js";
 
@@ -43,12 +42,15 @@ export default {
     ),
   async execute(interaction) {
     const client = interaction.client;
-    const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
-    if (!rows[0]) {
-      await interaction.reply("An error occurred while fetching the guild data.");
+    const guild_config = await client.getGuildConfig(interaction.guild.id);
+    if (!guild_config) {
+      await interaction.reply({
+        content: "This server is not registered in the database. This shouldn't happen, please contact developers",
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+      });
       return;
     }
-    const t = client.i18next.getFixedT(rows[0].language, "commands", "unban");
+    const t = client.i18next.getFixedT(guild_config.language, "commands", "unban");
     const user = interaction.options.getUser("user", true);
     if (!user) {
       await interaction.reply({ content: t("no_user"), flags: MessageFlagsBitField.Flags.Ephemeral });
@@ -61,7 +63,7 @@ export default {
         content: t("success", {
           user: user.tag,
           confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
-          case: rows[0].case_id,
+          case: guild_config.case_id,
         }),
         flags: MessageFlagsBitField.Flags.Ephemeral,
       });

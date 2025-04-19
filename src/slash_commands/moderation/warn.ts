@@ -2,6 +2,7 @@ import { SlashCommandBase } from "../../../@types/types";
 import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import logger from "../../lib/Logger.js";
 import modLog from "../../utils/modLog.js";
+import process from "node:process";
 
 export default {
   memberPermissions: [PermissionsBitField.Flags.ManageGuild],
@@ -42,12 +43,15 @@ export default {
     ),
   async execute(interaction) {
     const client = interaction.client;
-    const { rows } = await client.pgClient.query("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
-    if (!rows[0]) {
-      await interaction.reply("An error occurred while fetching the guild data.");
+    const guild_config = await client.getGuildConfig(interaction.guild.id);
+    if (!guild_config) {
+      await interaction.reply({
+        content: "This server is not registered in the database. This shouldn't happen, please contact developers",
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+      });
       return;
     }
-    const t = client.i18next.getFixedT(rows[0].language, "commands", "warn");
+    const t = client.i18next.getFixedT(guild_config.language, "commands", "warn");
     const member = interaction.options.getMember("user");
     if (!member) {
       await interaction.reply({ content: t("no_member"), flags: MessageFlagsBitField.Flags.Ephemeral });
@@ -61,15 +65,26 @@ export default {
       await interaction.reply({ content: t("bot_warn"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
-    if (member.permissions.has(PermissionsBitField.Flags.ManageGuild) || member.roles.cache.has(rows[0].mod_role)) {
+    if (
+      member.permissions.has(PermissionsBitField.Flags.ManageGuild) ||
+      member.roles.cache.has(guild_config.staff_role_id)
+    ) {
       await interaction.reply({ content: t("staff_warn"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
     const reason = interaction.options.getString("reason", true);
     try {
       await client.pgClient.query(
-        "INSERT INTO infractions (guild_id, user_id, moderator_id, type, reason, case_id) VALUES ($1, $2, $3, $4, $5, $6)",
-        [interaction.guild.id, member.id, interaction.user.id, "warn", reason, rows[0].case_id],
+        "INSERT INTO infractions (guild_id, user_id, moderator_id, type, reason, case_id) VALUES (pgp_sym_encrypt($1::TEXT, $7), pgp_sym_encrypt($2::TEXT, $7), pgp_sym_encrypt($3::TEXT, $7), pgp_sym_encrypt($4::TEXT, $7), pgp_sym_encrypt($5::TEXT, $7), pgp_sym_encrypt($6::TEXT, $7))",
+        [
+          interaction.guild.id,
+          member.id,
+          interaction.user.id,
+          "warn",
+          reason,
+          guild_config.case_id,
+          process.env.PASSPHRASE,
+        ],
       );
     } catch (error) {
       await interaction.reply(t("database_error"));
@@ -85,7 +100,7 @@ export default {
       await interaction.reply(
         t("success", {
           user: member.user.tag,
-          case: rows[0].case_id,
+          case: guild_config.case_id,
           confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
         }),
       );
@@ -93,7 +108,7 @@ export default {
       await interaction.reply(
         t("dm_error", {
           user: member.user.tag,
-          case: rows[0].case_id,
+          case: guild_config.case_id,
           confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
         }),
       );

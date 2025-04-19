@@ -16,18 +16,19 @@ import {
 import { Guilds } from "../../@types/DatabaseTypes";
 import { TFunction } from "i18next";
 import { toStringId } from "../utils/utils.js";
+import process from "node:process";
 
 export default async function registerConfig(interaction: ChatInputCommandInteraction<"cached">) {
   const client = interaction.client;
-  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guildId]);
-  if (rows.length === 0) {
+  const guild_config = await client.getGuildConfig(interaction.guildId);
+  if (!guild_config) {
     await interaction.reply({
       content: "Unexpected database error. This should not have happened. Please contact the bot developers",
       flags: MessageFlagsBitField.Flags.Ephemeral,
     });
     return;
   }
-  const t = client.i18next.getFixedT(rows[0].language, null, "register_config");
+  const t = client.i18next.getFixedT(guild_config.language, null, "register_config");
   const select_menu = new StringSelectMenuBuilder()
     .setCustomId("register_config")
     .setMinValues(1)
@@ -88,16 +89,16 @@ export default async function registerConfig(interaction: ChatInputCommandIntera
   }
   switch (message_component.values[0]) {
     case "register_join_channel":
-      await dynamicChannel("register_join_channel_id", message_component, rows[0], t);
+      await dynamicChannel("register_join_channel_id", message_component, guild_config, t);
       break;
     case "register_channel":
-      await dynamicChannel("register_channel_id", message_component, rows[0], t);
+      await dynamicChannel("register_channel_id", message_component, guild_config, t);
       break;
     case "register_join_message":
-      await dynamicMessage("register_join_message", message_component, rows[0], t);
+      await dynamicMessage("register_join_message", message_component, guild_config, t);
       break;
     case "register_clear_channel":
-      await registerClearChannel(message_component, rows[0], t);
+      await registerClearChannel(message_component, guild_config, t);
       break;
   }
 }
@@ -107,7 +108,9 @@ export async function dynamicChannel(
     | "register_channel_id"
     | "join_channel_id"
     | "leave_channel_id"
-    | "mod_log_channel_id",
+    | "mod_log_channel_id"
+    | "mod_mail_channel_id"
+    | "bump_leaderboard_channel_id",
   interaction: StringSelectMenuInteraction<"cached">,
   data: Guilds,
   t: TFunction,
@@ -149,11 +152,17 @@ export async function dynamicChannel(
       content: t(`${channel}.unset`),
       components: [],
     });
+    await client.setGuildConfig(message_component.guildId, {
+      [channel]: null,
+    });
   } else {
     await client.pgClient.query(`UPDATE guilds SET ${channel} = $1 WHERE id = $2`, [
       message_component.values[0],
       message_component.guildId,
     ]);
+    await client.setGuildConfig(message_component.guildId, {
+      [channel]: message_component.values[0],
+    });
     await message_component.editReply({
       content: t(`${channel}.set`, {
         channel: message_component.guild.channels.cache.get(message_component.values[0])!.toString(),
@@ -200,16 +209,21 @@ export async function dynamicMessage(
   }
   const client = message_component.client;
   await message_component.deferUpdate();
+  const defaultValueMap = {
+    mod_mail_message: "Thank you for your message! Our mod team will reply to you here as soon as possible.",
+    [message]: null,
+  };
+  const input = message_component.fields.getTextInputValue(message);
+  const valueToEncrypt = input === "" ? defaultValueMap[message] : input;
   await client.pgClient.query(
     `UPDATE guilds
-     SET ${message} = COALESCE(
-             NULLIF($1, ''),
-             (SELECT column_default FROM information_schema.columns
-              WHERE table_name = 'guilds' AND column_name = $2 LIMIT 1)
-                      )
-     WHERE id = $3`,
-    [message_component.fields.getTextInputValue(message), message, message_component.guildId],
+     SET ${message} = pgp_sym_encrypt($1, $3)
+     WHERE pgp_sym_decrypt(id, $3) = $2`,
+    [valueToEncrypt, message_component.guildId, process.env.PASSPHRASE],
   );
+  await client.setGuildConfig(message_component.guildId, {
+    [message]: message_component.fields.getTextInputValue(message),
+  });
   await message_component.editReply({
     content: t(`${message}.set`),
     components: [],
@@ -220,15 +234,25 @@ async function registerClearChannel(interaction: StringSelectMenuInteraction<"ca
   await interaction.deferUpdate();
   const client = interaction.client;
   if (data.register_channel_clear) {
-    await client.pgClient.query(`UPDATE guilds SET register_channel_clear = FALSE WHERE id = $1`, [
-      interaction.guildId,
-    ]);
+    await client.pgClient.query(
+      `UPDATE guilds SET register_channel_clear = pgp_sym_encrypt(FALSE, $2) WHERE pgp_sym_decrypt(id, $2) = $1`,
+      [interaction.guildId, process.env.PASSPHRASE],
+    );
+    await client.setGuildConfig(interaction.guildId, {
+      register_channel_clear: false,
+    });
     await interaction.editReply({
       content: t("register_clear_channel.unset"),
       components: [],
     });
   } else {
-    await client.pgClient.query(`UPDATE guilds SET register_channel_clear = TRUE WHERE id = $1`, [interaction.guildId]);
+    await client.pgClient.query(`UPDATE guilds SET register_channel_clear = pgp_sym_encrypt(TRUE, $2) WHERE id = $1`, [
+      interaction.guildId,
+      process.env.PASSPHRASE,
+    ]);
+    await client.setGuildConfig(interaction.guildId, {
+      register_channel_clear: true,
+    });
     await interaction.editReply({
       content: t("register_clear_channel.set"),
       components: [],

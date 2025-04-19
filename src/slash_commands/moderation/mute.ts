@@ -1,6 +1,5 @@
 import { SlashCommandBase } from "../../../@types/types";
 import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
-import { Guilds, Punishments } from "../../../@types/DatabaseTypes";
 import dayjs from "dayjs";
 import dayjsduration from "dayjs/plugin/duration.js";
 import relativeTime from "dayjs/plugin/relativeTime.js";
@@ -82,12 +81,15 @@ export default {
     dayjs.extend(dayjsduration);
     dayjs.extend(relativeTime);
     const client = interaction.client;
-    const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
-    const { rows: punishment_rows } = await client.pgClient.query<Punishments>(
-      "SELECT * FROM punishments WHERE guild_id = $1 AND user_id = $2 AND type = 'mute'",
-      [interaction.guild.id, interaction.user.id],
-    );
-    const t = client.i18next.getFixedT(rows[0].language, "commands", "mute");
+    const guild_config = await client.getGuildConfig(interaction.guild.id);
+    if (!guild_config) {
+      await interaction.reply({
+        content: "This server is not registered in the database. This shouldn't happen, please contact developers",
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+      });
+      return;
+    }
+    const t = client.i18next.getFixedT(guild_config.language, "commands", "mute");
     const member = interaction.options.getMember("user");
     if (!member) {
       await interaction.reply({ content: t("no_user"), flags: MessageFlagsBitField.Flags.Ephemeral });
@@ -103,7 +105,7 @@ export default {
     }
     if (
       member.permissions.has(PermissionsBitField.Flags.ManageRoles) ||
-      member.roles.cache.has(toStringId(rows[0].staff_role_id))
+      member.roles.cache.has(toStringId(guild_config.staff_role_id))
     ) {
       await interaction.reply({ content: t("cant_mute_mod"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
@@ -112,22 +114,23 @@ export default {
       await interaction.reply({ content: t("cant_mute_higher"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
-    const muteRole = interaction.guild.roles.cache.get(toStringId(rows[0].mute_role_id));
+    const muteRole = interaction.guild.roles.cache.get(toStringId(guild_config.mute_role_id));
     if (!muteRole) {
       await interaction.reply({ content: t("no_mute_role"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
-    if (member.roles.cache.has(muteRole.id) && punishment_rows[0]) {
+    const punishment_rows = await client.getPunishments(interaction.guild.id, member.id, "mute");
+    if (member.roles.cache.has(muteRole.id) && punishment_rows) {
       await interaction.reply({ content: t("already_muted"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
-    } else if (member.roles.cache.has(muteRole.id) && !punishment_rows[0]) {
+    } else if (member.roles.cache.has(muteRole.id) && !punishment_rows) {
       await interaction.reply({
         content: t("already_muted_no_punishment"),
         flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       await member.roles.remove(muteRole);
       return;
-    } else if (!member.roles.cache.has(muteRole.id) && punishment_rows[0]) {
+    } else if (!member.roles.cache.has(muteRole.id) && punishment_rows) {
       await interaction.reply({ content: t("not_muted"), flags: MessageFlagsBitField.Flags.Ephemeral });
       await member.roles.add(muteRole);
       return;
@@ -138,9 +141,9 @@ export default {
       interaction.options.getString("time", true) as dayjsduration.DurationUnitType,
     );
     const long_duration = dayjs(dayjs().add(duration))
-      .locale(rows[0].language || "en")
+      .locale(guild_config.language || "en")
       .fromNow(true);
-    if (rows[0].mute_get_all_roles) {
+    if (guild_config.mute_get_all_roles) {
       const filtered_roles = member.roles.cache
         .filter((role) => role.id !== interaction.guild!.id)
         .filter((role) => role.id !== interaction.guild!.roles.premiumSubscriberRole?.id)
@@ -148,7 +151,7 @@ export default {
         .map((role) => role.id);
       try {
         await client.pgClient.query(
-          "INSERT INTO punishments (user_id, guild_id, type, staff_id, expires, created_at, previous_roles) VALUES ($1, $2, 'mute', $3, $4, $5, $6)",
+          "INSERT INTO punishments (user_id, guild_id, type, staff_id, expires, created_at, previous_roles) VALUES (pgp_sym_encrypt($1, $7), pgp_sym_encrypt($2, $7), pgp_sym_encrypt('mute', $7), pgp_sym_encrypt($3, $7), pgp_sym_encrypt($4, $7), pgp_sym_encrypt($5, $7), pgp_sym_encrypt($6::text, $7))",
           [
             member.id,
             interaction.guild.id,
@@ -156,6 +159,7 @@ export default {
             new Date(Date.now() + duration.asMilliseconds()),
             new Date(),
             filtered_roles,
+            process.env.PASSPHRASE,
           ],
         );
       } catch (error) {
@@ -183,13 +187,14 @@ export default {
     } else {
       try {
         await client.pgClient.query(
-          "INSERT INTO punishments (user_id, guild_id, type, staff_id, expires, created_at) VALUES ($1, $2, 'mute', $3, $4, $5)",
+          "INSERT INTO punishments (user_id, guild_id, type, staff_id, expires, created_at) VALUES (pgp_sym_encrypt($1, $6), pgp_sym_encrypt($2, $6), pgp_sym_encrypt('mute', $6), pgp_sym_encrypt($3, $6), pgp_sym_encrypt($4, $6), pgp_sym_encrypt($5, $6))",
           [
             member.id,
             interaction.guild.id,
             interaction.user.id,
             new Date(Date.now() + duration.asMilliseconds()),
             new Date(),
+            process.env.PASSPHRASE,
           ],
         );
       } catch (error) {
@@ -222,7 +227,7 @@ export default {
           user: member.user.tag,
           duration: long_duration,
           confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
-          case: rows[0].case_id,
+          case: guild_config.case_id,
         }),
       });
     } catch {
@@ -230,7 +235,7 @@ export default {
         content: t("message.fail", {
           user: member.user.tag,
           duration: long_duration,
-          case: rows[0].case_id,
+          case: guild_config.case_id,
           confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
         }),
       });

@@ -192,6 +192,7 @@
   "misc_config": {
     "initial": "Select the setting you want to update.",
     "timeout": "Message timed out. Please run the command again.",
+    "channel_initial": "Select a channel below. If you want to remove the channel, press x and press elsewhere",
     "language": {
       "label": "Set Language",
       "description": "The language the bot will use.",
@@ -203,6 +204,12 @@
       "label": "Set Mod Mail Message",
       "set": "Mod mail message has been set.",
       "description": "The message that will be sent by the bot when a user sends a mod mail."
+    },
+    "bump_leaderboard_channel_id": {
+      "label": "Set Bump Leaderboard Channel",
+      "description": "The channel where the bump leaderboard will be sent.",
+      "unset": "Bump leaderboard channel has been removed.",
+      "set": "Bump leaderboard channel has been set to {{channel}}."
     }
   },
   "listen_for_notifications": {

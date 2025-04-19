@@ -1,6 +1,5 @@
 import { SlashCommandBase } from "../../../@types/types";
 import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
-import { Guilds } from "../../../@types/DatabaseTypes";
 import logger from "../../lib/Logger.js";
 import { toStringId } from "../../utils/utils.js";
 
@@ -67,16 +66,23 @@ export default {
     ),
   async execute(interaction) {
     const client = interaction.client;
-    const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
-    const t = client.i18next.getFixedT(rows[0].language || "en", "commands", "register");
+    const guild_config = await client.getGuildConfig(interaction.guild.id);
+    if (!guild_config) {
+      await interaction.reply({
+        content: "This server is not registered in the database. This shouldn't happen, please contact developers",
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+      });
+      return;
+    }
+    const t = client.i18next.getFixedT(guild_config.language || "en", "commands", "register");
     const member = interaction.options.getMember("user");
     if (!member) {
       await interaction.reply(t("no_member"));
       return;
     }
     const gender = interaction.options.getString("gender", true);
-    const registerChannel = interaction.guild.channels.cache.get(toStringId(rows[0].register_channel_id));
-    if (!rows[0].register_channel_id || !registerChannel) {
+    const registerChannel = interaction.guild.channels.cache.get(toStringId(guild_config.register_channel_id));
+    if (!guild_config.register_channel_id || !registerChannel) {
       await interaction.reply(t("no_register_channel"));
       return;
     }
@@ -84,19 +90,19 @@ export default {
       await interaction.reply(t("wrong_channel", { channel: registerChannel.id }));
       return;
     }
-    if (!rows[0].member_role_id || !interaction.guild.roles.cache.has(toStringId(rows[0].member_role_id))) {
+    if (!guild_config.member_role_id || !interaction.guild.roles.cache.has(toStringId(guild_config.member_role_id))) {
       await interaction.reply(t("no_member_role"));
       return;
     }
     switch (gender) {
       case "male":
-        if (!rows[0].male_role_id || !interaction.guild.roles.cache.has(toStringId(rows[0].male_role_id))) {
+        if (!guild_config.male_role_id || !interaction.guild.roles.cache.has(toStringId(guild_config.male_role_id))) {
           await interaction.reply(t("no_male_role"));
           return;
         }
         try {
-          await member.roles.add(toStringId(rows[0].male_role_id));
-          await member.roles.add(toStringId(rows[0].member_role_id));
+          await member.roles.add(toStringId(guild_config.male_role_id));
+          await member.roles.add(toStringId(guild_config.member_role_id));
           await interaction.reply(
             t("success", { member, confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format }),
           );
@@ -114,13 +120,16 @@ export default {
         }
         break;
       case "female":
-        if (!rows[0].female_role_id || !interaction.guild.roles.cache.has(toStringId(rows[0].female_role_id))) {
+        if (
+          !guild_config.female_role_id ||
+          !interaction.guild.roles.cache.has(toStringId(guild_config.female_role_id))
+        ) {
           await interaction.reply(t("no_female_role"));
           return;
         }
         try {
-          await member.roles.add(toStringId(rows[0].female_role_id));
-          await member.roles.add(toStringId(rows[0].member_role_id));
+          await member.roles.add(toStringId(guild_config.female_role_id));
+          await member.roles.add(toStringId(guild_config.member_role_id));
           await interaction.reply(
             t("success", { member, confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format }),
           );
@@ -139,7 +148,7 @@ export default {
         break;
       case "other":
         try {
-          await member.roles.add(toStringId(rows[0].member_role_id));
+          await member.roles.add(toStringId(guild_config.member_role_id));
           await interaction.reply(
             t("success", { member, confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format }),
           );

@@ -1,7 +1,8 @@
 import { EventBase } from "../../@types/types";
-import { Events, GuildMember, MessageFlagsBitField } from "discord.js";
+import { Events, MessageFlagsBitField } from "discord.js";
 import { missingPermissionsAsString } from "../utils/utils.js";
 import logger from "../lib/Logger.js";
+import process from "node:process";
 
 export default {
   name: Events.InteractionCreate,
@@ -14,18 +15,19 @@ export default {
     if (
       interaction.guildId &&
       !(
-        await interaction.client.pgClient.query("SELECT EXISTS (SELECT 1 FROM guilds WHERE id = $1)", [
-          interaction.guildId,
-        ])
+        await interaction.client.pgClient.query(
+          "SELECT EXISTS (SELECT 1 FROM guilds WHERE pgp_sym_decrypt(id, $2) = $1)",
+          [interaction.guildId, process.env.PASSPHRASE],
+        )
       ).rows[0].exists
     ) {
       logger.warn(`Guild config for ${interaction.guildId} not found. Creating...`);
       try {
         // Insert a new guild configuration into the database
-        await interaction.client.pgClient.query("INSERT INTO guilds (id, language) VALUES ($1, $2)", [
-          interaction.guildId,
-          "en",
-        ]);
+        await interaction.client.pgClient.query(
+          "INSERT INTO guilds (id, language, case_id, days_to_kick, default_expiry, mod_mail_message) VALUES (pgp_sym_encrypt($1, $2), pgp_sym_encrypt('en', $2), pgp_sym_encrypt(1::text, $2), pgp_sym_encrypt(0::text, $2), pgp_sym_encrypt(7::text, $2), pgp_sym_encrypt('Thank you for your message! Our mod team will reply to you here as soon as possible.', $2))",
+          [interaction.guildId, process.env.PASSPHRASE],
+        );
         logger.info(`Guild config for ${interaction.guildId} created successfully.`);
       } catch (error) {
         logger.error(error);
@@ -40,15 +42,14 @@ export default {
       return;
     }
     // Retrieve the language from the guild configuration
-    const language = (
-      await interaction.client.pgClient.query("SELECT language FROM guilds WHERE id = $1", [interaction.guildId])
-    ).rows[0].language;
+    const guilds_config = await interaction.client.getGuildConfig(interaction.guildId);
+    const language = guilds_config?.language || "en";
     // Retrieve the translation function
     const t = interaction.client.i18next.getFixedT(language);
     // Check if the member has the required permissions to execute the command
     if (
       command.memberPermissions &&
-      interaction.member instanceof GuildMember &&
+      interaction.member &&
       !interaction.member.permissions.has(command.memberPermissions)
     ) {
       const missingPermissions = missingPermissionsAsString(

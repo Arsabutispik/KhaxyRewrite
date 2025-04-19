@@ -18,163 +18,17 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: jsonb_remove_array_element(jsonb, jsonb); Type: FUNCTION; Schema: public; Owner: -
+-- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
 --
 
-CREATE FUNCTION public.jsonb_remove_array_element(arr jsonb, element jsonb) RETURNS jsonb
-    LANGUAGE plpgsql IMMUTABLE
-    AS $$
-
-
-
-
-
-
-
-  DECLARE _idx integer;
-
-
-
-
-
-
-
-  DECLARE _result jsonb;
-
-
-
-
-
-
-
-  BEGIN
-
-
-
-
-
-
-
-    _idx := (SELECT ordinality - 1 FROM jsonb_array_elements(arr) WITH ordinality WHERE value = element);
-
-
-
-
-
-
-
-    IF _idx IS NOT NULL 
-
-
-
-
-
-
-
-    THEN 
-
-
-
-
-
-
-
-      _result := arr - _idx;
-
-
-
-
-
-
-
-    ELSE
-
-
-
-
-
-
-
-      _result := arr;
-
-
-
-
-
-
-
-    END IF;
-
-
-
-
-
-
-
-    RETURN _result;
-
-
-
-
-
-
-
-  END;
-
-
-
-
-
-
-
-$$;
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 
 --
--- Name: notify_thread_closed(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: -
 --
 
-CREATE FUNCTION public.notify_thread_closed() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-    PERFORM pg_notify('thread_closed',
-                      json_build_object(
-                              'channel_id', NEW.channel_id::text,
-                              'user_id', NEW.user_id::text,
-                              'guild_id', NEW.guild_id::text
-                      )::text
-            );
-    RETURN NEW;
-END;
-$$;
-
-
---
--- Name: set_expiry_date(); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION public.set_expiry_date() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $$
-
-BEGIN
-
-    IF (SELECT default_expiry FROM guilds WHERE id = NEW.guild_id) = 0 THEN
-
-        NEW.expires_at := NULL;
-
-    ELSE
-
-        NEW.expires_at := NOW() + (INTERVAL '1 day' * (SELECT default_expiry FROM guilds WHERE id = NEW.guild_id));
-
-    END IF;
-
-    RETURN NEW;
-
-END;
-
-$$;
+COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
 
 
 SET default_tablespace = '';
@@ -182,13 +36,24 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: bump_leaderboard; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.bump_leaderboard (
+    guild_id bytea NOT NULL,
+    user_id bytea NOT NULL,
+    bump_count bytea NOT NULL
+);
+
+
+--
 -- Name: cronjobs; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.cronjobs (
-    id bigint NOT NULL,
-    color_time timestamp without time zone NOT NULL,
-    unregistered_people_time timestamp without time zone
+    id bytea NOT NULL,
+    color_time bytea NOT NULL,
+    unregistered_people_time bytea
 );
 
 
@@ -197,32 +62,36 @@ CREATE TABLE public.cronjobs (
 --
 
 CREATE TABLE public.guilds (
-    language character varying DEFAULT 'en'::character varying,
-    case_id integer DEFAULT 1,
-    mod_log_channel_id bigint,
-    color_id_of_the_day bigint,
-    color_name_of_the_day character varying,
-    days_to_kick integer DEFAULT 0,
-    register_channel_id bigint,
-    member_role_id bigint,
-    mute_role_id bigint,
-    mute_get_all_roles boolean,
-    join_channel_id bigint,
-    register_join_channel_id bigint,
-    join_message text,
-    register_join_message text,
-    leave_channel_id bigint,
-    leave_message text,
-    staff_role_id bigint,
-    male_role_id bigint,
-    female_role_id bigint,
-    register_channel_clear boolean,
-    mod_mail_channel_id bigint,
-    dj_role_id bigint,
-    mod_mail_message text DEFAULT 'Thank you for your message! Our mod team will reply to you here as soon as possible.'::text,
-    default_expiry integer DEFAULT 0,
-    id bigint NOT NULL,
-    mod_mail_parent_channel_id bigint
+    case_id bytea,
+    mod_log_channel_id bytea,
+    color_id_of_the_day bytea,
+    color_name_of_the_day bytea,
+    days_to_kick bytea,
+    register_channel_id bytea,
+    member_role_id bytea,
+    mute_role_id bytea,
+    mute_get_all_roles bytea,
+    join_channel_id bytea,
+    register_join_channel_id bytea,
+    join_message bytea,
+    register_join_message bytea,
+    leave_channel_id bytea,
+    leave_message bytea,
+    staff_role_id bytea,
+    male_role_id bytea,
+    female_role_id bytea,
+    register_channel_clear bytea,
+    mod_mail_channel_id bytea,
+    dj_role_id bytea,
+    mod_mail_message bytea,
+    default_expiry bytea,
+    mod_mail_parent_channel_id bytea,
+    language bytea,
+    id bytea NOT NULL,
+    bump_leaderboard_channel_id bytea,
+    last_bump_winner bytea,
+    last_bump_winner_count bytea,
+    last_bump_winner_total_count bytea
 );
 
 
@@ -231,14 +100,14 @@ CREATE TABLE public.guilds (
 --
 
 CREATE TABLE public.infractions (
-    user_id bigint NOT NULL,
-    moderator_id bigint NOT NULL,
-    reason text NOT NULL,
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    expires_at timestamp without time zone,
-    case_id integer,
-    type character varying,
-    guild_id bigint
+    user_id bytea,
+    moderator_id bytea,
+    reason bytea,
+    created_at bytea,
+    expires_at bytea,
+    case_id bytea,
+    type bytea,
+    guild_id bytea
 );
 
 
@@ -247,17 +116,15 @@ CREATE TABLE public.infractions (
 --
 
 CREATE TABLE public.mod_mail_messages (
-    thread_id bigint,
-    author_id bigint NOT NULL,
-    author_type text NOT NULL,
-    content text NOT NULL,
-    attachments text[] DEFAULT '{}'::text[],
-    sent_at timestamp without time zone DEFAULT now(),
-    message_id bigint NOT NULL,
-    send_to text NOT NULL,
-    first_message boolean,
-    CONSTRAINT modmail_messages_author_type_check CHECK ((author_type = ANY (ARRAY['user'::text, 'staff'::text, 'client'::text]))),
-    CONSTRAINT modmail_messages_send_to_check CHECK ((send_to = ANY (ARRAY['user'::text, 'thread'::text])))
+    thread_id bytea,
+    author_id bytea NOT NULL,
+    author_type bytea NOT NULL,
+    content bytea NOT NULL,
+    attachments bytea,
+    sent_at bytea,
+    sent_to bytea NOT NULL,
+    message_id bytea,
+    channel_id bytea NOT NULL
 );
 
 
@@ -266,15 +133,14 @@ CREATE TABLE public.mod_mail_messages (
 --
 
 CREATE TABLE public.mod_mail_threads (
-    thread_id bigint NOT NULL,
-    guild_id bigint NOT NULL,
-    user_id bigint NOT NULL,
-    channel_id bigint,
-    status text DEFAULT 'open'::text NOT NULL,
-    created_at timestamp without time zone DEFAULT now(),
-    closed_at timestamp without time zone,
-    close_date timestamp without time zone,
-    CONSTRAINT mod_mail_threads_status_check CHECK ((status = ANY (ARRAY['open'::text, 'closed'::text, 'suspended'::text])))
+    thread_id bytea NOT NULL,
+    guild_id bytea NOT NULL,
+    user_id bytea NOT NULL,
+    channel_id bytea,
+    status bytea NOT NULL,
+    created_at bytea,
+    closed_at bytea,
+    close_date bytea
 );
 
 
@@ -334,13 +200,13 @@ ALTER SEQUENCE public.pgmigrations_id_seq OWNED BY public.pgmigrations.id;
 --
 
 CREATE TABLE public.punishments (
-    expires timestamp without time zone NOT NULL,
-    type character varying NOT NULL,
-    user_id bigint NOT NULL,
-    guild_id bigint NOT NULL,
-    previous_roles bigint[],
-    staff_id bigint NOT NULL,
-    created_at timestamp without time zone NOT NULL
+    expires bytea NOT NULL,
+    type bytea NOT NULL,
+    user_id bytea NOT NULL,
+    guild_id bytea NOT NULL,
+    previous_roles bytea,
+    staff_id bytea NOT NULL,
+    created_at bytea NOT NULL
 );
 
 
@@ -360,11 +226,19 @@ ALTER TABLE ONLY public.cronjobs
 
 
 --
--- Name: guilds guilds_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: guilds guilds_pk; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.guilds
-    ADD CONSTRAINT guilds_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT guilds_pk PRIMARY KEY (id);
+
+
+--
+-- Name: guilds guilds_pk_2; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.guilds
+    ADD CONSTRAINT guilds_pk_2 UNIQUE (id);
 
 
 --
@@ -389,36 +263,6 @@ ALTER TABLE ONLY public.pgmigrations
 
 ALTER TABLE ONLY public.punishments
     ADD CONSTRAINT punishments_pk PRIMARY KEY (user_id);
-
-
---
--- Name: infractions infractions_expiry_trigger; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER infractions_expiry_trigger BEFORE INSERT ON public.infractions FOR EACH ROW EXECUTE FUNCTION public.set_expiry_date();
-
-
---
--- Name: mod_mail_threads trigger_notify_thread_closed; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER trigger_notify_thread_closed AFTER UPDATE ON public.mod_mail_threads FOR EACH ROW WHEN (((new.status = 'closed'::text) AND (old.close_date IS NOT NULL))) EXECUTE FUNCTION public.notify_thread_closed();
-
-
---
--- Name: infractions infractions_guild_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.infractions
-    ADD CONSTRAINT infractions_guild_id_fkey FOREIGN KEY (guild_id) REFERENCES public.guilds(id) ON DELETE CASCADE;
-
-
---
--- Name: mod_mail_messages modmail_messages_thread_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.mod_mail_messages
-    ADD CONSTRAINT modmail_messages_thread_id_fkey FOREIGN KEY (thread_id) REFERENCES public.mod_mail_threads(thread_id) ON DELETE CASCADE;
 
 
 --

@@ -6,20 +6,19 @@ import {
   MessageFlagsBitField,
   StringSelectMenuBuilder,
 } from "discord.js";
-import { Guilds } from "../../@types/DatabaseTypes";
 import { dynamicChannel, dynamicMessage } from "./register-config.js";
 
 export default async function welcomeLeaveConfig(interaction: ChatInputCommandInteraction<"cached">) {
   const client = interaction.client;
-  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guildId]);
-  if (rows.length === 0) {
+  const guild_config = await client.getGuildConfig(interaction.guild.id);
+  if (!guild_config) {
     await interaction.reply({
-      content: "Unexpected database error. This should not have happened. Please contact the bot developers",
+      content: "Guild config not found. Please contact the bot developers as this shouldn't happen.",
       flags: MessageFlagsBitField.Flags.Ephemeral,
     });
     return;
   }
-  const t = client.i18next.getFixedT(rows[0].language, null, "welcome_leave_config");
+  const t = client.i18next.getFixedT(guild_config.language, null, "welcome_leave_config");
   const select_menu = new StringSelectMenuBuilder()
     .setCustomId("welcome_leave_config")
     .setMinValues(1)
@@ -80,16 +79,16 @@ export default async function welcomeLeaveConfig(interaction: ChatInputCommandIn
   }
   switch (message_component.values[0]) {
     case "join_channel":
-      await dynamicChannel("join_channel_id", message_component, rows[0], t);
+      await dynamicChannel("join_channel_id", message_component, guild_config, t);
       break;
     case "join_message":
-      await dynamicMessage("join_message", message_component, rows[0], t);
+      await dynamicMessage("join_message", message_component, guild_config, t);
       break;
     case "leave_channel":
-      await dynamicChannel("leave_channel_id", message_component, rows[0], t);
+      await dynamicChannel("leave_channel_id", message_component, guild_config, t);
       break;
     case "leave_message":
-      await dynamicMessage("leave_message", message_component, rows[0], t);
+      await dynamicMessage("leave_message", message_component, guild_config, t);
       break;
   }
 }

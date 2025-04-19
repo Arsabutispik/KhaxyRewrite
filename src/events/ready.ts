@@ -1,14 +1,13 @@
 import { ActivityType, Events } from "discord.js";
 import { EventBase } from "../../@types/types";
 import { loadEmojis } from "../lib/PlayerConfig.js";
-import { CronJob } from "cron";
-import colorOfTheDay from "../utils/colorOfTheDay.js";
 import logger from "../lib/Logger.js";
-
+import recoverMissedCronjob from "../utils/recoverMissedCronjob.js";
 export default {
   name: Events.ClientReady,
   once: true,
   async execute(client) {
+    await recoverMissedCronjob(client);
     const emojis: Array<{ name: string; id: string; fallBack: string }> = [
       {
         name: "searchEmoji",
@@ -42,19 +41,6 @@ export default {
       },
     ];
     await loadEmojis(client, emojis);
-    CronJob.from({
-      cronTime: "0 0 0 * * *",
-      onTick: () => colorOfTheDay(client),
-      onComplete: () => {
-        logger.log({
-          level: "info",
-          message: "Color of the day cronjob has been completed.",
-          discord: false,
-        });
-      },
-      start: true,
-      timeZone: "UTC",
-    });
     const messages: { message: string; type: ActivityType.Custom | undefined }[] = [
       {
         message: `Use /invite to add me!`,

@@ -19,7 +19,7 @@ export default {
       if (!channel) return;
       if (channel.type !== ChannelType.GuildText) return;
       if (channel.isThread()) return;
-      channel.sendTyping();
+      await channel.sendTyping();
     }
   },
 } satisfies EventBase<Events.TypingStart>;

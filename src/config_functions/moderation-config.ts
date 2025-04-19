@@ -1,11 +1,9 @@
 import {
   ActionRowBuilder,
-  ChannelType,
   ChatInputCommandInteraction,
   ComponentType,
   MessageComponentInteraction,
   MessageFlagsBitField,
-  PermissionsBitField,
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
 } from "discord.js";
@@ -13,7 +11,7 @@ import { Guilds } from "../../@types/DatabaseTypes";
 import { dynamicChannel } from "./register-config.js";
 import { dynamicRole } from "./role-config.js";
 import { TFunction } from "i18next";
-import { toStringId } from "../utils/utils.js";
+import process from "node:process";
 
 export default async function moderationConfig(interaction: ChatInputCommandInteraction<"cached">) {
   const client = interaction.client;
@@ -105,7 +103,7 @@ export default async function moderationConfig(interaction: ChatInputCommandInte
       await dynamicRole("staff_role_id", message_component, rows[0], t);
       break;
     case "mod_mail_channel":
-      await modMailChannel(message_component, rows[0], t);
+      await dynamicChannel("mod_mail_channel_id", message_component, rows[0], t);
       break;
     case "mute_get_all_roles":
       await muteGetAllRoles(message_component, rows[0], t);
@@ -119,65 +117,29 @@ export default async function moderationConfig(interaction: ChatInputCommandInte
   }
 }
 
-async function modMailChannel(interaction: StringSelectMenuInteraction<"cached">, data: Guilds, t: TFunction) {
-  const client = interaction.client;
-  if (data.mod_mail_channel_id && interaction.guild.channels.cache.has(toStringId(data.mod_mail_channel_id))) {
-    await interaction.deferUpdate();
-    await interaction.editReply({
-      content: t("mod_mail_channel.already_set"),
-      components: [],
-    });
-    return;
-  } else {
-    let permissions = [
-      {
-        id: interaction.guild!.id,
-        deny: [PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ViewChannel],
-      },
-      {
-        id: interaction.client.user!.id,
-        allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages],
-      },
-    ];
-    if (interaction.guild.roles.cache.has(toStringId(data.staff_role_id))) {
-      permissions.push({
-        id: toStringId(data.staff_role_id),
-        allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages],
-      });
-    }
-    const parent = await interaction.guild!.channels.create({
-      name: "ModMail",
-      type: ChannelType.GuildCategory,
-      permissionOverwrites: permissions,
-    });
-    const child = await parent.children.create({
-      name: "ModMail Log",
-      type: ChannelType.GuildText,
-      permissionOverwrites: permissions,
-    });
-    await client.pgClient.query(
-      "UPDATE guilds SET mod_mail_channel_id = $1, mod_mail_parent_channel_id = $2 WHERE id = $3",
-      [child.id, parent.id, interaction.guildId],
-    );
-    await interaction.deferUpdate();
-    await interaction.editReply({
-      content: t("mod_mail_channel.set"),
-      components: [],
-    });
-  }
-}
-
 async function muteGetAllRoles(interaction: StringSelectMenuInteraction<"cached">, data: Guilds, t: TFunction) {
   const client = interaction.client;
   if (data.mute_get_all_roles) {
-    await client.pgClient.query("UPDATE guilds SET mute_get_all_roles = FALSE WHERE id = $1", [interaction.guildId]);
+    await client.pgClient.query(
+      "UPDATE guilds SET mute_get_all_roles = pgp_sym_encrypt(FALSE, $2) WHERE pgp_sym_decrypt(id, $2) = $1",
+      [interaction.guildId, process.env.PASSPHRASE],
+    );
+    await client.setGuildConfig(interaction.guildId, {
+      mute_get_all_roles: false,
+    });
     await interaction.deferUpdate();
     await interaction.editReply({
       content: t("mute_get_all_roles.false"),
       components: [],
     });
   } else {
-    await client.pgClient.query("UPDATE guilds SET mute_get_all_roles = TRUE WHERE id = $1", [interaction.guildId]);
+    await client.pgClient.query(
+      "UPDATE guilds SET mute_get_all_roles = pgp_sym_encrypt(TRUE, $2) WHERE pgp_sym_decrypt(id, $2) = $1",
+      [interaction.guildId, process.env.PASSPHRASE],
+    );
+    await client.setGuildConfig(interaction.guildId, {
+      mute_get_all_roles: true,
+    });
     await interaction.deferUpdate();
     await interaction.editReply({
       content: t("mute_get_all_roles.true"),
@@ -245,10 +207,13 @@ async function registerDayLimit(interaction: StringSelectMenuInteraction<"cached
     await reply.edit({ content: t("timeout"), components: [] });
     return;
   }
-  await client.pgClient.query("UPDATE guilds SET days_to_kick = $1 WHERE id = $2", [
-    message_component.values[0],
-    interaction.guildId,
-  ]);
+  await client.pgClient.query(
+    "UPDATE guilds SET days_to_kick = pgp_sym_encrypt($1, $3) WHERE pgp_sym_decrypt(id, $3) = $2",
+    [message_component.values[0], interaction.guildId, process.env.PASSPHRASE],
+  );
+  await client.setGuildConfig(interaction.guildId, {
+    days_to_kick: parseInt(message_component.values[0]),
+  });
   await message_component.deferUpdate();
   await message_component.editReply({
     content: t("register_day_limit.success", { days: message_component.values[0] }),
@@ -315,10 +280,13 @@ async function defaultExpiry(interaction: StringSelectMenuInteraction<"cached">,
     await reply.edit({ content: t("timeout"), components: [] });
     return;
   }
-  await client.pgClient.query("UPDATE guilds SET default_expiry = $1 WHERE id = $2", [
-    message_component.values[0],
-    interaction.guildId,
-  ]);
+  await client.pgClient.query(
+    "UPDATE guilds SET default_expiry = pgp_sym_encrypt($1, $3) WHERE pgp_sym_decrypt(id, $3) = $2",
+    [message_component.values[0], interaction.guildId, process.env.PASSPHRASE],
+  );
+  await client.setGuildConfig(interaction.guildId, {
+    default_expiry: parseInt(message_component.values[0]),
+  });
   await message_component.deferUpdate();
   await message_component.editReply({
     content: t("default_expiry.success", { days: message_component.values[0] }),

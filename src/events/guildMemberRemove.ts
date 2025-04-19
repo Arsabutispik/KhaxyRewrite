@@ -2,7 +2,6 @@ import { EventBase } from "../../@types/types";
 import { AuditLogEvent, Events, PermissionsBitField } from "discord.js";
 import { replacePlaceholders, toStringId } from "../utils/utils.js";
 import dayjs from "dayjs";
-import { Guilds } from "../../@types/DatabaseTypes";
 import modLog from "../utils/modLog.js";
 import relativeTime from "dayjs/plugin/relativeTime.js";
 
@@ -11,9 +10,7 @@ export default {
   once: false,
   async execute(member) {
     // Fetch guild data from the database
-    const { rows } = await member.client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
-      member.guild.id,
-    ]);
+    const guild_config = await member.client.getGuildConfig(member.guild.id);
     dayjs.extend(relativeTime);
     const replacements = {
       "{user}": member.toString(),
@@ -25,22 +22,25 @@ export default {
       "{createdAgo}": dayjs(member.user.createdAt).fromNow(),
     };
     // If no guild data is found, exit the function
-    if (rows.length === 0) return;
+    if (!guild_config) return;
 
     // If a goodbye message and channel are configured, send the goodbye message to the channel
     if (
-      rows[0].leave_message &&
-      rows[0].leave_channel_id &&
-      member.guild.channels.cache.has(toStringId(rows[0].leave_channel_id))
+      guild_config.leave_message &&
+      guild_config.leave_channel_id &&
+      member.guild.channels.cache.has(toStringId(guild_config.leave_channel_id))
     ) {
-      const goodbye_channel = member.guild.channels.cache.get(toStringId(rows[0].leave_channel_id))!;
+      const goodbye_channel = member.guild.channels.cache.get(toStringId(guild_config.leave_channel_id))!;
       if (!goodbye_channel.isTextBased()) return;
       if (!goodbye_channel.permissionsFor(member.guild.members.me!)?.has(PermissionsBitField.Flags.SendMessages))
         return;
-      goodbye_channel.send(replacePlaceholders(rows[0].leave_message, replacements));
+      await goodbye_channel.send(replacePlaceholders(guild_config.leave_message, replacements));
     }
 
-    if (rows[0].mod_log_channel_id && member.guild.channels.cache.has(toStringId(rows[0].mod_log_channel_id))) {
+    if (
+      guild_config.mod_log_channel_id &&
+      member.guild.channels.cache.has(toStringId(guild_config.mod_log_channel_id))
+    ) {
       if (!member.guild.members.me?.permissions.has("ViewAuditLog")) return;
       const auditLogs = await member.guild.fetchAuditLogs({ type: AuditLogEvent.MemberKick, limit: 1 });
       const log = auditLogs.entries.first();
@@ -55,7 +55,7 @@ export default {
           action: "KICK",
           user: member.user,
           moderator: executor!,
-          reason: reason ?? member.client.i18next.getFixedT(rows[0].language)("events:guildMemberRemove.noReason"),
+          reason: reason ?? member.client.i18next.getFixedT(guild_config.language)("events:guildMemberRemove.noReason"),
         },
         member.client,
       );

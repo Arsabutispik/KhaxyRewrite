@@ -12,16 +12,17 @@ import {
   ButtonStyle,
   EmbedBuilder,
 } from "discord.js";
-import { Guilds, Mod_mail_threads } from "../../@types/DatabaseTypes";
+import { Bump_leaderboard, Guilds, Mod_mail_threads } from "../../@types/DatabaseTypes";
 import dayjs from "dayjs";
 import logger from "../lib/Logger.js";
-import { toStringId } from "../utils/utils.js";
+import { bumpLeaderboard, toStringId } from "../utils/utils.js";
 import relativeTime from "dayjs/plugin/relativeTime.js";
+import process from "node:process";
 export default {
   name: Events.MessageCreate,
   async execute(message) {
-    if (message.author.bot) return;
     if (message.channel.type === ChannelType.DM) {
+      if (message.author.bot) return;
       const client = message.client;
       const { rows } = await client.pgClient.query<Mod_mail_threads>(
         "SELECT * FROM mod_mail_threads WHERE user_id = $1",
@@ -41,14 +42,12 @@ export default {
         if (shared_guilds.size === 0) return;
         if (shared_guilds.size === 1) {
           const guild = shared_guilds.first()!;
-          const { rows: guild_data } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
-            guild.id,
-          ]);
-          if (!guild_data.length) {
+          const guild_config = await client.getGuildConfig(guild.id);
+          if (!guild_config) {
             await message.reply("The server data is unavailable.");
             return;
           }
-          const t = client.i18next.getFixedT(guild_data[0].language, "events", "messageCreate.mod_mail");
+          const t = client.i18next.getFixedT(guild_config.language, "events", "messageCreate.mod_mail");
           const member = await guild.members.fetch(message.author.id).catch(() => null);
           if (!member) {
             await message.reply(t("not_member"));
@@ -78,7 +77,7 @@ export default {
             await prompt.edit({ content: t("timeout"), components: [], embeds: [] });
             return;
           }
-          confirmation.deferUpdate();
+          await confirmation.deferUpdate();
           if (confirmation.customId === "modmail_cancel") {
             const cancel_embed = new EmbedBuilder()
               .setTitle(t("cancelled_title"))
@@ -91,15 +90,13 @@ export default {
             .setTitle(t("confirmed_title"))
             .setDescription(t("confirmed_description", { guild: guild.name }))
             .setColor("Green");
-          const mod_mail_parent_channel = guild.channels.cache.get(
-            toStringId(guild_data[0].mod_mail_parent_channel_id),
-          );
+          const mod_mail_parent_channel = guild.channels.cache.get(toStringId(guild_config.mod_mail_parent_channel_id));
           if (!mod_mail_parent_channel) {
             await message.reply(t("parent_channel_missing"));
             return;
           }
 
-          const mod_mail_channel = guild.channels.cache.get(toStringId(guild_data[0].mod_mail_channel_id));
+          const mod_mail_channel = guild.channels.cache.get(toStringId(guild_config.mod_mail_channel_id));
           if (!mod_mail_channel) {
             await message.reply(t("channel_missing"));
             return;
@@ -107,9 +104,9 @@ export default {
 
           const permission_overwrites = [{ id: guild.id, deny: [PermissionsBitField.Flags.ViewChannel] }];
 
-          if (guild.roles.cache.has(toStringId(guild_data[0].staff_role_id))) {
+          if (guild.roles.cache.has(toStringId(guild_config.staff_role_id))) {
             permission_overwrites.push({
-              id: toStringId(guild_data[0].staff_role_id)!,
+              id: toStringId(guild_config.staff_role_id)!,
               // @ts-expect-error - This is a valid permission bitfield
               allow: [PermissionsBitField.Flags.ViewChannel],
             });
@@ -141,10 +138,8 @@ export default {
           let thread_rows;
           try {
             thread_rows = await client.pgClient.query<Mod_mail_threads>(
-              `INSERT INTO mod_mail_threads (thread_id, channel_id, guild_id, user_id, status, created_at)
-               SELECT COALESCE((SELECT MAX(thread_id) FROM mod_mail_threads WHERE guild_id = $2), 0) + 1, $1, $2, $3, $4, $5
-               RETURNING thread_id;`,
-              [channel.id, guild.id, message.author.id, "open", new Date().toISOString()],
+              "INSERT INTO mod_mail_threads (thread_id, channel_id, guild_id, user_id, status, created_at) VALUES (pgp_sym_encrypt(gen_random_uuid(), $6), pgp_sym_encrypt($1, $6), pgp_sym_encrypt($2, $6), pgp_sym_encrypt($3, $6), pgp_sym_encrypt($4, $6), $5) RETURNING pgp_sym_decrypt(thread_id, $6);",
+              [channel.id, guild.id, message.author.id, "open", new Date().toISOString(), process.env.PASSPHRASE],
             );
           } catch (e) {
             logger.error({ message: "Error inserting mod mail thread", error: e });
@@ -154,7 +149,7 @@ export default {
 
           try {
             await client.pgClient.query(
-              "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, sent_to, channel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+              "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, sent_to, channel_id) VALUES (pgp_sym_encrypt($1, $9), $2, pgp_sym_encrypt($3, $9), pgp_sym_encrypt($4, $9), pgp_sym_encrypt($5, $9), pgp_sym_encrypt($6::text, $9), pgp_sym_encrypt($7, $9), pgp_sym_encrypt($8, $9))",
               [
                 message.author.id,
                 new Date().toISOString(),
@@ -164,11 +159,11 @@ export default {
                 thread_rows.rows[0].thread_id,
                 "thread",
                 channel.id,
+                process.env.PASSPHRASE,
               ],
             );
-
             await client.pgClient.query(
-              "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, sent_to, channel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+              "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, sent_to, channel_id) VALUES (pgp_sym_encrypt($1, $9), $2, pgp_sym_encrypt($3, $9), pgp_sym_encrypt($4, $9), pgp_sym_encrypt($5, $9), pgp_sym_encrypt($6::text, $9), pgp_sym_encrypt($7, $9), pgp_sym_encrypt($8, $9))",
               [
                 client.user!.id,
                 new Date().toISOString(),
@@ -178,6 +173,7 @@ export default {
                 thread_rows.rows[0].thread_id,
                 "thread",
                 channel.id,
+                process.env.PASSPHRASE,
               ],
             );
           } catch (e) {
@@ -185,12 +181,12 @@ export default {
             await message.reply(t("error_inserting"));
             return;
           }
-          await prompt.edit({ content: guild_data[0].mod_mail_message, embeds: [confirmed_embed], components: [] });
+          await prompt.edit({ content: guild_config.mod_mail_message, embeds: [confirmed_embed], components: [] });
           await channel.send(
             `**[${message.author.tag}]**: ${message.content}\n${message.attachments?.map((a) => a.url).join("\n")}`,
           );
           await channel.send(
-            `${client.allEmojis.get(client.config.Emojis.gearSpinning)?.format} **(${client.user!.username})** ${guild_data[0].mod_mail_message}`,
+            `${client.allEmojis.get(client.config.Emojis.gearSpinning)?.format} **(${client.user!.username})** ${guild_config.mod_mail_message}`,
           );
           return;
         }
@@ -218,43 +214,41 @@ export default {
             componentType: ComponentType.StringSelect,
           });
         } catch {
-          msg.edit({ content: "You took too long to select a server", components: [] });
+          await msg.edit({ content: "You took too long to select a server", components: [] });
           return;
         }
-        message_component.deferUpdate();
+        await message_component.deferUpdate();
         const guild_id = message_component.values[0];
         const guild = client.guilds.cache.get(guild_id);
         if (!guild) {
-          message_component.editReply({ content: "The server you selected is not available", components: [] });
+          await message_component.editReply({ content: "The server you selected is not available", components: [] });
           return;
         }
-        const { rows: guild_data } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
-          guild_id,
-        ]);
-        if (!guild_data.length) {
-          message_component.editReply({ content: "The server you selected is not available", components: [] });
+        const guild_config = await client.getGuildConfig(guild_id);
+        if (!guild_config) {
+          await message_component.editReply({ content: "The server you selected is not available", components: [] });
           return;
         }
-        const t = client.i18next.getFixedT(guild_data[0].language, "events", "messageCreate.mod_mail");
+        const t = client.i18next.getFixedT(guild_config.language, "events", "messageCreate.mod_mail");
         let member;
         try {
           member = await guild.members.fetch(message.author.id);
         } catch {
-          message_component.editReply({ content: t("not_member"), components: [] });
+          await message_component.editReply({ content: t("not_member"), components: [] });
           return;
         }
         if (!member) {
-          message_component.editReply({ content: t("not_member"), components: [] });
+          await message_component.editReply({ content: t("not_member"), components: [] });
           return;
         }
-        const mod_mail_parent_channel = guild.channels.cache.get(toStringId(guild_data[0].mod_mail_parent_channel_id));
+        const mod_mail_parent_channel = guild.channels.cache.get(toStringId(guild_config.mod_mail_parent_channel_id));
         if (!mod_mail_parent_channel) {
-          message_component.editReply({ content: t("parent_channel_missing"), components: [] });
+          await message_component.editReply({ content: t("parent_channel_missing"), components: [] });
           return;
         }
-        const mod_mail_channel = guild.channels.cache.get(toStringId(guild_data[0].mod_mail_channel_id));
+        const mod_mail_channel = guild.channels.cache.get(toStringId(guild_config.mod_mail_channel_id));
         if (!mod_mail_channel) {
-          message_component.editReply({ content: t("channel_missing"), components: [] });
+          await message_component.editReply({ content: t("channel_missing"), components: [] });
           return;
         }
         const permission_overwrites = [
@@ -263,9 +257,9 @@ export default {
             deny: [PermissionsBitField.Flags.ViewChannel],
           },
         ];
-        if (guild.roles.cache.has(toStringId(guild_data[0].staff_role_id))) {
+        if (guild.roles.cache.has(toStringId(guild_config.staff_role_id))) {
           permission_overwrites.push({
-            id: toStringId(guild_data[0].staff_role_id)!,
+            id: toStringId(guild_config.staff_role_id)!,
             // @ts-expect-error - This is a valid permission bitfield
             allow: [PermissionsBitField.Flags.ViewChannel],
           });
@@ -288,7 +282,7 @@ export default {
             }),
           );
         } catch {
-          message_component.editReply({
+          await message_component.editReply({
             content: t("error_sending"),
             components: [],
           });
@@ -297,25 +291,24 @@ export default {
         let thread_rows;
         try {
           thread_rows = await client.pgClient.query<Mod_mail_threads>(
-            `INSERT INTO mod_mail_threads (thread_id, channel_id, guild_id, user_id, status, created_at) 
-            SELECT COALESCE((SELECT MAX(thread_id) FROM mod_mail_threads WHERE guild_id = $2), 0) + 1, $1, $2, $3, $4, $5 RETURNING thread_id;`,
-            [channel.id, guild.id, message.author.id, "open", new Date().toISOString()],
+            "INSERT INTO mod_mail_threads (thread_id, channel_id, guild_id, user_id, status, created_at) VALUES (pgp_sym_encrypt(gen_random_uuid(), $6), pgp_sym_encrypt($1, $6), pgp_sym_encrypt($2, $6), pgp_sym_encrypt($3, $6), pgp_sym_encrypt($4, $6), $5) RETURNING pgp_sym_decrypt(thread_id, $6);",
+            [channel.id, guild.id, message.author.id, "open", new Date().toISOString(), process.env.PASSPHRASE],
           );
         } catch (e) {
           logger.error({
             message: "Error upon inserting mod mail thread",
             error: e,
           });
-          message_component.editReply({ content: t("error_inserting"), components: [] });
+          await message_component.editReply({ content: t("error_inserting"), components: [] });
           return;
         }
-        message_component.editReply({ content: guild_data[0].mod_mail_message, components: [] });
+        await message_component.editReply({ content: guild_config.mod_mail_message, components: [] });
         await channel.send(
           `**[${message.author.tag}]**: ${message.content}\n${message.attachments?.map((attachment) => attachment.url).join("\n")}`,
         );
         try {
           await client.pgClient.query(
-            "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, sent_to, channel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+            "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, sent_to, channel_id) VALUES (pgp_sym_encrypt($1, $9), $2, pgp_sym_encrypt($3, $9), pgp_sym_encrypt($4, $9), pgp_sym_encrypt($5, $9), pgp_sym_encrypt($6::text, $9), pgp_sym_encrypt($7, $9), pgp_sym_encrypt($8, $9))",
             [
               message.author.id,
               new Date().toISOString(),
@@ -325,10 +318,11 @@ export default {
               thread_rows.rows[0].thread_id,
               "thread",
               channel.id,
+              process.env.PASSPHRASE,
             ],
           );
           await client.pgClient.query(
-            "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, sent_to, channel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+            "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, sent_to, channel_id) VALUES (pgp_sym_encrypt($1, $9), $2, pgp_sym_encrypt($3, $9), pgp_sym_encrypt($4, $9), pgp_sym_encrypt($5, $9), pgp_sym_encrypt($6::text, $9), pgp_sym_encrypt($7, $9), pgp_sym_encrypt($8, $9))",
             [
               client.user!.id,
               new Date().toISOString(),
@@ -338,6 +332,7 @@ export default {
               thread_rows.rows[0].thread_id,
               "thread",
               channel.id,
+              process.env.PASSPHRASE,
             ],
           );
         } catch (e) {
@@ -345,7 +340,7 @@ export default {
             message: "Error upon inserting mod mail message",
             error: e,
           });
-          message_component.followUp({ content: t("error_inserting"), components: [] });
+          await message_component.followUp({ content: t("error_inserting"), components: [] });
         }
       } else {
         const channel = client.channels.cache.get(toStringId(rows[0].channel_id)) as TextChannel;
@@ -359,20 +354,18 @@ export default {
           return;
         }
         if (!member) return;
-        const { rows: guild_data } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
-          guild.id,
-        ]);
-        if (!guild_data.length) {
+        const guild_config = await client.getGuildConfig(guild.id);
+        if (!guild_config) {
           await message.reply("The server data is unavailable.");
           return;
         }
-        const t = client.i18next.getFixedT(guild_data[0].language, "events", "messageCreate.mod_mail");
+        const t = client.i18next.getFixedT(guild_config.language, "events", "messageCreate.mod_mail");
         try {
           await channel.send(
             `**[${message.author.tag}]**: ${message.content}\n${message.attachments?.map((attachment) => attachment.url).join("\n")}`,
           );
           await client.pgClient.query(
-            "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, sent_to, channel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+            "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, sent_to, channel_id) VALUES (pgp_sym_encrypt($1, $9), $2, pgp_sym_encrypt($3, $9), pgp_sym_encrypt($4, $9), pgp_sym_encrypt($5, $9), pgp_sym_encrypt($6::text, $9), pgp_sym_encrypt($7, $9), pgp_sym_encrypt($8, $9))",
             [
               message.author.id,
               new Date().toISOString(),
@@ -382,6 +375,7 @@ export default {
               rows[0].thread_id,
               "thread",
               channel.id,
+              process.env.PASSPHRASE,
             ],
           );
         } catch (e) {
@@ -394,24 +388,23 @@ export default {
         }
         await message.react(client.allEmojis.get(client.config.Emojis.confirm)!.format);
       }
-    } else if (message.channel.type === ChannelType.GuildText) {
+    } else if (message.inGuild() && message.channel.type === ChannelType.GuildText) {
+      if (message.author.bot) return;
       const client = message.client;
-      const { rows: guild_rows } = await client.pgClient.query<Guilds>("SELECT language FROM guilds WHERE id = $1", [
-        message.guild!.id,
-      ]);
-      if (!guild_rows.length) {
+      const guild_config = await client.getGuildConfig(message.guild.id);
+      if (!guild_config) {
         await message.reply("This server is not in the database.");
         return;
       }
-      const t = client.i18next.getFixedT(guild_rows[0].language, "events", "messageCreate.mod_mail");
+      const t = client.i18next.getFixedT(guild_config.language, "events", "messageCreate.mod_mail");
       const { rows } = await client.pgClient.query<Mod_mail_threads>(
-        "SELECT * FROM mod_mail_threads WHERE channel_id = $1",
-        [message.channel.id],
+        "SELECT * FROM mod_mail_threads WHERE pgp_sym_decrypt(channel_id, $2) = $1",
+        [message.channel.id, process.env.PASSPHRASE],
       );
       if (!rows[0]) return;
       try {
         await client.pgClient.query(
-          "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, sent_to, channel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+          "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, sent_to, channel_id) VALUES (pgp_sym_encrypt($1, $9), $2, pgp_sym_encrypt($3, $9), pgp_sym_encrypt($4, $9), pgp_sym_encrypt($5, $9), pgp_sym_encrypt($6::text, $9), pgp_sym_encrypt($7, $9), pgp_sym_encrypt($8, $9))",
           [
             message.author.id,
             new Date().toISOString(),
@@ -421,6 +414,7 @@ export default {
             rows[0].thread_id,
             "thread",
             message.channel.id,
+            process.env.PASSPHRASE,
           ],
         );
       } catch (e) {
@@ -431,6 +425,45 @@ export default {
         await message.reply(t("error_inserting"));
         return;
       }
+    }
+    if (!message.inGuild()) return;
+    const guild_config = await message.client.getGuildConfig(message.guild.id);
+    if (!guild_config) return;
+    const leaderboard = guild_config.bump_leaderboard_channel_id;
+    if (
+      message.interaction &&
+      message.interaction.commandName === "bump" &&
+      message.author.id === "302050872383242240" &&
+      message.channel.id === leaderboard
+    ) {
+      const rows = await message.client.pgClient.query<Bump_leaderboard>(
+        "SELECT * FROM bump_leaderboard WHERE pgp_sym_decrypt(guild_id, $3) = $1 AND pgp_sym_decrypt(user_id, $3) = $2",
+        [message.guild.id, message.author.id, process.env.PASSPHRASE],
+      );
+      if (rows.rowCount === 0) {
+        await message.client.pgClient.query(
+          "INSERT INTO bump_leaderboard (guild_id, user_id, bump_count) VALUES (pgp_sym_encrypt($1, $3), pgp_sym_encrypt($2, $3), pgp_sym_encrypt(1::text, $3))",
+          [message.guild.id, message.author.id, process.env.PASSPHRASE],
+        );
+      } else {
+        await message.client.pgClient.query(
+          "UPDATE bump_leaderboard SET bump_count = pgp_sym_encrypt((pgp_sym_decrypt(bump_count, $3)::int + 1)::text, $3) WHERE pgp_sym_decrypt(guild_id, $3) = $1 AND pgp_sym_decrypt(user_id, $3) = $2",
+          [message.guild.id, message.author.id, process.env.PASSPHRASE],
+        );
+      }
+      await message.delete();
+      const result = await bumpLeaderboard(message.client, message.guild.id, message.author);
+      if (result?.error) {
+        await message.reply(result.error);
+        return;
+      }
+    } else if (
+      message.inGuild() &&
+      message.channel.id === leaderboard &&
+      message.author.id !== message.client.user!.id
+    ) {
+      await message.delete();
+      return;
     }
   },
 } satisfies EventBase<Events.MessageCreate>;

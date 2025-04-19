@@ -192,6 +192,7 @@
   "misc_config": {
     "initial": "Güncellemek istediğiniz ayarı seçin.",
     "timeout": "Mesaj zaman aşımına uğradı. Lütfen komutu tekrar çalıştırın.",
+    "channel_initial": "Aşağıdaki kanallardan birini seçin. Kanalı kaldırmak istiyorsanız x'e basın ve başka bir yere basın",
     "language": {
       "label": "Dil Ayarla",
       "description": "Botun dilini ayarlar",
@@ -203,6 +204,12 @@
       "set": "Mod mail mesajı ayarlandı.",
       "title": "Mod Mail Mesajı",
       "description": "Mod mail alındığında botun gönderdiği mesaj"
+    },
+    "bump_leaderboard_channel_id": {
+      "label": "Bump Lider Tablosu Kanalını Ayarla",
+      "description": "Bump lider tablosunun gönderildiği kanal",
+      "unset": "Bump lider tablosu kanalı kaldırıldı.",
+      "set": "Bump lider tablosu kanalı {{channel}} olarak ayarlandı."
     }
   },
   "listen_for_notifications": {

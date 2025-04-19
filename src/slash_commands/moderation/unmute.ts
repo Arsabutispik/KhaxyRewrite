@@ -1,18 +1,15 @@
 import { SlashCommandBase } from "../../../@types/types";
 import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
-import { Guilds, Punishments } from "../../../@types/DatabaseTypes";
 import logger from "../../lib/Logger.js";
 import modLog from "../../utils/modLog.js";
 import { toStringId } from "../../utils/utils.js";
+import process from "node:process";
 
 export default {
   memberPermissions: [PermissionsBitField.Flags.ManageRoles],
   clientPermissions: [PermissionsBitField.Flags.ManageRoles],
   data: new SlashCommandBuilder()
     .setName("unmute")
-    .setNameLocalizations({
-      tr: "susturmayı-kaldır",
-    })
     .setDescription("Unmute a user")
     .setDescriptionLocalizations({
       tr: "Bir kullanıcının susturmasını kaldırır",
@@ -44,38 +41,38 @@ export default {
     ),
   async execute(interaction) {
     const client = interaction.client;
-    const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
-    if (!rows[0]) {
-      await interaction.reply("An error occurred while fetching the guild data.");
+    const guild_config = await client.getGuildConfig(interaction.guild.id);
+    if (!guild_config) {
+      await interaction.reply({
+        content: "This server is not registered in the database. This shouldn't happen, please contact developers",
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+      });
       return;
     }
-    const t = client.i18next.getFixedT(rows[0].language, "commands", "unmute");
+    const t = client.i18next.getFixedT(guild_config.language, "commands", "unmute");
     const member = interaction.options.getMember("user");
     if (!member) {
       await interaction.reply({ content: t("no_member"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
-    if (!interaction.guild.roles.cache.has(toStringId(rows[0].mute_role_id))) {
+    if (!interaction.guild.roles.cache.has(toStringId(guild_config.mute_role_id))) {
       await interaction.reply({ content: t("no_mute_role"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
     const reason = interaction.options.getString("reason") || t("no_reason");
-    const { rows: punishment_rows } = await client.pgClient.query<Punishments>(
-      "SELECT * FROM punishments WHERE guild_id = $1 AND user_id = $2 AND type = 'mute'",
-      [interaction.guild.id, member.id],
-    );
-    if (!punishment_rows[0] && member.roles.cache.has(toStringId(rows[0].mute_role_id))) {
+    const punishment = await client.getPunishments(interaction.guild.id, member.id, "mute");
+    if (!punishment && member.roles.cache.has(toStringId(guild_config.mute_role_id))) {
       await interaction.reply({ content: t("muted_no_punishment"), flags: MessageFlagsBitField.Flags.Ephemeral });
-      await member.roles.remove(toStringId(rows[0].mute_role_id));
+      await member.roles.remove(toStringId(guild_config.mute_role_id));
       return;
     }
-    if (!punishment_rows[0]) {
+    if (!punishment) {
       await interaction.reply({ content: t("not_muted"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
-    if (rows[0].mute_get_all_roles) {
+    if (guild_config.mute_get_all_roles) {
       try {
-        await member.roles.set(punishment_rows[0].previous_roles);
+        await member.roles.set(punishment.previous_roles);
       } catch (error) {
         await interaction.reply({ content: t("previous_roles_error"), flags: MessageFlagsBitField.Flags.Ephemeral });
         logger.error({
@@ -87,7 +84,10 @@ export default {
       }
     }
     try {
-      await client.pgClient.query("DELETE FROM punishments WHERE user_id = $1", [punishment_rows[0].user_id]);
+      await client.pgClient.query("DELETE FROM punishments WHERE pgp_sym_decrypt(user_id, $2) = $1", [
+        punishment.user_id,
+        process.env.PASSPHRASE,
+      ]);
     } catch (error) {
       await interaction.reply({ content: t("database_error"), flags: MessageFlagsBitField.Flags.Ephemeral });
       logger.error({
@@ -98,7 +98,7 @@ export default {
       return;
     }
     try {
-      await member.roles.remove(toStringId(rows[0].mute_role_id));
+      await member.roles.remove(toStringId(guild_config.mute_role_id));
     } catch (error) {
       await interaction.reply({ content: t("role_error"), flags: MessageFlagsBitField.Flags.Ephemeral });
       logger.error({
@@ -114,7 +114,7 @@ export default {
         t("success", {
           user: member.user.tag,
           confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
-          case: rows[0].case_id,
+          case: guild_config.case_id,
         }),
       );
     } catch {

@@ -1,6 +1,5 @@
 import { EventBase } from "../../@types/types";
 import { AuditLogEvent, Events, PermissionsBitField } from "discord.js";
-import { Guilds } from "../../@types/DatabaseTypes";
 import modLog from "../utils/modLog.js";
 import logger from "../lib/Logger.js";
 import { toStringId } from "../utils/utils.js";
@@ -9,13 +8,14 @@ export default {
   name: Events.GuildBanAdd,
   async execute(ban) {
     // Fetch guild data from the database
-    const { rows } = await ban.client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [ban.guild.id]);
+    const guild_config = await ban.client.getGuildConfig(ban.guild.id);
 
     // If no guild data is found, exit the function
-    if (rows.length === 0) return;
+    if (!guild_config) return;
 
     // If mod log channel is configured but does not exist, exit the function
-    if (rows[0].mod_log_channel_id && !ban.guild.channels.cache.has(toStringId(rows[0].mod_log_channel_id))) return;
+    if (guild_config.mod_log_channel_id && !ban.guild.channels.cache.has(toStringId(guild_config.mod_log_channel_id)))
+      return;
 
     // If the bot does not have permission to view audit logs, log the ban without audit log details
     if (!ban.guild.members.me?.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
@@ -25,7 +25,7 @@ export default {
           action: "BAN",
           user: ban.user,
           moderator: ban.client.user,
-          reason: ban.client.i18next.getFixedT(rows[0].language)("events:guildBanAdd.noPermission"),
+          reason: ban.client.i18next.getFixedT(guild_config.language)("events:guildBanAdd.noPermission"),
         },
         ban.client,
       );
@@ -48,7 +48,7 @@ export default {
             action: "BAN",
             user: ban.user,
             moderator: ban.client.user,
-            reason: ban.client.i18next.getFixedT(rows[0].language)("events:guildBanAdd.executorNotMatch"),
+            reason: ban.client.i18next.getFixedT(guild_config.language)("events:guildBanAdd.executorNotMatch"),
           },
           ban.client,
         );
@@ -62,7 +62,7 @@ export default {
           action: "BAN",
           user: ban.user,
           moderator: entry.executor!,
-          reason: entry.reason || ban.client.i18next.getFixedT(rows[0].language)("events:guildBanAdd.noReason"),
+          reason: entry.reason || ban.client.i18next.getFixedT(guild_config.language)("events:guildBanAdd.noReason"),
         },
         ban.client,
       );
@@ -74,7 +74,7 @@ export default {
           action: "BAN",
           user: ban.user,
           moderator: ban.client.user,
-          reason: ban.client.i18next.getFixedT(rows[0].language)("events:guildBanAdd.errorOnFetchAuditLogs"),
+          reason: ban.client.i18next.getFixedT(guild_config.language)("events:guildBanAdd.errorOnFetchAuditLogs"),
         },
         ban.client,
       );

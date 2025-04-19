@@ -4,11 +4,13 @@ import dayjs from "dayjs";
 import { Guilds } from "../../@types/DatabaseTypes";
 import logger from "../lib/Logger.js";
 import { toStringId } from "./utils.js";
+import process from "node:process";
 
 export default async (client: Client) => {
   // Fetch guild configurations from the database
   const result = await client.pgClient.query<Guilds>(
-    "SELECT color_id_of_the_day, color_name_of_the_day, id FROM guilds",
+    "SELECT pgp_sym_decrypt(color_id_of_the_day, $1), pgp_sym_decrypt(color_name_of_the_day, $1), pgp_sym_decrypt(id, $1) FROM guilds",
+    [process.env.PASSPHRASE],
   );
   const rows = result.rows;
   for (const row of rows) {
@@ -33,7 +35,10 @@ export default async (client: Client) => {
     const colorName = result[1];
     try {
       // Update the color name in the database
-      await client.pgClient.query("UPDATE guilds SET color_name_of_the_day = $1 WHERE id = $2", [colorName, id]);
+      await client.pgClient.query(
+        "UPDATE guilds SET color_name_of_the_day = pgp_sym_encrypt($1, $3) WHERE pgp_sym_decrypt(id, $3) = $2",
+        [colorName, id, process.env.PASSPHRASE],
+      );
       // Edit the role with the new color and name
       await role.edit({
         name: `${colorName} ${name}`,
@@ -43,9 +48,9 @@ export default async (client: Client) => {
       // Update the color change time in the database
       const query = `
             UPDATE cronjobs
-            SET color_time = $1
-            WHERE id = $2`;
-      await client.pgClient.query(query, [dayjs().add(1, "day").toISOString(), id]);
+            SET color_time = pgp_sym_encrypt($1::text, $3)
+            WHERE pgp_sym_decrypt(id, $3) = $2`;
+      await client.pgClient.query(query, [dayjs().add(1, "day").toISOString(), id, process.env.PASSPHRASE]);
     } catch (error) {
       logger.log({
         level: "error",
@@ -62,8 +67,8 @@ export default async (client: Client) => {
 export async function specificGuildColorUpdate(client: Client, guildId: string) {
   // Fetch guild configuration for the specific guild
   const { rows } = await client.pgClient.query<Guilds>(
-    "SELECT color_id_of_the_day, color_name_of_the_day, id FROM guilds WHERE id = $1",
-    [guildId],
+    "SELECT pgp_sym_decrypt(color_id_of_the_day, $2), pgp_sym_decrypt(color_name_of_the_day, $2), pgp_sym_decrypt(id, $2) FROM guilds WHERE pgp_sym_decrypt(id, $2) = $1",
+    [guildId, process.env.PASSPHRASE],
   );
   if (rows.length === 0) {
     logger.warn(`Guild config for ${guildId} not found.`);
@@ -105,7 +110,10 @@ export async function specificGuildColorUpdate(client: Client, guildId: string) 
   const colorName = cresult[1];
   try {
     // Update the color name in the database
-    await client.pgClient.query("UPDATE guilds SET color_name_of_the_day = $1 WHERE id = $2", [colorName, id]);
+    await client.pgClient.query(
+      "UPDATE guilds SET color_name_of_the_day = pgp_sym_encrypt($1, $3) WHERE pgp_sym_decrypt(id, $3) = $2",
+      [colorName, id, process.env.PASSPHRASE],
+    );
     // Edit the role with the new color and name
     await role.edit({
       name: `${name}${colorName}`,
@@ -114,9 +122,9 @@ export async function specificGuildColorUpdate(client: Client, guildId: string) 
     });
     // Update the color change time in the database
     const query = `
-            UPDATE cronjobs
-            SET color_time = $1
-            WHERE id = $2`;
+      UPDATE cronjobs
+      SET color_time = pgp_sym_encrypt($1::text, $3)
+      WHERE pgp_sym_decrypt(id, $3) = $2`;
     await client.pgClient.query(query, [dayjs().add(1, "day").toISOString(), id]);
   } catch (error) {
     logger.log({

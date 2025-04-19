@@ -8,19 +8,21 @@ import {
 } from "discord.js";
 import { Guilds } from "../../@types/DatabaseTypes";
 import { TFunction } from "i18next";
-import { dynamicMessage } from "./register-config.js";
+import { dynamicChannel, dynamicMessage } from "./register-config.js";
+import process from "node:process";
 
 export default async function miscConfig(interaction: ChatInputCommandInteraction<"cached">) {
   const client = interaction.client;
-  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guildId]);
-  if (rows.length === 0) {
+  const guild_config = await client.getGuildConfig(interaction.guildId);
+  if (!guild_config) {
     await interaction.reply({
-      content: "Unexpected database error. This should not have happened. Please contact the bot developers",
+      content: "No guild config found. Running a simple command should create one.",
       flags: MessageFlagsBitField.Flags.Ephemeral,
     });
     return;
   }
-  const t = client.i18next.getFixedT(rows[0].language, null, "misc_config");
+
+  const t = client.i18next.getFixedT(guild_config.language, null, "misc_config");
   const select_menu = new StringSelectMenuBuilder()
     .setCustomId("misc_config")
     .setMinValues(1)
@@ -35,6 +37,11 @@ export default async function miscConfig(interaction: ChatInputCommandInteractio
         label: t("mod_mail_message.label"),
         value: "mod_mail_message",
         description: t("mod_mail_message.description"),
+      },
+      {
+        label: t("bump_leaderboard_channel_id.label"),
+        value: "leaderboard",
+        description: t("bump_leaderboard_channel_id.description"),
       },
     ]);
   const action_row = new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(select_menu);
@@ -68,11 +75,13 @@ export default async function miscConfig(interaction: ChatInputCommandInteractio
   switch (message_component.values[0]) {
     case "language":
       await message_component.deferUpdate();
-      await languageConfig(message_component, rows[0], t);
+      await languageConfig(message_component, guild_config, t);
       break;
     case "mod_mail_message":
-      await dynamicMessage("mod_mail_message", message_component, rows[0], t);
+      await dynamicMessage("mod_mail_message", message_component, guild_config, t);
       break;
+    case "leaderboard":
+      await dynamicChannel("bump_leaderboard_channel_id", message_component, guild_config, t);
   }
 }
 
@@ -134,10 +143,13 @@ async function languageConfig(interaction: MessageComponentInteraction, data: Gu
     return;
   }
   await message_component.deferUpdate();
-  await client.pgClient.query("UPDATE guilds SET language = $1 WHERE id = $2", [
-    message_component.values[0],
-    message_component.guild.id,
-  ]);
+  await client.pgClient.query(
+    "UPDATE guilds SET language = pgp_sym_encrypt($1, $3) WHERE pgp_sym_decrypt(id, $3) = $2",
+    [message_component.values[0], message_component.guild.id, process.env.PASSPHRASE],
+  );
+  await client.setGuildConfig(message_component.guild.id, {
+    language: message_component.values[0],
+  });
   const new_t = client.i18next.getFixedT(message_component.values[0], null, "misc_config");
   await message_component.editReply({
     content: new_t("language.set", { language: langs[message_component.values[0]] }),

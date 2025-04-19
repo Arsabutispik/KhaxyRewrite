@@ -1,6 +1,5 @@
 import { SlashCommandBase } from "../../../@types/types";
-import { PermissionsBitField, SlashCommandBuilder } from "discord.js";
-import { Guilds } from "../../../@types/DatabaseTypes";
+import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import logger from "../../lib/Logger.js";
 import { toStringId } from "../../utils/utils.js";
 
@@ -51,8 +50,15 @@ export default {
     ),
   async execute(interaction) {
     const client = interaction.client;
-    const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
-    const t = client.i18next.getFixedT(rows[0].language || "en", "commands", "kick");
+    const guild_config = await client.getGuildConfig(interaction.guildId);
+    if (!guild_config) {
+      await interaction.reply({
+        content: "This server is not registered in the database. This shouldn't happen, please contact developers",
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+      });
+      return;
+    }
+    const t = client.i18next.getFixedT(guild_config.language || "en", "commands", "kick");
 
     const member = interaction.options.getMember("user");
     const reason = interaction.options.getString("reason") || t("no_reason");
@@ -75,7 +81,7 @@ export default {
     }
     if (
       member.permissions.has(PermissionsBitField.Flags.KickMembers) ||
-      member.roles.cache.has(toStringId(rows[0].staff_role_id))
+      member.roles.cache.has(toStringId(guild_config.staff_role_id))
     ) {
       await interaction.reply(t("cant_kick_mod"));
       return;
@@ -121,7 +127,7 @@ export default {
       await interaction.reply(
         t("message.success", {
           user: member.user.tag,
-          case: rows[0].case_id,
+          case: guild_config.case_id,
           confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
         }),
       );
@@ -129,7 +135,7 @@ export default {
       await interaction.reply(
         t("message.fail", {
           user: member.user.tag,
-          case: rows[0].case_id,
+          case: guild_config.case_id,
           confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
         }),
       );

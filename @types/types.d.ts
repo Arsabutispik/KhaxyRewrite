@@ -1,14 +1,21 @@
 import { ChatInputCommandInteraction, Collection, SlashCommandBuilder, ClientEvents, Awaitable } from "discord.js";
 import { Client as PgClient } from "pg";
+import { Redis } from "ioredis";
 import { i18n } from "i18next";
 import PlayerConfig from "../src/lib/PlayerConfig";
+import { Guilds, Punishments, Mod_mail_threads } from "./DatabaseTypes";
 declare module "discord.js" {
   interface Client {
     slashCommands: Collection<string, SlashCommandBase>;
     pgClient: PgClient;
+    redis: Redis;
     i18next: i18n;
     allEmojis: Collection<string, { name: string; format: string }>;
     config: typeof PlayerConfig;
+    getGuildConfig: (guildId: string) => Promise<Guilds | null>;
+    setGuildConfig: (guildId: string, config: Partial<Guilds>) => Promise<void>;
+    getPunishments: (guildId: string, userId: string, type: "ban" | "mute") => Promise<Punishments | null>;
+    getModmailThread: (guildId: string, channelId: string) => Promise<Mod_mail_threads | null>;
   }
 }
 export interface SlashCommandBase {

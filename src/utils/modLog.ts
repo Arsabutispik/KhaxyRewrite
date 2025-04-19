@@ -3,8 +3,8 @@ import relativeTime from "dayjs/plugin/relativeTime.js";
 import "dayjs/locale/en.js";
 import "dayjs/locale/tr.js";
 import { ChannelType, Client, Guild, User } from "discord.js";
-import { GuildConfig } from "../../@types/types";
 import logger from "../lib/Logger.js";
+import process from "node:process";
 
 // Define the possible actions for the mod log
 type actions =
@@ -33,31 +33,29 @@ export default async (
 ) => {
   const { guild, user, action, moderator, reason, duration, caseID } = data;
   // Fetch guild configuration from the database
-  const { rows } = (await client.pgClient.query(
-    "SELECT language, mod_log_channel_id, case_id FROM guilds WHERE id = $1",
-    [guild.id],
-  )) as { rows: GuildConfig[] };
-  const lang = rows[0].language || "en";
-  const t = client.i18next.getFixedT(lang);
-
+  const guild_data = await client.getGuildConfig(guild.id);
   // If no guild configuration is found, create a new one
-  if (!rows[0]) {
+  if (!guild_data) {
     try {
       logger.warn(`Guild config for ${guild.id} not found. Creating a new one...`);
-      await client.pgClient.query("INSERT INTO guilds (id, language) VALUES ($1, $2)", [guild.id, "en"]);
+      await client.pgClient.query(
+        "INSERT INTO guilds (id, language, case_id, days_to_kick, default_expiry, mod_mail_message) VALUES (pgp_sym_encrypt($1, $2), pgp_sym_encrypt('en', $2), pgp_sym_encrypt(1::text, $2), pgp_sym_encrypt(0::text, $2), pgp_sym_encrypt(7::text, $2), pgp_sym_encrypt('Thank you for your message! Our mod team will reply to you here as soon as possible.', $2))",
+        [guild.id, process.env.PASSPHRASE],
+      );
       logger.info(`Guild config for ${guild.id} created successfully.`);
     } catch (error) {
       logger.error(error);
     }
-    return { message: t("mod_log.function_errors.no_guild_config"), type: "WARNING" };
+    return { message: client.i18next.getFixedT("en")("mod_log.function_errors.no_guild_config"), type: "WARNING" };
   }
-
+  const lang = guild_data.language || "en";
+  const t = client.i18next.getFixedT(lang);
   // If mod log channel is not configured, exit the function
-  if (!rows[0].mod_log_channel) {
+  if (!guild_data.mod_log_channel_id) {
     return { message: t("mod_log.function_errors.no_modlog_channel"), type: "WARNING" };
   }
 
-  const caseNumber = caseID || rows[0].case_id;
+  const caseNumber = caseID || guild_data.case_id;
   let message = `<t:${Math.floor(Date.now() / 1000)}> \`[${caseNumber}]\``;
 
   dayjs.extend(relativeTime);
@@ -120,7 +118,7 @@ export default async (
 
   try {
     // Fetch the mod log channel and send the log message
-    const channel = await guild.channels.fetch(rows[0].mod_log_channel);
+    const channel = await guild.channels.fetch(guild_data.mod_log_channel_id);
     if (channel && channel.isTextBased() && channel.type === ChannelType.GuildText) {
       await channel.send({ content: message });
     }
@@ -130,7 +128,10 @@ export default async (
       `Modlog channel for ${guild.name} (${guild.id}) not found. Deleting the modlog channel id from the database...`,
     );
     try {
-      await client.pgClient.query("UPDATE guilds SET mod_log_channel_id = NULL WHERE id = $1", [guild.id]);
+      await client.pgClient.query("UPDATE guilds SET mod_log_channel_id = NULL WHERE pgp_sym_decrypt(id, $2) = $1", [
+        guild.id,
+        process.env.PASSPHRASE,
+      ]);
       logger.info(`Modlog channel id for ${guild.id} deleted successfully.`);
     } catch (error) {
       logger.error(error);
@@ -141,7 +142,10 @@ export default async (
   // Update the case ID in the database if the action is not "CHANGES"
   if (action !== "CHANGES") {
     try {
-      await client.pgClient.query("UPDATE guilds SET case_id = $1 WHERE id = $2", [caseNumber + 1, guild.id]);
+      await client.pgClient.query(
+        "UPDATE guilds SET case_id = pgp_sym_encrypt($1::text, $3) WHERE pgp_sym_decrypt(id, $3) = $2",
+        [caseNumber + 1, guild.id, process.env.PASSPHRASE],
+      );
     } catch (error) {
       logger.log({
         level: "error",

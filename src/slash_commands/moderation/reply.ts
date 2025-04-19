@@ -1,8 +1,9 @@
 import { SlashCommandBase } from "../../../@types/types";
 import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
-import { Guilds, Mod_mail_messages, Mod_mail_threads } from "../../../@types/DatabaseTypes";
+import { Mod_mail_messages } from "../../../@types/DatabaseTypes";
 import { toStringId } from "../../utils/utils.js";
 import logger from "../../lib/Logger.js";
+import process from "node:process";
 
 export default {
   memberPermissions: [PermissionsBitField.Flags.ManageMessages],
@@ -56,20 +57,21 @@ export default {
     ),
   async execute(interaction) {
     const client = interaction.client;
-    const { rows: threads_rows } = await client.pgClient.query<Mod_mail_threads>(
-      "SELECT * FROM mod_mail_threads WHERE channel_id = $1",
-      [interaction.channel!.id],
-    );
-    const { rows: guilds_rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
-      interaction.guild.id,
-    ]);
-    if (!guilds_rows.length) return interaction.reply("This guild is not in the database.");
-    const t = client.i18next.getFixedT(guilds_rows[0].language, "commands", "reply");
-    if (!threads_rows.length) return interaction.reply(t("no_thread"));
-    if (threads_rows[0].status === "suspended") return interaction.reply(t("suspended"));
+    const threads = await client.getModmailThread(interaction.guild.id, interaction.channelId);
+    const guild_config = await client.getGuildConfig(interaction.guild.id);
+    if (!guild_config) {
+      await interaction.reply({
+        content: "This server is not registered in the database. This shouldn't happen, please contact developers",
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+      });
+      return;
+    }
+    const t = client.i18next.getFixedT(guild_config.language, "commands", "reply");
+    if (!threads) return interaction.reply(t("no_thread"));
+    if (threads.status === "suspended") return interaction.reply(t("suspended"));
     const message = interaction.options.getString("message", true);
     const anonymous = interaction.options.getBoolean("anonymous");
-    const member = await interaction.guild!.members.fetch(toStringId(threads_rows[0].user_id)).catch(() => null);
+    const member = await interaction.guild!.members.fetch(toStringId(threads.user_id)).catch(() => null);
     if (!member) return interaction.reply(t("member_not_found"));
     try {
       await client.pgClient.query(
@@ -82,7 +84,7 @@ export default {
           interaction.options.getAttachment("attachment")?.url
             ? [interaction.options.getAttachment("attachment")?.url]
             : [],
-          threads_rows[0].thread_id,
+          threads.thread_id,
           "user",
           interaction.channel!.id,
         ],
@@ -95,15 +97,15 @@ export default {
       return interaction.reply(t("error"));
     }
     const messages = await client.pgClient.query<Mod_mail_messages>(
-      "SELECT * FROM mod_mail_messages WHERE thread_id = $1",
-      [threads_rows[0].thread_id],
+      "SELECT * FROM mod_mail_messages WHERE pgp_sym_decrypt(thread_id, $2) = $1",
+      [threads.thread_id, process.env.PASSPHRASE],
     );
     if (anonymous) {
       const { id } = await member.send(`\`${messages.rowCount}\` **(Anonymous)**: ${message}`);
-      await client.pgClient.query("UPDATE mod_mail_messages SET message_id = $1 WHERE thread_id = $2", [
-        id,
-        threads_rows[0].thread_id,
-      ]);
+      await client.pgClient.query(
+        "UPDATE mod_mail_messages SET message_id = pgp_sym_encrypt($1, $3) WHERE pgp_sym_decrypt(thread_id, $3) = $2",
+        [id, threads.thread_id, process.env.PASSPHRASE],
+      );
     } else {
       const { id } = await member.send({
         content: `\`${messages.rows.filter((row) => row.author_type === "staff").length}\` **(${interaction.member.roles.highest.name})** **[${interaction.member.user.tag}]**: ${message}`,
@@ -111,10 +113,10 @@ export default {
           ? [interaction.options.getAttachment("attachment")!]
           : [],
       });
-      await client.pgClient.query("UPDATE mod_mail_messages SET message_id = $1 WHERE thread_id = $2", [
-        id,
-        threads_rows[0].thread_id,
-      ]);
+      await client.pgClient.query(
+        "UPDATE mod_mail_messages SET message_id = pgp_sym_encrypt($1, $3) WHERE pgp_sym_decrypt(thread_id, $3) = $2",
+        [id, threads.thread_id, process.env.PASSPHRASE],
+      );
     }
     await interaction.reply({ content: t("success"), flags: MessageFlagsBitField.Flags.Ephemeral });
     await interaction.channel!.send({

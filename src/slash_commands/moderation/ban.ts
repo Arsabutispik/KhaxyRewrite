@@ -1,6 +1,5 @@
 import { SlashCommandBase } from "../../../@types/types";
 import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
-import { Guilds } from "../../../@types/DatabaseTypes";
 import dayjs from "dayjs";
 import dayjsduration from "dayjs/plugin/duration.js";
 import relativeTime from "dayjs/plugin/relativeTime.js";
@@ -8,6 +7,7 @@ import modLog from "../../utils/modLog.js";
 import "dayjs/locale/tr.js";
 import logger from "../../lib/Logger.js";
 import { toStringId } from "../../utils/utils.js";
+import process from "node:process";
 
 export default {
   memberPermissions: [PermissionsBitField.Flags.BanMembers],
@@ -74,15 +74,15 @@ export default {
     dayjs.extend(dayjsduration);
     dayjs.extend(relativeTime);
     const client = interaction.client;
-    const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild!.id]);
-    if (rows.length === 0) {
+    const guild_config = await client.getGuildConfig(interaction.guild!.id);
+    if (!guild_config) {
       await interaction.reply({
-        content: "No guild data found, this shouldn't happen.",
+        content: "This server is not registered in the database. This shouldn't happen, please contact developers",
         flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
-    const t = client.i18next.getFixedT(rows[0].language || "en", "commands", "ban");
+    const t = client.i18next.getFixedT(guild_config.language || "en", "commands", "ban");
     const user = interaction.options.getUser("user", true);
     if (user.id === interaction.user.id) {
       await interaction.reply({ content: t("cant_ban_self"), flags: MessageFlagsBitField.Flags.Ephemeral });
@@ -96,7 +96,7 @@ export default {
     if (
       member &&
       (member.permissions.has(PermissionsBitField.Flags.BanMembers) ||
-        member.roles.cache.has(toStringId(rows[0].staff_role_id)))
+        member.roles.cache.has(toStringId(guild_config.staff_role_id)))
     ) {
       await interaction.reply({ content: t("cant_ban_mod"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
@@ -112,40 +112,56 @@ export default {
     if (duration && time) {
       const dayjsduration = dayjs.duration(duration, time as dayjsduration.DurationUnitType);
       const long_duration = dayjs(dayjs().add(dayjsduration))
-        .locale(rows[0].language || "en")
+        .locale(guild_config.language || "en")
         .fromNow(true);
+      console.log("🔍 Logging insert values:");
+      console.log({
+        type: "TIMED_BAN",
+        user_id: user?.id,
+        guild_id: interaction.guild?.id,
+        moderator_id: interaction.user?.id,
+        created_at: new Date().toISOString(),
+        reason: reason,
+        case_id: guild_config?.case_id,
+        expires_at: new Date(Date.now() + dayjsduration.asMilliseconds()).toISOString(),
+      });
+
       try {
         await interaction.client.pgClient.query(
-          "INSERT INTO punishments (expires, type, user_id, guild_id, staff_id, created_at) VALUES ($1, $2, $3, $4, $5, $6)",
+          "INSERT INTO punishments (expires, type, user_id, guild_id, staff_id, created_at) VALUES (pgp_sym_encrypt($1::TEXT, $7), pgp_sym_encrypt($2::TEXT, $7), pgp_sym_encrypt($3::TEXT, $7), pgp_sym_encrypt($4::TEXT, $7), pgp_sym_encrypt($5::TEXT, $7), pgp_sym_encrypt($6::TEXT, $7))",
           [
-            new Date(Date.now() + dayjsduration.asMilliseconds()),
+            new Date(Date.now() + dayjsduration.asMilliseconds()).toISOString(),
             "BAN",
             user.id,
             interaction.guild!.id,
             interaction.user.id,
-            new Date(),
+            new Date().toISOString(),
+            process.env.PGCRYPTO_PASSPHRASE,
+          ],
+        );
+        await interaction.client.pgClient.query(
+          `INSERT INTO infractions (type, user_id, guild_id, moderator_id, created_at, reason, case_id, expires_at) VALUES (pgp_sym_encrypt($1::TEXT, $9), pgp_sym_encrypt($2::TEXT, $9), pgp_sym_encrypt($3::TEXT, $9), pgp_sym_encrypt($4::TEXT, $9), pgp_sym_encrypt($5::TEXT, $9), pgp_sym_encrypt($6::TEXT, $9), pgp_sym_encrypt($7::TEXT, $9), pgp_sym_encrypt($8::TEXT, $9))`,
+          [
+            "TIMED_BAN",
+            user.id,
+            interaction.guild.id,
+            interaction.user.id,
+            new Date().toISOString(),
+            reason,
+            guild_config.case_id,
+            new Date(Date.now() + dayjsduration.asMilliseconds()).toISOString(),
+            process.env.PGCRYPTO_PASSPHRASE,
           ],
         );
       } catch (error) {
         await interaction.reply(t("database_error"));
         logger.error({
-          message: `Error while inserting punishment for user ${user.tag} from guild ${interaction.guild!.name}`,
+          message: `Error while inserting punishment/infraction for user ${user.tag} from guild ${interaction.guild!.name}`,
           error,
           guild: `${interaction.guild.name} (${interaction.guild.id})`,
           user: `${interaction.user.tag} (${interaction.user.id})`,
         });
         return;
-      }
-      try {
-        await interaction.guild!.members.ban(user, { reason, deleteMessageSeconds: 604800 });
-      } catch (error) {
-        await interaction.reply(t("failed_to_ban", { user: user.tag }));
-        logger.error({
-          message: `Error while banning user ${user.tag} from guild ${interaction.guild!.name}`,
-          error,
-          guild: `${interaction.guild.name} (${interaction.guild.id})`,
-          user: `${interaction.user.tag} (${interaction.user.id})`,
-        });
       }
       try {
         if (member) {
@@ -160,7 +176,7 @@ export default {
             content: t("message.success.duration", {
               user: user.tag,
               duration: long_duration,
-              case: rows[0].case_id,
+              case: guild_config.case_id,
               confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
             }),
           });
@@ -169,7 +185,7 @@ export default {
             content: t("message.success.duration_no_member", {
               user: user.tag,
               duration: long_duration,
-              case: rows[0].case_id,
+              case: guild_config.case_id,
               confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
             }),
           });
@@ -179,9 +195,20 @@ export default {
           content: t("message.fail.duration", {
             user: user.tag,
             duration: long_duration,
-            case: rows[0].case_id,
+            case: guild_config.case_id,
             confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
           }),
+        });
+      }
+      try {
+        await interaction.guild!.members.ban(user, { reason, deleteMessageSeconds: 604800 });
+      } catch (error) {
+        await interaction.reply(t("failed_to_ban", { user: user.tag }));
+        logger.error({
+          message: `Error while banning user ${user.tag} from guild ${interaction.guild!.name}`,
+          error,
+          guild: `${interaction.guild.name} (${interaction.guild.id})`,
+          user: `${interaction.user.tag} (${interaction.user.id})`,
         });
       }
       const reply = await modLog(
@@ -192,7 +219,7 @@ export default {
           moderator: interaction.user,
           reason,
           duration: dayjs(Date.now() + dayjsduration.asMilliseconds()),
-          caseID: rows[0].case_id,
+          caseID: guild_config.case_id,
         },
         client,
       );
@@ -206,18 +233,56 @@ export default {
     } else {
       try {
         await interaction.client.pgClient.query(
-          "INSERT INTO punishments (type, user_id, guild_id, staff_id, created_at) VALUES ($1, $2, $3, $4, $5)",
-          ["BAN", user.id, interaction.guild!.id, interaction.user.id, new Date()],
+          "INSERT INTO infractions (type, user_id, guild_id, moderator_id, created_at, reason, case_id) VALUES (pgp_sym_encrypt($1, $8), pgp_sym_encrypt($2, $8), pgp_sym_encrypt($3, $8), pgp_sym_encrypt($4, $8), pgp_sym_encrypt($5, $8), pgp_sym_encrypt($6, $8), pgp_sym_encrypt($7, $8))",
+          [
+            "BAN",
+            user.id,
+            interaction.guild.id,
+            interaction.user.id,
+            new Date().toISOString(),
+            reason,
+            guild_config.case_id,
+            process.env.PG_ENCRYPTION_PASSPHRASE,
+          ],
         );
       } catch (e) {
         await interaction.reply(t("database_error"));
         logger.error({
-          message: `Error while inserting punishment for user ${user.tag} from guild ${interaction.guild!.name}`,
+          message: `Error while inserting infraction for user ${user.tag} from guild ${interaction.guild!.name}`,
           error: e,
           guild: `${interaction.guild.name} (${interaction.guild.id})`,
           user: `${interaction.user.tag} (${interaction.user.id})`,
         });
         return;
+      }
+      try {
+        if (member) {
+          await user.send(t("message.dm.permanent", { guild: interaction.guild!.name, reason }));
+
+          await interaction.reply({
+            content: t("message.success.permanent", {
+              user: user.tag,
+              case: guild_config.case_id,
+              confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
+            }),
+          });
+        } else {
+          await interaction.reply({
+            content: t("message.success.permanent_no_member", {
+              user: user.tag,
+              case: guild_config.case_id,
+              confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
+            }),
+          });
+        }
+      } catch {
+        await interaction.reply({
+          content: t("message.fail.permanent", {
+            user: user.tag,
+            case: guild_config.case_id,
+            confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
+          }),
+        });
       }
       try {
         await interaction.guild!.members.ban(user, { reason, deleteMessageSeconds: 604800 });
@@ -230,35 +295,6 @@ export default {
           user: `${interaction.user.tag} (${interaction.user.id})`,
         });
       }
-      try {
-        if (member) {
-          await user.send(t("message.dm.permanent", { guild: interaction.guild!.name, reason }));
-
-          await interaction.reply({
-            content: t("message.success.permanent", {
-              user: user.tag,
-              case: rows[0].case_id,
-              confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
-            }),
-          });
-        } else {
-          await interaction.reply({
-            content: t("message.success.permanent_no_member", {
-              user: user.tag,
-              case: rows[0].case_id,
-              confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
-            }),
-          });
-        }
-      } catch {
-        await interaction.reply({
-          content: t("message.fail.permanent", {
-            user: user.tag,
-            case: rows[0].case_id,
-            confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
-          }),
-        });
-      }
       const reply = await modLog(
         {
           guild: interaction.guild!,
@@ -266,7 +302,7 @@ export default {
           action: "BAN",
           moderator: interaction.user,
           reason,
-          caseID: rows[0].case_id,
+          caseID: guild_config.case_id,
         },
         client,
       );
