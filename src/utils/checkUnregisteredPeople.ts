@@ -4,14 +4,10 @@ import dayjs from "dayjs";
 import { Guilds } from "../../@types/DatabaseTypes";
 import logger from "../lib/Logger.js";
 import { toStringId } from "./utils.js";
-import process from "node:process";
 
 export default async (client: Client) => {
   // Fetch guild configurations from the database
-  const { rows } = await client.pgClient.query<Guilds>(
-    "SELECT id, pgp_sym_decrypt(days_to_kick, $1)::INTEGER as days_to_kick, pgp_sym_decrypt(register_channel_id, $1) as register_channel_id, pgp_sym_decrypt(member_role_id, $1) as member_role_id, pgp_sym_decrypt(mute_role_id, $1) as mute_role_id, pgp_sym_decrypt(language, $1) as language FROM guilds",
-    [process.env.PASSPHRASE],
-  );
+  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds");
 
   for (const row of rows) {
     const { id, days_to_kick, register_channel_id, member_role_id, mute_role_id, language } = row;

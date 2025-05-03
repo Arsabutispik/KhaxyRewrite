@@ -1,16 +1,22 @@
 import { EventBase } from "../../@types/types";
 import { AuditLogEvent, Events } from "discord.js";
-import { sleep } from "../utils/utils.js";
+import { sleep, toStringId } from "../utils/utils.js";
 import modlog from "../utils/modLog.js";
 import dayjs from "dayjs";
+import { Guilds } from "../../@types/DatabaseTypes";
 
 export default {
   name: Events.GuildMemberUpdate,
   once: false,
   async execute(oldMember, newMember) {
-    const guild_config = await oldMember.client.getGuildConfig(oldMember.guild.id);
+    const { rows } = await oldMember.client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
+      oldMember.guild.id,
+    ]);
+    const guild_config = rows[0];
     if (!guild_config) return;
-    const modlog_channel = await oldMember.guild.channels.fetch(guild_config.mod_log_channel_id).catch(() => null);
+    const modlog_channel = await oldMember.guild.channels
+      .fetch(toStringId(guild_config.mod_log_channel_id))
+      .catch(() => null);
     if (!modlog_channel) return;
     if (!modlog_channel.isTextBased()) return;
     if (!oldMember.isCommunicationDisabled() && newMember.isCommunicationDisabled()) {

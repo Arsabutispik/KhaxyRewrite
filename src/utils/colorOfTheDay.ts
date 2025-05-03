@@ -4,27 +4,23 @@ import dayjs from "dayjs";
 import { Guilds } from "../../@types/DatabaseTypes";
 import logger from "../lib/Logger.js";
 import { toStringId } from "./utils.js";
-import process from "node:process";
 
 export default async (client: Client) => {
   // Fetch guild configurations from the database
-  const result = await client.pgClient.query<Guilds>(
-    "SELECT pgp_sym_decrypt(color_id_of_the_day, $1), pgp_sym_decrypt(color_name_of_the_day, $1), pgp_sym_decrypt(id, $1) FROM guilds",
-    [process.env.PASSPHRASE],
-  );
+  const result = await client.pgClient.query<Guilds>("SELECT * FROM guilds");
   const rows = result.rows;
   for (const row of rows) {
-    const { color_id_of_the_day, color_name_of_the_day, id } = row;
+    const { colour_id_of_the_day, colour_name_of_the_day, id } = row;
     const guild = client.guilds.cache.get(toStringId(id));
     if (!guild) continue;
     if (!guild.members.me) continue;
     // Check if the bot has permission to manage roles
     if (!guild.members.me.permissions.has(PermissionsBitField.Flags.ManageRoles)) continue;
-    const role = guild.roles.cache.find((role) => role.id === toStringId(color_id_of_the_day));
+    const role = guild.roles.cache.find((role) => role.id === toStringId(colour_id_of_the_day));
     if (!role) continue;
     // Check if the bot's highest role is higher than the target role
     if (role.position >= guild.members.me.roles.highest.position) continue;
-    const name = role.name.replace(color_name_of_the_day, "");
+    const name = role.name.replace(colour_name_of_the_day, "");
     // Generate a random color
     const x = Math.round(0xffffff * Math.random()).toString(16);
     const y = 6 - x.length;
@@ -35,10 +31,7 @@ export default async (client: Client) => {
     const colorName = result[1];
     try {
       // Update the color name in the database
-      await client.pgClient.query(
-        "UPDATE guilds SET color_name_of_the_day = pgp_sym_encrypt($1, $3) WHERE pgp_sym_decrypt(id, $3) = $2",
-        [colorName, id, process.env.PASSPHRASE],
-      );
+      await client.pgClient.query("UPDATE guilds SET colour_name_of_the_day = $1 WHERE id = $2", [colorName, id]);
       // Edit the role with the new color and name
       await role.edit({
         name: `${colorName} ${name}`,
@@ -48,9 +41,9 @@ export default async (client: Client) => {
       // Update the color change time in the database
       const query = `
             UPDATE cronjobs
-            SET color_time = pgp_sym_encrypt($1::text, $3)
-            WHERE pgp_sym_decrypt(id, $3) = $2`;
-      await client.pgClient.query(query, [dayjs().add(1, "day").toISOString(), id, process.env.PASSPHRASE]);
+            SET color_time = $1
+            WHERE id = $2`;
+      await client.pgClient.query(query, [dayjs().add(1, "day").toISOString(), id]);
     } catch (error) {
       logger.log({
         level: "error",
@@ -66,15 +59,12 @@ export default async (client: Client) => {
 
 export async function specificGuildColorUpdate(client: Client, guildId: string) {
   // Fetch guild configuration for the specific guild
-  const { rows } = await client.pgClient.query<Guilds>(
-    "SELECT pgp_sym_decrypt(color_id_of_the_day, $2), pgp_sym_decrypt(color_name_of_the_day, $2), pgp_sym_decrypt(id, $2) FROM guilds WHERE pgp_sym_decrypt(id, $2) = $1",
-    [guildId, process.env.PASSPHRASE],
-  );
+  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [guildId]);
   if (rows.length === 0) {
     logger.warn(`Guild config for ${guildId} not found.`);
     return;
   }
-  const { color_id_of_the_day, color_name_of_the_day, id } = rows[0];
+  const { colour_id_of_the_day, colour_name_of_the_day, id } = rows[0];
   const guild = client.guilds.cache.get(toStringId(id));
   if (!guild) {
     logger.warn(`Guild ${id} not found.`);
@@ -89,9 +79,9 @@ export async function specificGuildColorUpdate(client: Client, guildId: string) 
     logger.warn(`Bot doesn't have permission to manage roles in guild ${id}.`);
     return;
   }
-  const role = guild.roles.cache.find((role) => role.id === toStringId(color_id_of_the_day));
+  const role = guild.roles.cache.find((role) => role.id === toStringId(colour_id_of_the_day));
   if (!role) {
-    logger.warn(`Role ${color_id_of_the_day} not found in guild ${id}.`);
+    logger.warn(`Role ${colour_id_of_the_day} not found in guild ${id}.`);
     return;
   }
   // Check if the bot's highest role is higher than the target role
@@ -99,7 +89,7 @@ export async function specificGuildColorUpdate(client: Client, guildId: string) 
     logger.warn(`Bot's highest role is lower than the target role in guild ${id}.`);
     return;
   }
-  const name = role.name.replace(color_name_of_the_day || "", " ");
+  const name = role.name.replace(colour_name_of_the_day || "", " ");
   // Generate a random color
   const x = Math.round(0xffffff * Math.random()).toString(16);
   const y = 6 - x.length;
@@ -110,10 +100,7 @@ export async function specificGuildColorUpdate(client: Client, guildId: string) 
   const colorName = cresult[1];
   try {
     // Update the color name in the database
-    await client.pgClient.query(
-      "UPDATE guilds SET color_name_of_the_day = pgp_sym_encrypt($1, $3) WHERE pgp_sym_decrypt(id, $3) = $2",
-      [colorName, id, process.env.PASSPHRASE],
-    );
+    await client.pgClient.query("UPDATE guilds SET colour_name_of_the_day = $1 WHERE id = $2", [colorName, id]);
     // Edit the role with the new color and name
     await role.edit({
       name: `${name}${colorName}`,
@@ -123,8 +110,8 @@ export async function specificGuildColorUpdate(client: Client, guildId: string) 
     // Update the color change time in the database
     const query = `
       UPDATE cronjobs
-      SET color_time = pgp_sym_encrypt($1::text, $3)
-      WHERE pgp_sym_decrypt(id, $3) = $2`;
+      SET color_time = $1
+      WHERE id = $2`;
     await client.pgClient.query(query, [dayjs().add(1, "day").toISOString(), id]);
   } catch (error) {
     logger.log({

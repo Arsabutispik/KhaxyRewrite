@@ -7,6 +7,7 @@ import logger from "../../lib/Logger.js";
 import "dayjs/locale/tr.js";
 import modLog from "../../utils/modLog.js";
 import { toStringId } from "../../utils/utils.js";
+import { Guilds, Punishments } from "../../../@types/DatabaseTypes";
 export default {
   memberPermissions: [PermissionsBitField.Flags.ManageRoles],
   clientPermissions: [PermissionsBitField.Flags.ManageRoles],
@@ -81,7 +82,8 @@ export default {
     dayjs.extend(dayjsduration);
     dayjs.extend(relativeTime);
     const client = interaction.client;
-    const guild_config = await client.getGuildConfig(interaction.guild.id);
+    const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
+    const guild_config = rows[0];
     if (!guild_config) {
       await interaction.reply({
         content: "This server is not registered in the database. This shouldn't happen, please contact developers",
@@ -119,18 +121,22 @@ export default {
       await interaction.reply({ content: t("no_mute_role"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
-    const punishment_rows = await client.getPunishments(interaction.guild.id, member.id, "mute");
-    if (member.roles.cache.has(muteRole.id) && punishment_rows) {
+    const { rows: punishment_rows } = await client.pgClient.query<Punishments>(
+      "SELECT * FROM punishments WHERE user_id = $1 AND guild_id = $2 AND type = 'mute'",
+      [member.id, interaction.guild.id],
+    );
+
+    if (member.roles.cache.has(muteRole.id) && punishment_rows.length) {
       await interaction.reply({ content: t("already_muted"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
-    } else if (member.roles.cache.has(muteRole.id) && !punishment_rows) {
+    } else if (member.roles.cache.has(muteRole.id) && !punishment_rows.length) {
       await interaction.reply({
         content: t("already_muted_no_punishment"),
         flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       await member.roles.remove(muteRole);
       return;
-    } else if (!member.roles.cache.has(muteRole.id) && punishment_rows) {
+    } else if (!member.roles.cache.has(muteRole.id) && punishment_rows.length) {
       await interaction.reply({ content: t("not_muted"), flags: MessageFlagsBitField.Flags.Ephemeral });
       await member.roles.add(muteRole);
       return;
@@ -151,15 +157,15 @@ export default {
         .map((role) => role.id);
       try {
         await client.pgClient.query(
-          "INSERT INTO punishments (user_id, guild_id, type, staff_id, expires, created_at, previous_roles) VALUES (pgp_sym_encrypt($1, $7), pgp_sym_encrypt($2, $7), pgp_sym_encrypt('mute', $7), pgp_sym_encrypt($3, $7), pgp_sym_encrypt($4, $7), pgp_sym_encrypt($5, $7), pgp_sym_encrypt($6::text, $7))",
+          "INSERT INTO punishments (user_id, guild_id, type, staff_id, expires, created_at, previous_roles) VALUES ($1, $2, $3, $4, $5, $6, $7)",
           [
             member.id,
             interaction.guild.id,
+            "mute",
             interaction.user.id,
             new Date(Date.now() + duration.asMilliseconds()),
             new Date(),
             filtered_roles,
-            process.env.PASSPHRASE,
           ],
         );
       } catch (error) {
@@ -187,14 +193,14 @@ export default {
     } else {
       try {
         await client.pgClient.query(
-          "INSERT INTO punishments (user_id, guild_id, type, staff_id, expires, created_at) VALUES (pgp_sym_encrypt($1, $6), pgp_sym_encrypt($2, $6), pgp_sym_encrypt('mute', $6), pgp_sym_encrypt($3, $6), pgp_sym_encrypt($4, $6), pgp_sym_encrypt($5, $6))",
+          "INSERT INTO punishments (user_id, guild_id, type, staff_id, expires, created_at) VALUES ($1, $2, $3, $4, $5, $6)",
           [
             member.id,
             interaction.guild.id,
+            "mute",
             interaction.user.id,
             new Date(Date.now() + duration.asMilliseconds()),
             new Date(),
-            process.env.PASSPHRASE,
           ],
         );
       } catch (error) {

@@ -15,7 +15,7 @@ import dayjsduration from "dayjs/plugin/duration.js";
 import relativeTime from "dayjs/plugin/relativeTime.js";
 import "dayjs/locale/tr.js";
 import logger from "../../lib/Logger.js";
-import { Mod_mail_threads } from "../../../@types/DatabaseTypes";
+import { Guilds, Mod_mail_threads } from "../../../@types/DatabaseTypes";
 import { modMailLog, toStringId } from "../../utils/utils.js";
 export default {
   memberPermissions: [PermissionsBitField.Flags.ModerateMembers],
@@ -59,7 +59,10 @@ export default {
     ),
   async execute(interaction) {
     const client = interaction.client;
-    const guild_config = await client.getGuildConfig(interaction.guild.id);
+    const { rows: guild_rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
+      interaction.guild.id,
+    ]);
+    const guild_config = guild_rows[0];
     if (!guild_config) {
       await interaction.reply({
         content: "Guild not found in the database. Please contact the bot developers as this shouldn't happen.",

@@ -10,7 +10,9 @@ export default {
   once: false,
   async execute(member) {
     // Fetch guild data from the database
-    const guild_config = await member.client.getGuildConfig(member.guild.id);
+    const { rows } = await member.client.pgClient.query("SELECT * FROM guilds WHERE id = $1", [member.guild.id]);
+    // Extract the guild configuration from the database result
+    const guild_config = rows[0];
     dayjs.extend(relativeTime);
     const replacements = {
       "{user}": member.toString(),

@@ -16,11 +16,11 @@ import {
 import { Guilds } from "../../@types/DatabaseTypes";
 import { TFunction } from "i18next";
 import { toStringId } from "../utils/utils.js";
-import process from "node:process";
 
 export default async function registerConfig(interaction: ChatInputCommandInteraction<"cached">) {
   const client = interaction.client;
-  const guild_config = await client.getGuildConfig(interaction.guildId);
+  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
+  const guild_config = rows[0];
   if (!guild_config) {
     await interaction.reply({
       content: "Unexpected database error. This should not have happened. Please contact the bot developers",
@@ -35,15 +35,15 @@ export default async function registerConfig(interaction: ChatInputCommandIntera
     .setMaxValues(1)
     .setOptions([
       {
-        label: t("register_join_channel.label"),
+        label: t("register_join_channel_id.label"),
         value: "register_join_channel",
-        description: t("register_join_channel.description"),
+        description: t("register_join_channel_id.description"),
         emoji: "📝",
       },
       {
-        label: t("register_channel.label"),
+        label: t("register_channel_id.label"),
         value: "register_channel",
-        description: t("register_channel.description"),
+        description: t("register_channel_id.description"),
         emoji: "📝",
       },
       {
@@ -152,17 +152,11 @@ export async function dynamicChannel(
       content: t(`${channel}.unset`),
       components: [],
     });
-    await client.setGuildConfig(message_component.guildId, {
-      [channel]: null,
-    });
   } else {
     await client.pgClient.query(`UPDATE guilds SET ${channel} = $1 WHERE id = $2`, [
       message_component.values[0],
       message_component.guildId,
     ]);
-    await client.setGuildConfig(message_component.guildId, {
-      [channel]: message_component.values[0],
-    });
     await message_component.editReply({
       content: t(`${channel}.set`, {
         channel: message_component.guild.channels.cache.get(message_component.values[0])!.toString(),
@@ -217,13 +211,10 @@ export async function dynamicMessage(
   const valueToEncrypt = input === "" ? defaultValueMap[message] : input;
   await client.pgClient.query(
     `UPDATE guilds
-     SET ${message} = pgp_sym_encrypt($1, $3)
-     WHERE pgp_sym_decrypt(id, $3) = $2`,
-    [valueToEncrypt, message_component.guildId, process.env.PASSPHRASE],
+     SET ${message} = $1
+     WHERE id = $2`,
+    [valueToEncrypt, message_component.guildId],
   );
-  await client.setGuildConfig(message_component.guildId, {
-    [message]: message_component.fields.getTextInputValue(message),
-  });
   await message_component.editReply({
     content: t(`${message}.set`),
     components: [],
@@ -234,25 +225,13 @@ async function registerClearChannel(interaction: StringSelectMenuInteraction<"ca
   await interaction.deferUpdate();
   const client = interaction.client;
   if (data.register_channel_clear) {
-    await client.pgClient.query(
-      `UPDATE guilds SET register_channel_clear = pgp_sym_encrypt(FALSE, $2) WHERE pgp_sym_decrypt(id, $2) = $1`,
-      [interaction.guildId, process.env.PASSPHRASE],
-    );
-    await client.setGuildConfig(interaction.guildId, {
-      register_channel_clear: false,
-    });
+    await client.pgClient.query(`UPDATE guilds SET register_channel_clear = FALSE WHERE id= $1`, [interaction.guildId]);
     await interaction.editReply({
       content: t("register_clear_channel.unset"),
       components: [],
     });
   } else {
-    await client.pgClient.query(`UPDATE guilds SET register_channel_clear = pgp_sym_encrypt(TRUE, $2) WHERE id = $1`, [
-      interaction.guildId,
-      process.env.PASSPHRASE,
-    ]);
-    await client.setGuildConfig(interaction.guildId, {
-      register_channel_clear: true,
-    });
+    await client.pgClient.query(`UPDATE guilds SET register_channel_clear = TRUE WHERE id = $1`, [interaction.guildId]);
     await interaction.editReply({
       content: t("register_clear_channel.set"),
       components: [],

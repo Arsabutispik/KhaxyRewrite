@@ -1,10 +1,8 @@
 import { AttachmentBuilder, ChannelType, Client, TextChannel, time, User } from "discord.js";
-import { Client as PgClient } from "pg";
-import { Bump_leaderboard, Guilds, Mod_mail_messages } from "../../@types/DatabaseTypes";
+import { Bump_leaderboard, Guilds, Mod_mail_messages, Mod_mail_threads } from "../../@types/DatabaseTypes";
 import { Buffer } from "node:buffer";
 import crypto from "crypto";
 import dayjs from "dayjs";
-import process from "node:process";
 /**
  * Pauses execution for a specified number of milliseconds.
  *
@@ -48,29 +46,39 @@ function toStringId(id: bigint | string | null): string | "0" {
   return id.toString();
 }
 
+/**
+ * Logs mod mail messages to a specified channel.
+ * @param client - The Discord client instance.
+ * @param channel - The channel where the mod mail is being sent.
+ * @param user - The user who sent the mod mail.
+ * @param closer - The user who closed the mod mail thread.
+ */
 async function modMailLog(client: Client, channel: TextChannel, user: User | null, closer: User) {
-  const { rows: guild_rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
-    channel.guild.id,
-  ]);
-  if (guild_rows.length === 0) return;
-  const t = client.i18next.getFixedT(guild_rows[0].language, null, "mod_mail_log");
+  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [channel.guild.id]);
+  const guild_data = rows[0];
+  if (!guild_data) return;
+  const t = client.i18next.getFixedT(guild_data.language, null, "mod_mail_log");
   if (!user) return;
-  const mod_mail_log_channel = channel.guild.channels.cache.get(toStringId(guild_rows[0].mod_mail_channel_id));
+  const mod_mail_log_channel = channel.guild.channels.cache.get(toStringId(guild_data.mod_mail_channel_id));
   if (!mod_mail_log_channel) return;
   if (mod_mail_log_channel.type !== ChannelType.GuildText) return;
-  const { rows: mod_mail_messages_rows } = await client.pgClient.query<Mod_mail_messages>(
+  const { rows: mod_mail_messages } = await client.pgClient.query<Mod_mail_messages>(
     "SELECT * FROM mod_mail_messages WHERE channel_id = $1",
     [channel.id],
   );
-  if (mod_mail_messages_rows.length === 0) return;
+  if (!mod_mail_messages) return;
+  const threads = await client.pgClient.query<Mod_mail_threads>(
+    "SELECT * FROM mod_mail_threads WHERE mod_mail_threads.guild_id = $1",
+    [channel.guild.id],
+  );
   let messages: string[] = [
     t("initial", {
-      thread_id: mod_mail_messages_rows[0].thread_id,
+      thread_id: threads.rowCount,
       user,
-      time: dayjs(mod_mail_messages_rows[0].sent_at),
+      time: dayjs(mod_mail_messages[0].sent_at),
     }),
   ];
-  for (const row of mod_mail_messages_rows) {
+  for (const row of mod_mail_messages) {
     if (row.author_type === "client" && row.sent_to === "thread") {
       messages.push(`[${dayjs(row.sent_at)}] [BOT] ${row.content}`);
     }
@@ -85,7 +93,7 @@ async function modMailLog(client: Client, channel: TextChannel, user: User | nul
       messages.push(`[${dayjs(row.sent_at)}] ${t("to_user")} [${author ? author.tag : "Unknown"}] ${row.content}`);
     }
     if (row.author_type === "user" && row.sent_to === "thread") {
-      messages.push(`[${dayjs(row.sent_at)}] ${t("from_user")} ${row.content}`);
+      messages.push(`[${dayjs(row.sent_at)}] ${t("from_user")} [${user.tag}] ${row.content}`);
     }
     if (row.author_type === "staff" && row.sent_to === "thread") {
       const author = await client.users.fetch(toStringId(row.author_id)).catch(() => null);
@@ -96,13 +104,13 @@ async function modMailLog(client: Client, channel: TextChannel, user: User | nul
   const id = crypto.randomUUID();
   const attachment = new AttachmentBuilder(buffer, { name: id + ".txt" });
   const thread_messages = {
-    user: mod_mail_messages_rows.filter((row) => row.author_type === "user" && row.sent_to === "thread").length,
-    staff: mod_mail_messages_rows.filter((row) => row.author_type === "staff" && row.sent_to === "user").length,
-    internal: mod_mail_messages_rows.filter((row) => row.author_type === "staff" && row.sent_to === "thread").length,
+    user: mod_mail_messages.filter((row) => row.author_type === "user" && row.sent_to === "thread").length,
+    staff: mod_mail_messages.filter((row) => row.author_type === "staff" && row.sent_to === "user").length,
+    internal: mod_mail_messages.filter((row) => row.author_type === "staff" && row.sent_to === "thread").length,
   };
   await mod_mail_log_channel.send({
     content: t("close_message", {
-      thread_id: mod_mail_messages_rows[0].thread_id,
+      thread_id: threads.rowCount,
       user,
       closer,
       messages: thread_messages,
@@ -115,16 +123,17 @@ async function modMailLog(client: Client, channel: TextChannel, user: User | nul
 async function bumpLeaderboard(client: Client, guildId: string, lastBump?: User) {
   const guild = client.guilds.cache.get(guildId);
   if (!guild) return;
-  const guild_config = await client.getGuildConfig(guildId);
+  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [guildId]);
+  const guild_config = rows[0];
   if (!guild_config) return;
-  const channel = guild.channels.cache.get(guild_config.bump_leaderboard_channel_id);
+  const channel = guild.channels.cache.get(toStringId(guild_config.bump_leaderboard_channel_id));
   if (!channel || channel.type !== ChannelType.GuildText) return;
-  const { rows } = await client.pgClient.query<Bump_leaderboard>(
-    "SELECT bump_leaderboard.*, pgp_sym_decrypt(user_id, $2) as user_id, pgp_sym_decrypt(bump_count, $2) as bump_count FROM bump_leaderboard WHERE pgp_sym_decrypt(guild_id, $2) = $1",
-    [guildId, process.env.PASSPHRASE],
+  const { rows: bump_rows } = await client.pgClient.query<Bump_leaderboard>(
+    "SELECT * FROM bump_leaderboard WHERE guild_id = $1",
+    [guildId],
   );
   if (rows.length === 0) return;
-  const leaderboard = rows
+  const leaderboard = bump_rows
     .map((row) => ({
       user: row.user_id,
       bump_count: row.bump_count,
@@ -167,32 +176,5 @@ async function bumpLeaderboard(client: Client, guildId: string, lastBump?: User)
     await channel.send(initial);
   }
 }
-async function decryptValue(encryptedValue: string, pgClient: PgClient) {
-  try {
-    // Execute the decryption query
-    const decrypted = await pgClient.query("SELECT pgp_sym_decrypt($1::bytea, $2) AS decrypted", [
-      Buffer.from(encryptedValue, "base64"),
-      process.env.PASSPHRASE,
-    ]);
 
-    // Check if the decryption was successful
-    if (decrypted.rows.length === 0 || !decrypted.rows[0].decrypted) {
-      console.error("Decryption failed for:", encryptedValue);
-      return null; // Decryption failed
-    }
-    return decrypted.rows[0].decrypted;
-  } catch (error) {
-    console.error("Error during decryption:", error);
-    return null;
-  }
-}
-
-export {
-  sleep,
-  missingPermissionsAsString,
-  replacePlaceholders,
-  toStringId,
-  modMailLog,
-  bumpLeaderboard,
-  decryptValue,
-};
+export { sleep, missingPermissionsAsString, replacePlaceholders, toStringId, modMailLog, bumpLeaderboard };

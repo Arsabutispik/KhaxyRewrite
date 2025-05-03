@@ -2,6 +2,8 @@ import { SlashCommandBase } from "../../../@types/types";
 import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import logger from "../../lib/Logger.js";
 import { toStringId } from "../../utils/utils.js";
+import { Guilds } from "../../../@types/DatabaseTypes";
+import { addInfraction } from "../../utils/infractionHandler.js";
 
 export default {
   memberPermissions: [PermissionsBitField.Flags.KickMembers],
@@ -50,7 +52,8 @@ export default {
     ),
   async execute(interaction) {
     const client = interaction.client;
-    const guild_config = await client.getGuildConfig(interaction.guildId);
+    const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
+    const guild_config = rows[0];
     if (!guild_config) {
       await interaction.reply({
         content: "This server is not registered in the database. This shouldn't happen, please contact developers",
@@ -90,6 +93,14 @@ export default {
       await interaction.reply(t("cant_kick"));
       return;
     }
+    await addInfraction({
+      guild: interaction.guild,
+      member: member.id,
+      reason,
+      type: "kick",
+      moderator: interaction.user.id,
+      client,
+    });
     if (clear) {
       try {
         await member.ban({ reason: `Softban- ${reason}`, deleteMessageSeconds: 604800 });

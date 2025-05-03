@@ -3,7 +3,7 @@ import path from "path";
 import chalk from "chalk"; // Import chalk for colored output
 
 // Base language to compare against
-const baseLang = "en";
+const baseLang = "en-GB";
 const localesDir = path.join(process.cwd(), "locales");
 
 // Function to recursively extract all keys from an object

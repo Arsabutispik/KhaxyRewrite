@@ -1,21 +1,21 @@
 {
   "guildBanAdd": {
-    "noPermission": "I need the View Audit Log permission to see the banned users in this server.",
-    "errorOnFetchAuditLogs": "Error occurred while fetching audit logs.",
-    "executorNotMatch": "I couldn't find the user who banned this user.",
+    "noPermission": "I need the 'View Audit Log' permission to see the banned users in this server.",
+    "errorOnFetchAuditLogs": "An error occurred while fetching audit logs.",
+    "executorNotMatch": "I couldn't determine who banned this user.",
     "noReason": "No reason provided."
   },
   "guildBanRemove": {
-    "noPermission": "I need the View Audit Log permission to see the unbanned users in this server.",
-    "errorOnFetchAuditLogs": "Error occurred while fetching audit logs.",
-    "executorNotMatch": "I couldn't find the user who unbanned this user.",
+    "noPermission": "I need the 'View Audit Log' permission to see the unbanned users in this server.",
+    "errorOnFetchAuditLogs": "An error occurred while fetching audit logs.",
+    "executorNotMatch": "I couldn't determine who unbanned this user.",
     "noReason": "No reason provided."
   },
   "interactionCreate": {
     "memberMissingPermissions": "You don't have the required `{{permissions}}` permissions to use this command."
   },
   "guildMemberUpdate": {
-    "noPermission": "I need the View Audit Log permission to see the updated members in this server.",
+    "noPermission": "I need the 'View Audit Log' permission to see the updated members in this server.",
     "noReason": "No reason provided."
   },
   "playerStart": {
@@ -28,7 +28,7 @@
   },
   "emptyChannel": {
     "embed": {
-      "description": "Music has been stopped because no one is left in the voice channel.",
+      "description": "Music has been stopped because no one remains in the voice channel.",
       "title": "Empty Channel"
     }
   },
@@ -42,16 +42,16 @@
       "confirm": "Yes",
       "cancel": "No",
       "confirm_title": "Confirm Mod Mail Thread Button",
-      "confirm_description": "Click the button below to confirm the mod mail thread for {{guild}} or click the cancel button to cancel the thread.",
+      "confirm_description": "Click the button below to confirm the mod mail thread for {{guild}}, or click the cancel button to cancel the thread.",
       "cancelled_title": "Mod Mail Thread Cancelled",
       "cancelled_description": "The mod mail thread for {{guild}} has been cancelled.",
       "confirmed_title": "Mod Mail Thread Confirmed",
-      "confirmed_description": "The mod mail thread for {{guild}} has been confirmed and the conversation has started.",
+      "confirmed_description": "The mod mail thread for {{guild}} has been confirmed and the conversation has begun.",
       "parent_channel_missing": "Parent channel is missing. Moderators need to set the parent channel for the mod mail to work.",
       "channel_missing": "Channel is missing. Moderators need to set the channel for the mod mail to work.",
       "topic": "Mod Mail conversation with {{user}}",
-      "error_sending": "An error occurred while trying to send the message.",
-      "error_inserting": "An error occurred while trying to insert the message to the database."
+      "error_sending": "An error occurred while attempting to send the message.",
+      "error_inserting": "An error occurred while attempting to insert the message into the database."
     }
   }
 }

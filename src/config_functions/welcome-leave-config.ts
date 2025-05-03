@@ -7,10 +7,12 @@ import {
   StringSelectMenuBuilder,
 } from "discord.js";
 import { dynamicChannel, dynamicMessage } from "./register-config.js";
+import { Guilds } from "../../@types/DatabaseTypes";
 
 export default async function welcomeLeaveConfig(interaction: ChatInputCommandInteraction<"cached">) {
   const client = interaction.client;
-  const guild_config = await client.getGuildConfig(interaction.guild.id);
+  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guildId]);
+  const guild_config = rows[0];
   if (!guild_config) {
     await interaction.reply({
       content: "Guild config not found. Please contact the bot developers as this shouldn't happen.",
@@ -25,9 +27,9 @@ export default async function welcomeLeaveConfig(interaction: ChatInputCommandIn
     .setMaxValues(1)
     .setOptions([
       {
-        label: t("join_channel.label"),
+        label: t("join_channel_id.label"),
         value: "join_channel",
-        description: t("join_channel.description"),
+        description: t("join_channel_id.description"),
         emoji: "👋",
       },
       {
@@ -37,9 +39,9 @@ export default async function welcomeLeaveConfig(interaction: ChatInputCommandIn
         emoji: "📩",
       },
       {
-        label: t("leave_channel.label"),
+        label: t("leave_channel_id.label"),
         value: "leave_channel",
-        description: t("leave_channel.description"),
+        description: t("leave_channel_id.description"),
         emoji: "🚪",
       },
       {

@@ -44,27 +44,28 @@
     "dj": "DJ Rolünü Ayarla",
     "dj_description": "Müzik komutu kısıtlamalarını atlayan bir rol",
     "role_initial": "Aşağıdaki rollerden birini seçin. Rolü kaldırmak istiyorsanız x'e basın ve başka bir yere basın",
-    "member_role": {
+    "role_too_high": "Verilen rol, botun sahip olduğu en yüksek rolün üstünde. Lütfen daha düşük bir rol seçin.",
+    "member_role_id": {
       "unset": "Üye rolü kaldırıldı.",
       "set": "Üye rolü {{role}} olarak ayarlandı."
     },
-    "male_role": {
+    "male_role_id": {
       "unset": "Erkek rolü kaldırıldı.",
       "set": "Erkek rolü {{role}} olarak ayarlandı."
     },
-    "female_role": {
+    "female_role_id": {
       "unset": "Kadın rolü kaldırıldı.",
       "set": "Kadın rolü {{role}} olarak ayarlandı."
     },
-    "color_id_of_the_day": {
+    "colour_id_of_the_day": {
       "unset": "Günün rengi rolü kaldırıldı.",
       "set": "Günün rengi rolü {{role}} olarak ayarlandı."
     },
-    "mute_role": {
+    "mute_role_id": {
       "unset": "Susturma rolü kaldırıldı.",
       "set": "Susturma rolü {{role}} olarak ayarlandı."
     },
-    "dj_role": {
+    "dj_role_id": {
       "unset": "DJ rolü kaldırıldı.",
       "set": "DJ rolü {{role}} olarak ayarlandı."
     }
@@ -73,13 +74,13 @@
     "initial": "Güncellemek istediğiniz ayarı seçin.",
     "timeout": "Mesaj zaman aşımına uğradı. Lütfen komutu tekrar çalıştırın.",
     "channel_initial": "Aşağıdaki kanallardan birini seçin. Kanalı kaldırmak istiyorsanız x'e basın ve başka bir yere basın",
-    "register_join_channel": {
+    "register_join_channel_id": {
       "label": "Kayıt Giriş Kanalını Ayarla",
       "description": "Üye katıldığında kayıt mesajının gönderildiği kanal",
       "unset": "Kayıt giriş kanalı kaldırıldı.",
       "set": "Kayıt giriş kanalı {{channel}} olarak ayarlandı."
     },
-    "register_channel": {
+    "register_channel_id": {
         "label": "Kayıt Kanalını Ayarla",
         "description": "Kayıt komutunun çalıştırıldığı kanal",
         "unset": "Kayıt kanalı kaldırıldı.",
@@ -104,13 +105,13 @@
     "timeout": "Mesaj zaman aşımına uğradı. Lütfen komutu tekrar çalıştırın.",
     "channel_initial": "Aşağıdaki kanallardan birini seçin. Kanalı kaldırmak istiyorsanız x'e basın ve başka bir yere basın",
     "role_initial": "Aşağıdaki rollerden birini seçin. Rolü kaldırmak istiyorsanız x'e basın ve başka bir yere basın",
-    "join_channel": {
+    "join_channel_id": {
       "label": "Katılma Kanalını Ayarla",
       "description": "Üye katıldığında gönderilen mesajın gönderildiği kanal",
       "unset": "Katılma kanalı kaldırıldı.",
       "set": "Katılma kanalı {{channel}} olarak ayarlandı."
     },
-    "leave_channel": {
+    "leave_channel_id": {
       "label": "Ayrılma Kanalını Ayarla",
       "description": "Üye ayrıldığında gönderilen mesajın gönderildiği kanal",
       "unset": "Ayrılma kanalı kaldırıldı.",
@@ -135,13 +136,14 @@
     "initial": "Güncellemek istediğiniz ayarı seçin.",
     "timeout": "Mesaj zaman aşımına uğradı. Lütfen komutu tekrar çalıştırın.",
     "channel_initial": "Aşağıdaki kanallardan birini seçin. Kanalı kaldırmak istiyorsanız x'e basın ve başka bir yere basın",
-    "mod_log_channel": {
+    "role_too_high": "Verilen rol, botun sahip olduğu en yüksek rolün üstünde. Lütfen daha düşük bir rol seçin.",
+    "mod_log_channel_id": {
       "label": "Moderasyon Log Kanalını Ayarla",
       "description": "Moderasyon loglarının gönderildiği kanal",
       "unset": "Moderasyon log kanalı kaldırıldı.",
       "set": "Moderasyon log kanalı {{channel}} olarak ayarlandı."
     },
-    "staff_role": {
+    "staff_role_id": {
       "initial": "Aşağıdaki rollerden birini seçin. Rolü kaldırmak istiyorsanız x'e basın ve başka bir yere basın",
       "label": "Yetkili Rolünü Ayarla",
       "description": "Yetkililerin sahip olduğu rol",
@@ -212,10 +214,6 @@
       "set": "Bump lider tablosu kanalı {{channel}} olarak ayarlandı."
     }
   },
-  "listen_for_notifications": {
-    "preparing_close": "Kapatılıyor...",
-    "thread_closed_dm": "{{guild}} sunucusundaki mod mail konuşmanız kapatıldı."
-  },
   "mod_mail_log": {
     "initial": "{{user.tag}} ({{user.id}}) ile olan modmail konuşması #{{thread_id}} {{time}} tarihinde başladı. Bütün zamanlar UTC+0'dır.",
     "bot_to_user": "[BOTTAN KULLANICIYA]",
@@ -223,6 +221,8 @@
     "to_user": "[KULLANICIYA]",
     "from_user": "[KULLANICIDAN]",
     "to_thread": "[KONUŞMAYA]",
-    "close_message": "{{user.tag}} ({{user.id}}) ile olan modmail konuşması #{{thread_id}} {{closer.tag}} tarafından kapatıldı.\n Kullanıcı tarafından **{{messages.user}}** mesaj, kullanıcıya **{{messages.staff}}**, **{{messages.internal}}** iç mesaj gönderildi."
+    "close_message": "{{user.tag}} ({{user.id}}) ile olan modmail konuşması #{{thread_id}} {{closer.tag}} tarafından kapatıldı.\n Kullanıcı tarafından **{{messages.user}}** mesaj, kullanıcıya **{{messages.staff}}**, **{{messages.internal}}** iç mesaj gönderildi.",
+    "preparing_close": "Kapatılıyor...",
+    "thread_closed_dm": "{{guild}} sunucusundaki mod mail konuşmanız kapatıldı."
   }
 }

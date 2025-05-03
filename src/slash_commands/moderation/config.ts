@@ -14,6 +14,7 @@ import registerConfig from "../../config_functions/register-config.js";
 import welcomeLeaveConfig from "../../config_functions/welcome-leave-config.js";
 import moderationConfig from "../../config_functions/moderation-config.js";
 import miscConfig from "../../config_functions/misc-config.js";
+import { Guilds } from "../../../@types/DatabaseTypes";
 export default {
   memberPermissions: [PermissionsBitField.Flags.Administrator],
   data: new SlashCommandBuilder()
@@ -78,7 +79,8 @@ export default {
     ),
   async execute(interaction) {
     const client = interaction.client;
-    const guild_config = await client.getGuildConfig(interaction.guildId);
+    const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
+    const guild_config = rows[0];
     if (!guild_config) {
       await interaction.reply({
         content: "This server is not registered in the database. This shouldn't happen, please contact developers",
@@ -244,7 +246,7 @@ export default {
             .addFields(
               {
                 name: t("embed.role.fields.color_of_the_day"),
-                value: guild_config.color_id_of_the_day ? `<@&${guild_config.color_id_of_the_day}>` : t("none"),
+                value: guild_config.colour_id_of_the_day ? `<@&${guild_config.colour_id_of_the_day}>` : t("none"),
                 inline: true,
               },
               {

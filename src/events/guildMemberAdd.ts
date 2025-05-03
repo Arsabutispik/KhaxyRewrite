@@ -10,7 +10,9 @@ export default {
   name: Events.GuildMemberAdd,
   async execute(member) {
     // Fetch guild data from the database
-    const guild_config = await member.client.getGuildConfig(member.guild.id);
+    const { rows } = await member.client.pgClient.query("SELECT * FROM guilds WHERE id = $1", [member.guild.id]);
+    // Extract the guild configuration from the database result
+    const guild_config = rows[0];
 
     // If no guild data is found, exit the function
     if (!guild_config) return;

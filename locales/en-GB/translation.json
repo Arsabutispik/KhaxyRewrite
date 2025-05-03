@@ -1,70 +1,71 @@
 {
   "ping": "This command was run by {{interaction.user.username}}, who joined on {{interaction.member.joinedAt}}.",
   "mod_log": {
-    "warning": "⚠\uFE0F **{{user.username}}** has been warned by **{{moderator.username}}**. Reason:```{{reason}}```",
+    "warning": "⚠️ **{{user.username}}** has been warned by **{{moderator.username}}**. Reason:```{{reason}}```",
     "ban": "{{emoji}}  **{{user.username}}** has been banned by **{{moderator.username}}**. Reason:```{{reason}}```",
-    "kick": "\uD83D\uDC62  **{{user.username}}** has been kicked by **{{moderator.username}}**. Reason:```{{reason}}```",
-    "mute": "\uD83D\uDD07  **{{user.username}}** has been muted by **{{moderator.username}}** for **{{duration}}**. Reason:```{{reason}}```",
+    "kick": "👢  **{{user.username}}** has been kicked by **{{moderator.username}}**. Reason:```{{reason}}```",
+    "mute": "🔇  **{{user.username}}** has been muted by **{{moderator.username}}** for **{{duration}}**. Reason:```{{reason}}```",
     "timed_ban": "{{emoji}}  **{{user.username}}** has been banned by **{{moderator.username}}** for **{{duration}}**. Reason:```{{reason}}```",
     "change_warn": "<t:{{time}}> `[{{case}}]` ✏️ Case #{{case}}, has been modified by **{{moderator.username}}**. Reason:```{{reason}}```",
     "unban": "🔓 User (`{{user.id}}`) has been unbanned by **{{moderator.username}}**. Reason:```{{reason}}```",
     "ban_expired": "🔓 User (`{{user.id}}`) has been automatically unbanned by **{{moderator.username}}** after **{{duration}}**. Reason:```{{reason}}```",
     "timeout": "🔇 **{{user.username}}** has been timed out by **{{moderator.username}}** for **{{duration}}**. Reason:```{{reason}}```",
-    "unmute": "\uD83D\uDD0A  **{{user.username}}** has been unmuted by **{{moderator.username}}**. Reason:```{{reason}}```",
+    "unmute": "🔊  **{{user.username}}** has been unmuted by **{{moderator.username}}**. Reason:```{{reason}}```",
     "function_errors": {
-      "no_guild_config": "Guild config not found, creating one, this stops the mod_log_operation. To disable this warning change the \"Function Warnings\" setting.",
-      "channel_error": "An error occurred while trying to send the message. This is likely due to the channel being deleted or the bot not having permission to send messages. Please check the channel and try again. This error removes the modlog channel id from the guild config.",
-      "case_id_error": "An error occurred while trying to increment the case id. This is likely a database error on our side. This will likely cause duplicate case ids. Please report this to the bot developers.",
-      "no_modlog_channel": "No modlog channel is set in the guild config. Please set one to enable modlog."
+      "no_guild_config": "Guild config not found, creating one. This stops the mod_log_operation. To disable this warning, change the \"Function Warnings\" setting.",
+      "channel_error": "An error occurred while trying to send the message. This is likely due to the channel being deleted or the bot not having permission to send messages. Please check the channel and try again. This error removes the mod log channel ID from the guild config.",
+      "case_id_error": "An error occurred while trying to increment the case ID. This is likely a database error on our side. This may cause duplicate case IDs. Please report this to the bot developers.",
+      "no_modlog_channel": "No mod log channel is set in the guild config. Please set one to enable mod logs."
     }
   },
   "bump_leaderboard": {
     "initial": "This month's bump leaderboard:\n\n",
     "last_bump": "Last bump was made {{time}} by {{user}}.",
     "last_winner": "Last month's winner: {{user}} with `{{count}}` bump out of **{{totalBump}}** bumps.",
-    "message_not_sent_by_bot": "There are messages in the bump leaderboard channel that are not sent by the bot. Please remove them to avoid errors."
+    "message_not_sent_by_bot": "There are messages in the bump leaderboard channel that were not sent by the bot. Please remove them to avoid errors."
   },
   "unregistered_people": {
-    "kick_message": "You have failed to register in **{{server}}** server within **{{days}}** days. You have been kicked from the server.",
+    "kick_message": "You failed to register in the **{{server}}** server within **{{days}}** days. You have been kicked from the server.",
     "initial": "Member failed to register within {{days}} days."
   },
   "role_config": {
     "initial": "Select the setting you want to update.",
     "timeout": "Message timed out. Please run the command again.",
     "member": "Set Member Role",
-    "member_description": "The role given when member registers.",
+    "member_description": "The role given when a member registers.",
     "male": "Set Male Role",
-    "male_description": "The role given when member registers as male.",
+    "male_description": "The role given when a member registers as male.",
     "female": "Set Female Role",
-    "female_description": "The role given when member registers as female.",
+    "female_description": "The role given when a member registers as female.",
     "colour_of_the_day": "Set Colour of the Day Role",
     "colour_of_the_day_description": "A role that changes every day.",
     "mute": "Set Mute Role",
-    "mute_description": "The role given when member gets muted.",
+    "mute_description": "The role given when a member is muted.",
     "dj": "Set DJ Role",
     "dj_description": "A role that bypasses the music command restrictions.",
-    "role_initial": "Select a role below. If you want to remove the role, press x and press elsewhere",
-    "member_role": {
+    "role_initial": "Select a role below. If you want to remove the role, press x and click elsewhere.",
+    "role_too_high": "The role you selected is too high. Please select a role that is lower than the bot's role.",
+    "member_role_id": {
       "unset": "Member role has been removed.",
       "set": "Member role has been set to {{role}}."
     },
-    "male_role": {
+    "male_role_id": {
       "unset": "Male role has been removed.",
       "set": "Male role has been set to {{role}}."
     },
-    "female_role": {
+    "female_role_id": {
       "unset": "Female role has been removed.",
       "set": "Female role has been set to {{role}}."
     },
-    "color_id_of_the_day": {
-      "unset": "Colour of the day role has been removed.",
-      "set": "Colour of the day role has been set to {{role}}."
+    "colour_id_of_the_day": {
+      "unset": "Colour of the Day role has been removed.",
+      "set": "Colour of the Day role has been set to {{role}}."
     },
-    "mute_role": {
+    "mute_role_id": {
       "unset": "Mute role has been removed.",
       "set": "Mute role has been set to {{role}}."
     },
-    "dj_role": {
+    "dj_role_id": {
       "unset": "DJ role has been removed.",
       "set": "DJ role has been set to {{role}}."
     }
@@ -72,14 +73,14 @@
   "register_config": {
     "initial": "Select the setting you want to update.",
     "timeout": "Message timed out. Please run the command again.",
-    "channel_initial": "Select a channel below. If you want to remove the channel, press x and press elsewhere",
-    "register_join_channel": {
+    "channel_initial": "Select a channel below. If you want to remove the channel, press x and click elsewhere.",
+    "register_join_channel_id": {
       "label": "Set Register Join Channel",
-      "description": "The channel is where the register message will be sent.",
+      "description": "The channel where the register message will be sent.",
       "unset": "Register join channel has been removed.",
       "set": "Register join channel has been set to {{channel}}."
     },
-    "register_channel": {
+    "register_channel_id": {
       "label": "Set Register Channel",
       "description": "The channel where the register command will be used.",
       "unset": "Register channel has been removed.",
@@ -94,23 +95,23 @@
     },
     "register_clear_channel": {
       "label": "Set Register Clear Channel",
-      "description": "Clears the channel after user registers.",
-      "unset": "Register channel clear is disabled.",
-      "set": "Register channel clear is enabled."
+      "description": "Clears the channel after a user registers.",
+      "unset": "Register channel clearing is disabled.",
+      "set": "Register channel clearing is enabled."
     }
   },
   "welcome_leave_config": {
     "initial": "Select the setting you want to update.",
     "timeout": "Message timed out. Please run the command again.",
-    "channel_initial": "Select a channel below. If you want to remove the channel, press x and press elsewhere",
-    "role_initial": "Select a role below. If you want to remove the role, press x and press elsewhere",
-    "join_channel": {
+    "channel_initial": "Select a channel below. If you want to remove the channel, press x and click elsewhere.",
+    "role_initial": "Select a role below. If you want to remove the role, press x and click elsewhere.",
+    "join_channel_id": {
       "label": "Set Welcome Channel",
       "description": "The channel where the welcome message will be sent.",
       "unset": "Welcome channel has been removed.",
       "set": "Welcome channel has been set to {{channel}}."
     },
-    "leave_channel": {
+    "leave_channel_id": {
       "label": "Set Leave Channel",
       "description": "The channel where the leave message will be sent.",
       "unset": "Leave channel has been removed.",
@@ -134,25 +135,26 @@
   "moderation_config": {
     "initial": "Select the setting you want to update.",
     "timeout": "Message timed out. Please run the command again.",
-    "channel_initial": "Select a channel below. If you want to remove the channel, press x and press elsewhere",
-    "mod_log_channel": {
+    "channel_initial": "Select a channel below. If you want to remove the channel, press x and click elsewhere.",
+    "role_too_high": "The role you selected is too high. Please select a role that is lower than the bot's role.",
+    "mod_log_channel_id": {
       "label": "Set Mod Log Channel",
       "description": "The channel where the moderation logs will be sent.",
       "unset": "Mod log channel has been removed.",
       "set": "Mod log channel has been set to {{channel}}."
     },
-    "staff_role": {
-      "initial": "Select a role below. If you want to remove the role, press x and press elsewhere",
+    "staff_role_id": {
+      "initial": "Select a role below. If you want to remove the role, press x and click elsewhere.",
       "label": "Set Staff Role",
-      "description": "The role that is required to use moderation commands.",
+      "description": "The role required to use moderation commands.",
       "unset": "Staff role has been removed.",
       "set": "Staff role has been set to {{role}}."
     },
     "mod_mail_channel": {
-      "label": "Set Mod Mail Channel",
-      "description": "The channel where the mod mail will be sent.",
-      "unset": "Mod mail channel has been removed.",
-      "set": "Mod mail channel has been set to {{channel}}."
+      "label": "Set Mod-Mail Channel",
+      "description": "The channel where the mod-mail will be sent.",
+      "unset": "Mod-mail channel has been removed.",
+      "set": "Mod-mail channel has been set to {{channel}}."
     },
     "mute_get_all_roles": {
       "label": "Mute Get All Roles",
@@ -162,7 +164,7 @@
     },
     "register_day_limit": {
       "label": "Set Register Day Limit",
-      "description": "The limit of days a user has to register.",
+      "description": "The number of days a user has to register.",
       "label_zero": "Disable Register Day Limit",
       "description_zero": "Disables the register day limit.",
       "label_one": "Set Register Day Limit 1 Day",
@@ -176,7 +178,7 @@
     },
     "default_expiry": {
       "label": "Set Default Expiry",
-      "description": "The default expiry for the infractions.",
+      "description": "The default expiry for infractions.",
       "label_zero": "Disable Default Expiry",
       "description_zero": "Disables the default expiry.",
       "label_seven": "Set Default Expiry 7 Days",
@@ -192,7 +194,7 @@
   "misc_config": {
     "initial": "Select the setting you want to update.",
     "timeout": "Message timed out. Please run the command again.",
-    "channel_initial": "Select a channel below. If you want to remove the channel, press x and press elsewhere",
+    "channel_initial": "Select a channel below. If you want to remove the channel, press x and click elsewhere.",
     "language": {
       "label": "Set Language",
       "description": "The language the bot will use.",
@@ -200,10 +202,10 @@
       "initial": "Select the language you want to set."
     },
     "mod_mail_message": {
-      "title": "Set Mod Mail Message",
-      "label": "Set Mod Mail Message",
-      "set": "Mod mail message has been set.",
-      "description": "The message that will be sent by the bot when a user sends a mod mail."
+      "title": "Set Mod-Mail Message",
+      "label": "Set Mod-Mail Message",
+      "set": "Mod-mail message has been set.",
+      "description": "The message that will be sent by the bot when a user sends a mod-mail."
     },
     "bump_leaderboard_channel_id": {
       "label": "Set Bump Leaderboard Channel",
@@ -212,17 +214,15 @@
       "set": "Bump leaderboard channel has been set to {{channel}}."
     }
   },
-  "listen_for_notifications": {
-    "preparing_close": "Thread is being closed...",
-    "thread_closed_dm": "Your thread in {{guild}} has been closed."
-  },
   "mod_mail_log": {
-    "initial": "# Modmail thread #{{thread_id}} with {{user.tag}} {{user.id}} has started at {{time}}. All times are in UTC.\n",
+    "initial": "# Mod-mail thread #{{thread_id}} with {{user.tag}} {{user.id}} started at {{time}}. All times are in UTC.\n",
     "bot_to_user": "[BOT TO USER]",
     "command": "[COMMAND]",
     "to_user": "[TO USER]",
     "from_user": "[FROM USER]",
     "to_thread": "[CHAT]",
-    "close_message": "Modmail thread #{{thread_id}} with {{user.tag}} ({{user.id}}) was closed by {{closer.tag}}.\n**{{messages.user}}** messages from the user, **{{messages.staff}}** messages to the user and **{{messages.internal}}** internal chat messages"
+    "close_message": "Mod-mail thread #{{thread_id}} with {{user.tag}} ({{user.id}}) was closed by {{closer.tag}}.\n**{{messages.user}}** messages from the user, **{{messages.staff}}** messages to the user, and **{{messages.internal}}** internal chat messages.",
+    "preparing_close": "Thread is being closed...",
+    "thread_closed_dm": "Your thread in {{guild}} has been closed."
   }
 }

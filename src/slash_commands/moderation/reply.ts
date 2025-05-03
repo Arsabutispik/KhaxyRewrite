@@ -1,9 +1,8 @@
 import { SlashCommandBase } from "../../../@types/types";
 import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
-import { Mod_mail_messages } from "../../../@types/DatabaseTypes";
 import { toStringId } from "../../utils/utils.js";
 import logger from "../../lib/Logger.js";
-import process from "node:process";
+import { Guilds, Mod_mail_messages, Mod_mail_threads } from "../../../@types/DatabaseTypes";
 
 export default {
   memberPermissions: [PermissionsBitField.Flags.ManageMessages],
@@ -57,8 +56,15 @@ export default {
     ),
   async execute(interaction) {
     const client = interaction.client;
-    const threads = await client.getModmailThread(interaction.guild.id, interaction.channelId);
-    const guild_config = await client.getGuildConfig(interaction.guild.id);
+    const { rows: thread_rows } = await client.pgClient.query<Mod_mail_threads>(
+      "SELECT * FROM mod_mail_threads WHERE channel_id = $1",
+      [interaction.channelId],
+    );
+    const threads = thread_rows[0];
+    const { rows: guild_rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
+      interaction.guildId,
+    ]);
+    const guild_config = guild_rows[0];
     if (!guild_config) {
       await interaction.reply({
         content: "This server is not registered in the database. This shouldn't happen, please contact developers",
@@ -73,54 +79,74 @@ export default {
     const anonymous = interaction.options.getBoolean("anonymous");
     const member = await interaction.guild!.members.fetch(toStringId(threads.user_id)).catch(() => null);
     if (!member) return interaction.reply(t("member_not_found"));
-    try {
-      await client.pgClient.query(
-        "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, attachments, thread_id, sent_to, channel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
-        [
-          interaction.member.id,
-          new Date(),
-          "staff",
-          message,
-          interaction.options.getAttachment("attachment")?.url
-            ? [interaction.options.getAttachment("attachment")?.url]
-            : [],
-          threads.thread_id,
-          "user",
-          interaction.channel!.id,
-        ],
-      );
-    } catch (e) {
-      logger.error({
-        message: "Error while inserting a new mod mail message.",
-        error: e,
-      });
-      return interaction.reply(t("error"));
-    }
-    const messages = await client.pgClient.query<Mod_mail_messages>(
-      "SELECT * FROM mod_mail_messages WHERE pgp_sym_decrypt(thread_id, $2) = $1",
-      [threads.thread_id, process.env.PASSPHRASE],
+    await interaction.deferReply({ flags: MessageFlagsBitField.Flags.Ephemeral });
+    const { rows: messages } = await client.pgClient.query<Mod_mail_messages>(
+      "SELECT * FROM mod_mail_messages WHERE channel_id = $1",
+      [interaction.channelId],
     );
+    if (!messages) return interaction.reply(t("no_messages"));
     if (anonymous) {
-      const { id } = await member.send(`\`${messages.rowCount}\` **(Anonymous)**: ${message}`);
-      await client.pgClient.query(
-        "UPDATE mod_mail_messages SET message_id = pgp_sym_encrypt($1, $3) WHERE pgp_sym_decrypt(thread_id, $3) = $2",
-        [id, threads.thread_id, process.env.PASSPHRASE],
-      );
-    } else {
       const { id } = await member.send({
-        content: `\`${messages.rows.filter((row) => row.author_type === "staff").length}\` **(${interaction.member.roles.highest.name})** **[${interaction.member.user.tag}]**: ${message}`,
+        content: `\`${messages.filter((row) => row.author_type === "staff").length}\` **(Anonymous)**: ${message}`,
         files: interaction.options.getAttachment("attachment")
           ? [interaction.options.getAttachment("attachment")!]
           : [],
       });
-      await client.pgClient.query(
-        "UPDATE mod_mail_messages SET message_id = pgp_sym_encrypt($1, $3) WHERE pgp_sym_decrypt(thread_id, $3) = $2",
-        [id, threads.thread_id, process.env.PASSPHRASE],
-      );
+      try {
+        await client.pgClient.query(
+          "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, sent_to, channel_id, message_id) VALUES ($1 ,$2, $3, $4, $5, $6, $7)",
+          [
+            interaction.member.id,
+            new Date(),
+            "staff",
+            interaction.options.getAttachment("attachment")
+              ? `${message} ${interaction.options.getAttachment("attachment")?.url}`
+              : message,
+            "user",
+            interaction.channel!.id,
+            id,
+          ],
+        );
+      } catch (e) {
+        logger.error({
+          message: "Error while inserting a new mod mail message.",
+          error: e,
+        });
+        return interaction.reply(t("error"));
+      }
+    } else {
+      const { id } = await member.send({
+        content: `\`${messages.filter((row) => row.author_type === "staff").length}\` **(${interaction.member.roles.highest.name})** **[${interaction.member.user.tag}]**: ${message}`,
+        files: interaction.options.getAttachment("attachment")
+          ? [interaction.options.getAttachment("attachment")!]
+          : [],
+      });
+      try {
+        await client.pgClient.query(
+          "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, sent_to, channel_id, message_id) VALUES ($1 ,$2, $3, $4, $5, $6, $7)",
+          [
+            interaction.member.id,
+            new Date(),
+            "staff",
+            interaction.options.getAttachment("attachment")
+              ? `${message} ${interaction.options.getAttachment("attachment")?.url}`
+              : message,
+            "user",
+            interaction.channel!.id,
+            id,
+          ],
+        );
+      } catch (e) {
+        logger.error({
+          message: "Error while inserting a new mod mail message.",
+          error: e,
+        });
+        return interaction.reply(t("error"));
+      }
     }
-    await interaction.reply({ content: t("success"), flags: MessageFlagsBitField.Flags.Ephemeral });
+    await interaction.editReply({ content: t("success") });
     await interaction.channel!.send({
-      content: `\`${messages.rows.filter((row) => row.author_type === "staff").length}\` **(${interaction.member.roles.highest.name})** **[${interaction.member.user.tag}]**: ${message}`,
+      content: `\`${messages.filter((row) => row.author_type === "staff").length}\` **(${interaction.member.roles.highest.name})** **[${interaction.member.user.tag}]**: ${message}`,
       files: interaction.options.getAttachment("attachment") ? [interaction.options.getAttachment("attachment")!] : [],
     });
   },

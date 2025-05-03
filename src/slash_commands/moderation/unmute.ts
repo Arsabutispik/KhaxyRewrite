@@ -3,7 +3,7 @@ import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "
 import logger from "../../lib/Logger.js";
 import modLog from "../../utils/modLog.js";
 import { toStringId } from "../../utils/utils.js";
-import process from "node:process";
+import { Guilds, Punishments } from "../../../@types/DatabaseTypes";
 
 export default {
   memberPermissions: [PermissionsBitField.Flags.ManageRoles],
@@ -41,7 +41,8 @@ export default {
     ),
   async execute(interaction) {
     const client = interaction.client;
-    const guild_config = await client.getGuildConfig(interaction.guild.id);
+    const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
+    const guild_config = rows[0];
     if (!guild_config) {
       await interaction.reply({
         content: "This server is not registered in the database. This shouldn't happen, please contact developers",
@@ -60,7 +61,11 @@ export default {
       return;
     }
     const reason = interaction.options.getString("reason") || t("no_reason");
-    const punishment = await client.getPunishments(interaction.guild.id, member.id, "mute");
+    const { rows: punishment_rows } = await client.pgClient.query<Punishments>(
+      "SELECT * FROM punishments WHERE guild_id = $1 AND user_id = $2",
+      [interaction.guild.id, member.id],
+    );
+    const punishment = punishment_rows[0];
     if (!punishment && member.roles.cache.has(toStringId(guild_config.mute_role_id))) {
       await interaction.reply({ content: t("muted_no_punishment"), flags: MessageFlagsBitField.Flags.Ephemeral });
       await member.roles.remove(toStringId(guild_config.mute_role_id));
@@ -72,7 +77,7 @@ export default {
     }
     if (guild_config.mute_get_all_roles) {
       try {
-        await member.roles.set(punishment.previous_roles);
+        await member.roles.set(punishment.previous_roles.map((id) => toStringId(id)));
       } catch (error) {
         await interaction.reply({ content: t("previous_roles_error"), flags: MessageFlagsBitField.Flags.Ephemeral });
         logger.error({
@@ -84,10 +89,7 @@ export default {
       }
     }
     try {
-      await client.pgClient.query("DELETE FROM punishments WHERE pgp_sym_decrypt(user_id, $2) = $1", [
-        punishment.user_id,
-        process.env.PASSPHRASE,
-      ]);
+      await client.pgClient.query("DELETE FROM punishments WHERE user_id = $1", [punishment.user_id]);
     } catch (error) {
       await interaction.reply({ content: t("database_error"), flags: MessageFlagsBitField.Flags.Ephemeral });
       logger.error({

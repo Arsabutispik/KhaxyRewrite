@@ -2,7 +2,9 @@ import { SlashCommandBase } from "../../../@types/types";
 import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import logger from "../../lib/Logger.js";
 import modLog from "../../utils/modLog.js";
-import process from "node:process";
+import { Guilds } from "../../../@types/DatabaseTypes";
+import { toStringId } from "../../utils/utils.js";
+import { addInfraction } from "../../utils/infractionHandler.js";
 
 export default {
   memberPermissions: [PermissionsBitField.Flags.ManageGuild],
@@ -43,7 +45,8 @@ export default {
     ),
   async execute(interaction) {
     const client = interaction.client;
-    const guild_config = await client.getGuildConfig(interaction.guild.id);
+    const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
+    const guild_config = rows[0];
     if (!guild_config) {
       await interaction.reply({
         content: "This server is not registered in the database. This shouldn't happen, please contact developers",
@@ -67,25 +70,21 @@ export default {
     }
     if (
       member.permissions.has(PermissionsBitField.Flags.ManageGuild) ||
-      member.roles.cache.has(guild_config.staff_role_id)
+      member.roles.cache.has(toStringId(guild_config.staff_role_id))
     ) {
       await interaction.reply({ content: t("staff_warn"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
     const reason = interaction.options.getString("reason", true);
     try {
-      await client.pgClient.query(
-        "INSERT INTO infractions (guild_id, user_id, moderator_id, type, reason, case_id) VALUES (pgp_sym_encrypt($1::TEXT, $7), pgp_sym_encrypt($2::TEXT, $7), pgp_sym_encrypt($3::TEXT, $7), pgp_sym_encrypt($4::TEXT, $7), pgp_sym_encrypt($5::TEXT, $7), pgp_sym_encrypt($6::TEXT, $7))",
-        [
-          interaction.guild.id,
-          member.id,
-          interaction.user.id,
-          "warn",
-          reason,
-          guild_config.case_id,
-          process.env.PASSPHRASE,
-        ],
-      );
+      await addInfraction({
+        guild: interaction.guild,
+        member: member.id,
+        client: interaction.client,
+        reason: reason,
+        moderator: interaction.user.id,
+        type: "warn",
+      });
     } catch (error) {
       await interaction.reply(t("database_error"));
       logger.error({

@@ -9,11 +9,11 @@ import {
 import { Guilds } from "../../@types/DatabaseTypes";
 import { TFunction } from "i18next";
 import { dynamicChannel, dynamicMessage } from "./register-config.js";
-import process from "node:process";
 
 export default async function miscConfig(interaction: ChatInputCommandInteraction<"cached">) {
   const client = interaction.client;
-  const guild_config = await client.getGuildConfig(interaction.guildId);
+  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
+  const guild_config = rows[0];
   if (!guild_config) {
     await interaction.reply({
       content: "No guild config found. Running a simple command should create one.",
@@ -87,8 +87,8 @@ export default async function miscConfig(interaction: ChatInputCommandInteractio
 
 async function languageConfig(interaction: MessageComponentInteraction, data: Guilds, t: TFunction) {
   const langs: Record<string, string> = {
-    en: "English",
-    tr: "Türkçe",
+    "en-UK": "English",
+    "tr-TR": "Türkçe",
   };
   const client = interaction.client;
   const select_menu = new StringSelectMenuBuilder()
@@ -98,14 +98,14 @@ async function languageConfig(interaction: MessageComponentInteraction, data: Gu
     .setOptions(
       [
         {
-          label: langs.en,
-          value: "en",
+          label: langs["en-UK"],
+          value: "en-UK",
           description: "English",
           emoji: "🇬🇧",
         },
         {
-          label: langs.tr,
-          value: "tr",
+          label: langs["tr-TR"],
+          value: "tr-TR",
           description: "Türkçe",
           emoji: "🇹🇷",
         },
@@ -143,13 +143,10 @@ async function languageConfig(interaction: MessageComponentInteraction, data: Gu
     return;
   }
   await message_component.deferUpdate();
-  await client.pgClient.query(
-    "UPDATE guilds SET language = pgp_sym_encrypt($1, $3) WHERE pgp_sym_decrypt(id, $3) = $2",
-    [message_component.values[0], message_component.guild.id, process.env.PASSPHRASE],
-  );
-  await client.setGuildConfig(message_component.guild.id, {
-    language: message_component.values[0],
-  });
+  await client.pgClient.query("UPDATE guilds SET language = $1 WHERE id = $2", [
+    message_component.values[0],
+    message_component.guild.id,
+  ]);
   const new_t = client.i18next.getFixedT(message_component.values[0], null, "misc_config");
   await message_component.editReply({
     content: new_t("language.set", { language: langs[message_component.values[0]] }),

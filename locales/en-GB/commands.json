@@ -1,26 +1,26 @@
 {
   "ban": {
-    "expired": "Ban has been expired.",
+    "expired": "Ban has expired.",
     "cant_ban_self": "You can't ban yourself.",
     "cant_ban_bot": "You can't ban a bot.",
     "cant_ban_mod": "You can't ban a moderator.",
     "cant_ban_higher": "You can't ban a user with a higher role than you.",
     "no_reason": "No reason provided.",
-    "database_error": "Critical error while updating the database. Developers have been notified. Command has been cancelled.",
+    "database_error": "Critical error while updating the database. The developers have been notified. The command has been cancelled.",
     "message": {
       "dm": {
         "duration": "You have been banned from **{{guild}}** for **{{duration}}**. Reason:```{{reason}}```",
         "permanent": "You have been permanently banned from **{{guild}}**. Reason:```{{reason}}```"
       },
       "success": {
-        "duration": "{{confirm}} **{{user}}** has been banned for **{{duration}}** (Case #{{case}}) User has been notified with a DM.",
-        "permanent": "{{confirm}} **{{user}}** has been permanently banned (Case #{{case}}). User has been notified with a DM.",
-        "duration_no_member": "{{confirm}} **{{user}}** has been banned for **{{duration}}** (Case #{{case}})",
-        "permanent_no_member": "{{confirm}} **{{user}}** has been permanently banned (Case #{{case}})"
+        "duration": "{{confirm}} **{{user}}** has been banned for **{{duration}}** (Case #{{case}}). The user has been notified via DM.",
+        "permanent": "{{confirm}} **{{user}}** has been permanently banned (Case #{{case}}). The user has been notified via DM.",
+        "duration_no_member": "{{confirm}} **{{user}}** has been banned for **{{duration}}** (Case #{{case}}).",
+        "permanent_no_member": "{{confirm}} **{{user}}** has been permanently banned (Case #{{case}})."
       },
       "fail": {
-        "duration": "{{confirm}} **{{user}}** has been banned for **{{duration}}** (Case #{{case}}) User has not been notified with a DM.",
-        "permanent": "{{confirm}} **{{user}}** has been permanently banned (Case #{{case}}). User has not been notified with a DM."
+        "duration": "{{confirm}} **{{user}}** has been banned for **{{duration}}** (Case #{{case}}). The user could not be notified via DM.",
+        "permanent": "{{confirm}} **{{user}}** has been permanently banned (Case #{{case}}). The user could not be notified via DM."
       }
     }
   },
@@ -34,8 +34,8 @@
     "cant_kick": "This user can't be kicked.",
     "message": {
       "dm": "You have been kicked from **{{guild}}**. Reason:```{{reason}}```",
-      "success": "{{confirm}} **{{user}}** has been kicked (Case #{{case}}) User has been notified with a DM.",
-      "fail": "{{confirm}} **{{user}}** has been kicked (Case #{{case}}) User has not been notified with a DM."
+      "success": "{{confirm}} **{{user}}** has been kicked (Case #{{case}}). The user has been notified via DM.",
+      "fail": "{{confirm}} **{{user}}** has been kicked (Case #{{case}}). The user could not be notified via DM."
     },
     "clear_fail": "Failed to clear the messages.",
     "fail": "Failed to kick the member."
@@ -46,58 +46,58 @@
     "no_mute_role": "Mute role not found.",
     "already_muted": "User is already muted.",
     "already_muted_no_punishments": "User is already muted but no punishments found. Removing the role.",
-    "not_muted": "Found a punishment but user is not muted. Adding the role.",
+    "not_muted": "A punishment was found, but the user is not muted. Adding the role.",
     "cant_mute_yourself": "You can't mute yourself.",
     "cant_mute_higher": "You can't mute a user with a higher role than you.",
     "cant_mute_bot": "You can't mute a bot.",
     "cant_mute_mod": "You can't mute a moderator.",
     "message": {
       "dm": "You have been muted in **{{guild}}** for **{{duration}}**. Reason:```{{reason}}```",
-      "success": "{{confirm}} **{{user}}** has been muted for **{{duration}}** (Case #{{case}}) User has been notified with a DM.",
-      "fail": "{{confirm}} **{{user}}** has been muted for **{{duration}}** (Case #{{case}}) User has not been notified with a DM."
+      "success": "{{confirm}} **{{user}}** has been muted for **{{duration}}** (Case #{{case}}). The user has been notified via DM.",
+      "fail": "{{confirm}} **{{user}}** has been muted for **{{duration}}** (Case #{{case}}). The user could not be notified via DM."
     },
-    "database_error": "Critical error while updating the database. Developers have been notified. Command has been cancelled.",
-    "role_error": "Error while removing/adding the roles. I might don't have the permission to remove/add them. Please check the role permissions. Command has been cancelled."
+    "database_error": "Critical error while updating the database. The developers have been notified. The command has been cancelled.",
+    "role_error": "Error while removing or adding roles. I may not have permission to do so. Please check the role permissions. The command has been cancelled."
   },
   "register": {
     "no_member": "Member not found. Is the member still in the server?",
-    "no_register_channel": "Register channel not found. Update the register channel in the settings.",
-    "wrong_channel": "You can only register in <#{{channel}}>.",
-    "no_member_role": "Member role not found. Update the member role in the settings",
-    "no_male_role": "Male role not found. Update the male role in the settings.",
-    "success": "{{confirm}} **{{member}}** has been registered",
+    "no_register_channel": "Register channel not found. Please update the register channel in the settings.",
+    "wrong_channel": "You can only register in <#{{channel}}>",
+    "no_member_role": "Member role not found. Please update the member role in the settings.",
+    "no_male_role": "Male role not found. Please update the male role in the settings.",
+    "success": "{{confirm}} **{{member}}** has been registered.",
     "error": "Error while registering the user. {{error}}",
-    "no_female_role": "Female role not found. Update the female role in the settings.",
+    "no_female_role": "Female role not found. Please update the female role in the settings.",
     "not_valid": "The option you provided is not valid. Please provide a valid option."
   },
   "unban": {
     "no_reason": "No reason provided for unbanning.",
     "no_user": "User not found.",
-    "success": "{{confirm}} **{{user}}** has been unbanned (Case #{{case}})",
+    "success": "{{confirm}} **{{user}}** has been unbanned (Case #{{case}}).",
     "error": "Error while unbanning the user. {{error}}"
   },
   "unmute": {
-    "no_member": "Member is not found. Is the member still in the server?",
+    "no_member": "Member not found. Is the member still in the server?",
     "no_reason": "No reason provided for unmuting.",
-    "no_mute_role": "Mute role not found. Update the mute role in the settings.",
-    "previous_roles_error": "Failed to add the previous roles. Here are the roles that couldn't be added:```{{roles}}```",
-    "not_muted": "User is not muted. If the user is muted but the role is added, remove the role manually. Lost roles can't be added back automatically.",
-    "muted_no_punishments": "User is muted but no punishments were found. Removing the role. Lost roles can't be added back automatically.",
-    "success": "{{confirm}} **{{user}}** has been unmuted (Case #{{case}}). User has been notified with a DM.",
-    "database_error": "Critical error while updating the database. Developers have been notified. Command has been cancelled.",
-    "role_error": "Error while removing the role. Role might be deleted or I don't have the permission to remove it.",
-    "dm_error": "{{confirm}} **{{user}}** has been unmuted (Case #{{case}}). User has not been notified with a DM.",
+    "no_mute_role": "Mute role not found. Please update the mute role in the settings.",
+    "previous_roles_error": "Failed to reassign previous roles. The following roles couldn't be added:```{{roles}}```",
+    "not_muted": "User is not muted. If they appear to be, please remove the role manually. Lost roles cannot be restored automatically.",
+    "muted_no_punishments": "User is muted but no punishments found. Removing the role. Lost roles cannot be restored automatically.",
+    "success": "{{confirm}} **{{user}}** has been unmuted (Case #{{case}}). The user has been notified via DM.",
+    "database_error": "Critical error while updating the database. The developers have been notified. The command has been cancelled.",
+    "role_error": "Error while removing the role. The role may have been deleted or I may not have permission to remove it.",
+    "dm_error": "{{confirm}} **{{user}}** has been unmuted (Case #{{case}}). The user could not be notified via DM.",
     "dm": "You have been unmuted in **{{guild}}**."
   },
   "warn": {
-    "no_member": "Member is not found. Is the member still in the server?",
+    "no_member": "Member not found. Is the member still in the server?",
     "self_warn": "You can't warn yourself.",
     "bot_warn": "You can't warn a bot.",
     "staff_warn": "You can't warn a staff member.",
-    "database_error": "Critical error while updating the database. Developers have been notified. Command has been cancelled.",
+    "database_error": "Critical error while updating the database. The developers have been notified. The command has been cancelled.",
     "dm": "You have been warned in **{{guild}}**. Reason:```{{reason}}```",
-    "success": "{{confirm}} **{{user}}** has been warned (Case #{{case}}). User has been notified with a DM.",
-    "dm_error": "{{confirm}} **{{user}}** has been warned (Case #{{case}}). User has not been notified with a DM."
+    "success": "{{confirm}} **{{user}}** has been warned (Case #{{case}}). The user has been notified via DM.",
+    "dm_error": "{{confirm}} **{{user}}** has been warned (Case #{{case}}). The user could not be notified via DM."
   },
   "config": {
     "select_menu": {
@@ -107,9 +107,9 @@
       "role": "Role Settings",
       "misc": "Miscellaneous Settings"
     },
-    "no_setting": "Use the menu below to go around the settings. Each title can be clicked to see the documentation.",
+    "no_setting": "Use the menu below to navigate the settings. Each title can be clicked to view the documentation.",
     "none": "N/A",
-    "times_up": "Times up! You can't look at the settings anymore.",
+    "times_up": "Time's up! You can no longer view the settings.",
     "embed": {
       "register": {
         "title": "Register Settings",
@@ -143,7 +143,7 @@
       "role": {
         "title": "Role Settings",
         "fields": {
-          "color_of_the_day": "Color of the Day",
+          "color_of_the_day": "Colour of the Day",
           "dj_role": "DJ Role",
           "member_role": "Member Role",
           "male_role": "Male Role",
@@ -168,17 +168,17 @@
     "close_duration": "Thread will be closed in **{{duration}}**.",
     "close": "Thread is being closed...",
     "thread_closed_dm": "Your thread in {{guild}} has been closed.",
-    "thread_close_date": "Thread is scheduled to be closed on **{{date}}**. Would you like to override it?",
+    "thread_close_date": "Thread is scheduled to be closed on **{{date}}**. Would you like to override this?",
     "accept": "Override",
     "reject": "Cancel",
-    "timeout": "Timeout. Thread will be closed on **{{date}}**.",
+    "timeout": "Timed out. The thread will be closed on **{{date}}**.",
     "thread_close_date_rejected": "Thread will be closed on **{{date}}**.",
     "thread_close_date_accepted": "Continuing override..."
   },
   "reply": {
     "no_thread": "This is not a mod mail thread.",
     "member_not_found": "Member not found. Is the member still in the server?",
-    "error": "Error occurred on database.",
+    "error": "An error occurred while accessing the database.",
     "success": "Message has been sent to the user.",
     "suspended": "This mod mail thread has been suspended. Unsuspend the thread to reply."
   }

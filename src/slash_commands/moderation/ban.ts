@@ -7,7 +7,8 @@ import modLog from "../../utils/modLog.js";
 import "dayjs/locale/tr.js";
 import logger from "../../lib/Logger.js";
 import { toStringId } from "../../utils/utils.js";
-import process from "node:process";
+import { Guilds } from "../../../@types/DatabaseTypes";
+import { addInfraction } from "../../utils/infractionHandler.js";
 
 export default {
   memberPermissions: [PermissionsBitField.Flags.BanMembers],
@@ -74,7 +75,10 @@ export default {
     dayjs.extend(dayjsduration);
     dayjs.extend(relativeTime);
     const client = interaction.client;
-    const guild_config = await client.getGuildConfig(interaction.guild!.id);
+    const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE guild_id = $1", [
+      interaction.guild!.id,
+    ]);
+    const guild_config = rows[0];
     if (!guild_config) {
       await interaction.reply({
         content: "This server is not registered in the database. This shouldn't happen, please contact developers",
@@ -128,31 +132,24 @@ export default {
 
       try {
         await interaction.client.pgClient.query(
-          "INSERT INTO punishments (expires, type, user_id, guild_id, staff_id, created_at) VALUES (pgp_sym_encrypt($1::TEXT, $7), pgp_sym_encrypt($2::TEXT, $7), pgp_sym_encrypt($3::TEXT, $7), pgp_sym_encrypt($4::TEXT, $7), pgp_sym_encrypt($5::TEXT, $7), pgp_sym_encrypt($6::TEXT, $7))",
+          "INSERT INTO punishments (expires, type, user_id, guild_id, staff_id, created_at) VALUES ($1, $2, $3, $4, $5, $6)",
           [
-            new Date(Date.now() + dayjsduration.asMilliseconds()).toISOString(),
-            "BAN",
+            new Date(Date.now() + dayjsduration.asMilliseconds()),
+            "ban",
             user.id,
             interaction.guild!.id,
             interaction.user.id,
-            new Date().toISOString(),
-            process.env.PGCRYPTO_PASSPHRASE,
+            new Date(),
           ],
         );
-        await interaction.client.pgClient.query(
-          `INSERT INTO infractions (type, user_id, guild_id, moderator_id, created_at, reason, case_id, expires_at) VALUES (pgp_sym_encrypt($1::TEXT, $9), pgp_sym_encrypt($2::TEXT, $9), pgp_sym_encrypt($3::TEXT, $9), pgp_sym_encrypt($4::TEXT, $9), pgp_sym_encrypt($5::TEXT, $9), pgp_sym_encrypt($6::TEXT, $9), pgp_sym_encrypt($7::TEXT, $9), pgp_sym_encrypt($8::TEXT, $9))`,
-          [
-            "TIMED_BAN",
-            user.id,
-            interaction.guild.id,
-            interaction.user.id,
-            new Date().toISOString(),
-            reason,
-            guild_config.case_id,
-            new Date(Date.now() + dayjsduration.asMilliseconds()).toISOString(),
-            process.env.PGCRYPTO_PASSPHRASE,
-          ],
-        );
+        await addInfraction({
+          guild: interaction.guild!,
+          member: user.id,
+          reason,
+          type: "ban",
+          moderator: interaction.user.id,
+          client,
+        });
       } catch (error) {
         await interaction.reply(t("database_error"));
         logger.error({
@@ -232,19 +229,14 @@ export default {
       }
     } else {
       try {
-        await interaction.client.pgClient.query(
-          "INSERT INTO infractions (type, user_id, guild_id, moderator_id, created_at, reason, case_id) VALUES (pgp_sym_encrypt($1, $8), pgp_sym_encrypt($2, $8), pgp_sym_encrypt($3, $8), pgp_sym_encrypt($4, $8), pgp_sym_encrypt($5, $8), pgp_sym_encrypt($6, $8), pgp_sym_encrypt($7, $8))",
-          [
-            "BAN",
-            user.id,
-            interaction.guild.id,
-            interaction.user.id,
-            new Date().toISOString(),
-            reason,
-            guild_config.case_id,
-            process.env.PG_ENCRYPTION_PASSPHRASE,
-          ],
-        );
+        await addInfraction({
+          guild: interaction.guild,
+          member: user.id,
+          reason,
+          type: "ban",
+          moderator: interaction.user.id,
+          client,
+        });
       } catch (e) {
         await interaction.reply(t("database_error"));
         logger.error({
