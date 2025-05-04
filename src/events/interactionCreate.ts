@@ -28,7 +28,7 @@ export default {
       try {
         // Insert a new guild configuration into the database
         await interaction.client.pgClient.query(
-          "INSERT INTO guilds (id, language, case_id, days_to_kick, default_expiry, mod_mail_message) VALUES ($1, 'en-UK', 1, 0, 0, 'Thank you for your message! Our mod team will reply to you here as soon as possible.')",
+          "INSERT INTO guilds (id, language, case_id, days_to_kick, default_expiry, mod_mail_message) VALUES ($1, 'en-GB', 1, 0, 0, 'Thank you for your message! Our mod team will reply to you here as soon as possible.')",
           [interaction.guildId],
         );
         logger.log({

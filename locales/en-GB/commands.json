@@ -181,5 +181,21 @@
     "error": "An error occurred while accessing the database.",
     "success": "Message has been sent to the user.",
     "suspended": "This mod mail thread has been suspended. Unsuspend the thread to reply."
+  },
+  "newthread": {
+    "user_not_in_guild": "The user is not a member of the server.",
+    "no_modmail_channel": "Mod mail channel not found. Update the mod mail channel with the /config command.",
+    "modmail_channel_not_text": "Mod mail channel is not a text channel. Update the mod mail channel in the channel settings.",
+    "modmail_channel_not_in_parent": "Mod mail channel is not in the same parent as the mod mail thread. Put the mod mail channel in the same parent as the mod mail thread or update the mod mail channel with the /config command.",
+    "thread_already_exists": "A thread already exists for this user. Close the thread or suspend before creating a new one.",
+    "topic": "Mod Mail conversation with {{user}}",
+    "channel_create_failed": "Could not create the channel.",
+    "initial": "`Account Age:` **{{account_age}}**, `ID:` **{{user.id}}**\n`Username:` **{{user.username}}** (<@{{user.id}}>), `Join Date:` **{{join_date}}**\n**»»----------------------------¤----------------------------««**",
+    "message": "A thread with the `{{guild}}` has been created. **[{{user}}]:** {{message}}",
+    "dm_fail": "Failed to send a DM to the user.",
+    "created_by": "`Created by {{user}}`",
+    "db_error": "Failed database query. Mod mail thread is dropped.",
+    "message_send_failed": "Message couldn't be delivered to thread. Mod mail thread is closed.",
+    "thread_created": "Thread has been created."
   }
 }

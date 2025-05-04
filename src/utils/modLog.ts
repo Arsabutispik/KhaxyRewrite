@@ -42,7 +42,7 @@ export default async (
     try {
       logger.warn(`Guild config for ${guild.id} not found. Creating a new one...`);
       await client.pgClient.query(
-        "INSERT INTO guilds (id, language, case_id, days_to_kick, default_expiry, mod_mail_message) VALUES ($1, 'en-UK', 1, 0, 0, 'TThank you for your message! Our mod team will reply to you here as soon as possible.')",
+        "INSERT INTO guilds (id, language, case_id, days_to_kick, default_expiry, mod_mail_message) VALUES ($1, 'en-GB', 1, 0, 0, 'TThank you for your message! Our mod team will reply to you here as soon as possible.')",
         [guild.id, process.env.PASSPHRASE],
       );
       logger.info(`Guild config for ${guild.id} created successfully.`);

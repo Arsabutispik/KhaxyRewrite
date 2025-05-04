@@ -87,7 +87,7 @@ export default {
     if (!messages) return interaction.reply(t("no_messages"));
     if (anonymous) {
       const { id } = await member.send({
-        content: `\`${messages.filter((row) => row.author_type === "staff").length}\` **(Anonymous)**: ${message}`,
+        content: `\`${messages.filter((row) => row.author_type === "staff").length + 1}\` **(Anonymous)**: ${message}`,
         files: interaction.options.getAttachment("attachment")
           ? [interaction.options.getAttachment("attachment")!]
           : [],
@@ -116,7 +116,7 @@ export default {
       }
     } else {
       const { id } = await member.send({
-        content: `\`${messages.filter((row) => row.author_type === "staff").length}\` **(${interaction.member.roles.highest.name})** **[${interaction.member.user.tag}]**: ${message}`,
+        content: `\`${messages.filter((row) => row.author_type === "staff").length + 1}\` **(${interaction.member.roles.highest.name})** **[${interaction.member.user.tag}]**: ${message}`,
         files: interaction.options.getAttachment("attachment")
           ? [interaction.options.getAttachment("attachment")!]
           : [],
@@ -146,7 +146,7 @@ export default {
     }
     await interaction.editReply({ content: t("success") });
     await interaction.channel!.send({
-      content: `\`${messages.filter((row) => row.author_type === "staff").length}\` **(${interaction.member.roles.highest.name})** **[${interaction.member.user.tag}]**: ${message}`,
+      content: `\`${messages.filter((row) => row.author_type === "staff").length + 1}\` **(${interaction.member.roles.highest.name})** **[${interaction.member.user.tag}]**: ${message}`,
       files: interaction.options.getAttachment("attachment") ? [interaction.options.getAttachment("attachment")!] : [],
     });
   },

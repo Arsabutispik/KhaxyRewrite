@@ -87,7 +87,7 @@ export default async function miscConfig(interaction: ChatInputCommandInteractio
 
 async function languageConfig(interaction: MessageComponentInteraction, data: Guilds, t: TFunction) {
   const langs: Record<string, string> = {
-    "en-UK": "English",
+    "en-GB": "English",
     "tr-TR": "Türkçe",
   };
   const client = interaction.client;
@@ -98,8 +98,8 @@ async function languageConfig(interaction: MessageComponentInteraction, data: Gu
     .setOptions(
       [
         {
-          label: langs["en-UK"],
-          value: "en-UK",
+          label: langs["en-GB"],
+          value: "en-GB",
           description: "English",
           emoji: "🇬🇧",
         },

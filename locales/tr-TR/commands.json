@@ -181,5 +181,21 @@
     "error": "Veritabanı güncellenirken hata oluştu.",
     "success": "Mesaj kullanıcıya gönderildi.",
     "suspended": "Bu mod mail konuşması askıya alındı. Cevaplamak için tekrar açın."
+  },
+  "newthread": {
+    "user_not_in_guild": "Kullanıcı sunucuda bulunamadı.",
+    "no_modmail_channel": "Mod mail kanalı bulunamadı. /ayarlar komutunu kullanarak ayarlayın.",
+    "modmail_channel_not_text": "Mod mail kanalı bir metin kanalı değil. Kanal ayarlarını kontrol edin.",
+    "modmail_channel_not_in_parent": "Mod mail kanalı doğru kategoriye ait değil. Lütfen ayarları kontrol edin.",
+    "thread_already_exists": "Bu kullanıcı için zaten bir mod mail kanalı var. Mod maili kapatın veya askıya alın.",
+    "topic": "{{user}} ile Mod Mail konuşması",
+    "channel_create_failed": "Kanal oluşturulamadı.",
+    "initial": "`Hesap Yaşı:` **{{account_age}}**, `ID:` **{{user.id}}**\n`Kullanıcı Adı:` **{{user.username}}** (<@{{user.id}}>), `Katılma Tarihi:` **{{join_date}}**\n**»»----------------------------¤----------------------------««**",
+    "message": "`{{guild}}` ile bir konuşma başlatıldı. **[{{user}}]:** {{message}}",
+    "dm_fail": "Kullanıcıya DM gönderilemedi.",
+    "created_by": "`{{user}} tarafından oluşturuldu`",
+    "db_error": "Veritabanı güncellenirken hata oluştu. Mod mail kanalı iptal edildi.",
+    "message_send_failed": "Mesaj gönderilirken hata oluştu. Mod mail kanalı iptal edildi.",
+    "thread_created": "Konuşma oluşturuldu."
   }
 }

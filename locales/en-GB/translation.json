@@ -215,7 +215,7 @@
     }
   },
   "mod_mail_log": {
-    "initial": "# Mod-mail thread #{{thread_id}} with {{user.tag}} {{user.id}} started at {{time}}. All times are in UTC.\n",
+    "initial": "# Mod-mail thread #{{thread_id}} with {{user.tag}} {{user.id}} started at {{time}}. All times are in GMT.\n",
     "bot_to_user": "[BOT TO USER]",
     "command": "[COMMAND]",
     "to_user": "[TO USER]",
