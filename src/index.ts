@@ -10,7 +10,8 @@ import FsBackend from "i18next-fs-backend";
 import pg from "pg";
 import logger from "./lib/Logger.js";
 import { Player } from "discord-player";
-import { DefaultExtractors } from "@discord-player/extractor";
+import { SpotifyExtractor } from "discord-player-spotify";
+import { YoutubeiExtractor } from "discord-player-youtubei";
 import process from "node:process";
 import { CronJob } from "cron";
 import checkPunishments from "./utils/checkPunishments.js";
@@ -36,7 +37,8 @@ const client = new Client({
   partials: [Partials.Channel],
 });
 const player = new Player(client);
-await player.extractors.loadMulti(DefaultExtractors);
+await player.extractors.register(SpotifyExtractor, {});
+await player.extractors.register(YoutubeiExtractor, {});
 const pgClient = new PgClient({
   user: process.env.DB_USER,
   host: "localhost",
@@ -104,8 +106,7 @@ player.events.on("playerStart", async (queue, track) => {
   if (!rows.length) return;
   const t = client.i18next.getFixedT(rows[0].language);
   const embed = new EmbedBuilder()
-    .setThumbnail(track.thumbnail)
-    .setAuthor({ name: t("events:playerStart.embed.author"), iconURL: client.config.IconURL })
+    .setAuthor({ name: t("events:playerStart.embed.author"), url: track.url })
     .setColor("Random")
     .setDescription(t("events:playerStart.embed.description", { track }))
     .setFields([
@@ -120,6 +121,7 @@ player.events.on("playerStart", async (queue, track) => {
         inline: true,
       },
     ]);
+  if (track.thumbnail.length) embed.setThumbnail(track.thumbnail);
   if (
     queue.metadata.channel.isSendable() &&
     queue.metadata.channel.permissionsFor(queue.metadata.guild.members.me).has(PermissionsBitField.Flags.SendMessages)

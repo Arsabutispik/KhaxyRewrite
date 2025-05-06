@@ -197,5 +197,13 @@
     "db_error": "Veritabanı güncellenirken hata oluştu. Mod mail kanalı iptal edildi.",
     "message_send_failed": "Mesaj gönderilirken hata oluştu. Mod mail kanalı iptal edildi.",
     "thread_created": "Konuşma oluşturuldu."
+  },
+  "play": {
+    "not_in_voice_channel": "Herhangi bir ses kanalında değilsin.",
+    "already_in_voice_channel": "Bot ile aynı ses kanalında olmak zorundasın.",
+    "no_connect_permission": "Kanala katılma iznim yok.",
+    "no_speak_permission": "Kanalda konuşma iznim yok.",
+    "playing": "Şu anda oynatılan müzik **{{query}}**",
+    "error_playing": "Müzik oynatılırken hata oluştu."
   }
 }

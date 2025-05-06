@@ -3,6 +3,7 @@ import { Events, MessageFlagsBitField } from "discord.js";
 import { missingPermissionsAsString } from "../utils/utils.js";
 import logger from "../lib/Logger.js";
 import { Guilds } from "../../@types/DatabaseTypes";
+import { useMainPlayer } from "discord-player";
 
 export default {
   name: Events.InteractionCreate,
@@ -91,8 +92,12 @@ export default {
       return;
     }
     try {
+      const player = useMainPlayer();
+      const data = {
+        guild: interaction.guild,
+      };
       // Execute the command
-      await command.execute(interaction);
+      await player.context.provide(data, () => command.execute(interaction));
     } catch (error) {
       logger.log({
         level: "error",
