@@ -31,6 +31,7 @@
     "i18next-fs-backend": "^2.6.0",
     "lodash": "^4.17.21",
     "pg": "^8.14.0",
+    "string-progressbar": "^1.0.4",
     "winston": "^3.17.0",
     "winston-transport": "^4.9.0"
   },

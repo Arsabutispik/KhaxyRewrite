@@ -50,6 +50,9 @@ importers:
       pg:
         specifier: ^8.14.0
         version: 8.14.0
+      string-progressbar:
+        specifier: ^1.0.4
+        version: 1.0.4
       winston:
         specifier: ^3.17.0
         version: 3.17.0
@@ -1821,6 +1824,9 @@ packages:
 
   stack-trace@0.0.10:
     resolution: {integrity: sha512-KGzahc7puUKkzyMt+IqAep+TVNbKP+k2Lmwhub39m1AsTSkaDutx56aDCo+HLDzf/D26BIHTJWNiTG1KAJiQCg==}
+
+  string-progressbar@1.0.4:
+    resolution: {integrity: sha512-OpkcFxlFjn7kz5jTWmPGY+FFJVN21lQ9k0fkK0XS5GVvlCgS1stgDNEoMyqnkbZEcVP3Gv6IxqgG7tnD7ChBSw==}
 
   string-width@4.2.3:
     resolution: {integrity: sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==}
@@ -3757,6 +3763,8 @@ snapshots:
       spotify-uri: 4.1.0
 
   stack-trace@0.0.10: {}
+
+  string-progressbar@1.0.4: {}
 
   string-width@4.2.3:
     dependencies:

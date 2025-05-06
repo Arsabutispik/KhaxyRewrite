@@ -34,7 +34,7 @@ export async function loadEmojis(
 ): Promise<void> {
   try {
     const emojis = await client.application?.emojis.fetch();
-    if (!emojis) {
+    if (!emojis?.size) {
       logger.log({
         level: "warn",
         message: "No emojis found.",

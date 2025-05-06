@@ -205,5 +205,14 @@
     "no_speak_permission": "I don't have permission to speak in the voice channel.",
     "playing": "Now playing **{{query}}**",
     "error_playing": "An error occurred while playing the song."
+  },
+  "playing": {
+    "no_song_playing": "Currently, no song is playing.",
+    "embed": {
+      "author": "Currently Playing ♪",
+      "description": "\uD83C\uDFB6 | Currently playing **[{{track.title}}]({{track.url}})**!",
+      "fieldName0": "Requested by",
+      "fieldName1": "Duration"
+    }
   }
 }

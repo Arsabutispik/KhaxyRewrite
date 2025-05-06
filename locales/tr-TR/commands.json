@@ -205,5 +205,14 @@
     "no_speak_permission": "Kanalda konuşma iznim yok.",
     "playing": "Şu anda oynatılan müzik **{{query}}**",
     "error_playing": "Müzik oynatılırken hata oluştu."
+  },
+  "playing": {
+    "no_song_playing": "Şu anda oynatılan bir müzik yok.",
+    "embed": {
+      "author": "Şu Anda Oynatılıyor ♪",
+      "description": "\uD83C\uDFB6 | Şu anda oynatılan müzik **[{{track.title}}]({{track.url}})**!",
+      "fieldName0": "Talep Eden",
+      "fieldName1": "Süre"
+    }
   }
 }

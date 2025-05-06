@@ -3,6 +3,7 @@ import { Bump_leaderboard, Guilds, Mod_mail_messages, Mod_mail_threads } from ".
 import { Buffer } from "node:buffer";
 import crypto from "crypto";
 import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration.js";
 /**
  * Pauses execution for a specified number of milliseconds.
  *
@@ -176,5 +177,29 @@ async function bumpLeaderboard(client: Client, guildId: string, lastBump?: User)
     await channel.send(initial);
   }
 }
+dayjs.extend(duration);
+/**
+ * Formats a duration in milliseconds to a string.
+ * @param ms - The duration in milliseconds.
+ * @returns A formatted string representing the duration.
+ */
+function formatDuration(ms: number): string {
+  const d = dayjs.duration(ms);
+  const hours = d.hours();
+  const minutes = d.minutes().toString().padStart(2, "0");
+  const seconds = d.seconds().toString().padStart(2, "0");
 
-export { sleep, missingPermissionsAsString, replacePlaceholders, toStringId, modMailLog, bumpLeaderboard };
+  return hours > 0
+    ? `${hours}:${minutes}:${seconds}` // e.g., 1:02:15
+    : `${minutes}:${seconds}`; // e.g., 02:15
+}
+
+export {
+  sleep,
+  missingPermissionsAsString,
+  replacePlaceholders,
+  toStringId,
+  modMailLog,
+  bumpLeaderboard,
+  formatDuration,
+};

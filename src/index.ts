@@ -132,14 +132,21 @@ player.events.on("playerStart", async (queue, track) => {
 player.events.on("emptyChannel", async (queue) => {
   const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [queue.metadata.guild.id]);
   if (!rows.length) return;
-  const t = client.i18next.getFixedT(rows[0].language);
+  const t = client.i18next.getFixedT(rows[0].language, "events", "emptyChannel");
   const embed = new EmbedBuilder()
-    .setDescription(t("events:emptyChannel.embed.description"))
+    .setDescription(t("embed.description"))
     .setTitle(t("events:emptyChannel.embed.title"))
     .setColor("Red");
   queue.metadata.channel.send({ embeds: [embed] });
 });
 
+player.events.on("emptyQueue", async (queue) => {
+  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [queue.metadata.guild.id]);
+  if (!rows.length) return;
+  const t = client.i18next.getFixedT(rows[0].language, "events", "emptyQueue");
+  const embed = new EmbedBuilder().setDescription(t("embed.description")).setTitle(t("embed.title")).setColor("Red");
+  queue.metadata.channel.send({ embeds: [embed] });
+});
 await client.login(process.env.TOKEN);
 CronJob.from({
   cronTime: "*/5 * * * *",
