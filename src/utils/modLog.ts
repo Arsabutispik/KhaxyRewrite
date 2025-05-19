@@ -2,7 +2,7 @@ import dayjs, { Dayjs } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime.js";
 import "dayjs/locale/en.js";
 import "dayjs/locale/tr.js";
-import { ChannelType, Client, Guild, User } from "discord.js";
+import { ChannelType, Client, Guild, PartialUser, User } from "discord.js";
 import logger from "../lib/Logger.js";
 import process from "node:process";
 import { Guilds } from "../../@types/DatabaseTypes";
@@ -24,9 +24,9 @@ type actions =
 export default async (
   data: {
     guild: Guild;
-    user: User;
+    user: User | PartialUser;
     action: actions;
-    moderator: User;
+    moderator: User | PartialUser;
     reason?: string;
     duration?: Dayjs;
     caseID?: number;

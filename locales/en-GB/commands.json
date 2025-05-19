@@ -203,7 +203,7 @@
     "already_in_voice_channel": "You need to be in the same voice channel as the bot.",
     "no_connect_permission": "I don't have permission to connect to the voice channel.",
     "no_speak_permission": "I don't have permission to speak in the voice channel.",
-    "playing": "Now playing **{{query}}**",
+    "playing": "Added to queue **{{query}}**",
     "error_playing": "An error occurred while playing the song."
   },
   "playing": {
@@ -214,5 +214,20 @@
       "fieldName0": "Requested by",
       "fieldName1": "Duration"
     }
+  },
+  "pause": {
+    "no_song_playing": "Currently, no song is playing.",
+    "pause_vote": "**{{user}}** started a vote to pause the song **{{track}}**. Users have to react with ✅ or ❌ to vote. {{count}} vote(s) needed to pause the song.",
+    "resume_vote": "**{{user}}** started a vote to resume the song **{{track}}**. Users have to react with ✅ or ❌ to vote. {{count}} vote(s) needed to resume the song.",
+    "pause_vote_fail": "The voting has failed.",
+    "resumed": "The song has been resumed.",
+    "paused": "The song has been paused."
+  },
+  "skip": {
+    "no_queue": "Currently, no song is playing.",
+    "not_in_the_same_voice": "You need to be in the same voice channel as the bot.",
+    "skip_vote": "**{{user}}** started a vote to skip the song **{{track}}**. Users have to react with ✅ or ❌ to vote. {{count}} vote(s) needed to skip the song.",
+    "skip_vote_success": "The song has been skipped.",
+    "skip_vote_fail": "The song has not been skipped."
   }
 }

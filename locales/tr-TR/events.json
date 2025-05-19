@@ -32,6 +32,12 @@
       "title": "Boş Kanal"
     }
   },
+  "emptyQueue": {
+    "embed": {
+      "description": "Şarkı kuyruğu boş olduğu için müzik durduruldu.",
+      "title": "Boş Kuyruk"
+    }
+  },
   "guildMemberRemove": {
     "noReason": "Sebep belirtilmedi."
   },

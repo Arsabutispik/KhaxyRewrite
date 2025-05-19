@@ -224,5 +224,22 @@
     "close_message": "Mod-mail thread #{{thread_id}} with {{user.tag}} ({{user.id}}) was closed by {{closer.tag}}.\n**{{messages.user}}** messages from the user, **{{messages.staff}}** messages to the user, and **{{messages.internal}}** internal chat messages.",
     "preparing_close": "Thread is being closed...",
     "thread_closed_dm": "Your thread in {{guild}} has been closed."
+  },
+  "vote": {
+    "not_eligible": "You are not eligible to vote.",
+    "already_voted": "You have already voted.",
+    "voted_yes": "You have voted yes.",
+    "voted_no": "You have voted no.",
+    "no_votes": "No votes have been cast.",
+    "embed":  {
+      "title": "Voting In Progress",
+      "description": "A vote started with **{{totalUsers}}** users. **{{requiredVotes}}** votes are required to pass the vote. So far, **{{yesVotes}}** votes have been yes and **{{noVotes}}** votes have no making it **{{votedUsers}}** votes.",
+      "fields": {
+        "yes": "✅ Yes",
+        "no": "❌ No",
+        "voted": "🗳️ Voted",
+        "required": "\uD83D\uDCCA Required"
+      }
+    }
   }
 }

@@ -32,6 +32,12 @@
       "title": "Empty Channel"
     }
   },
+  "emptyQueue": {
+    "embed": {
+      "description": "Music has been stopped because the queue is empty",
+      "title": "Empty Queue"
+    }
+  },
   "guildMemberRemove": {
     "noReason": "No reason provided."
   },

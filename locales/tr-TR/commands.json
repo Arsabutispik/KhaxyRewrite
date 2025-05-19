@@ -203,7 +203,7 @@
     "already_in_voice_channel": "Bot ile aynı ses kanalında olmak zorundasın.",
     "no_connect_permission": "Kanala katılma iznim yok.",
     "no_speak_permission": "Kanalda konuşma iznim yok.",
-    "playing": "Şu anda oynatılan müzik **{{query}}**",
+    "playing": "Listeye eklendi **{{query}}**",
     "error_playing": "Müzik oynatılırken hata oluştu."
   },
   "playing": {
@@ -214,5 +214,20 @@
       "fieldName0": "Talep Eden",
       "fieldName1": "Süre"
     }
+  },
+  "pause": {
+    "no_song_playing": "Şu anda oynatılan bir müzik yok.",
+    "pause_vote": "**{{track}}**, **{{user}}** tarafından duraklatılmak için oylamaya sunuldu. Kullanıcılar ✅ veya ❌ ile oylamak zorundadır. Şarkıyı duraklatmak için {{count}} oya ihtiyaç var.",
+    "resume_vote": "**{{track}}**, **{{user}}** tarafından devam ettirilmek için oylamaya sunuldu. Kullanıcılar ✅ veya ❌ ile oylamak zorundadır. Şarkıyı devam ettirmek için {{count}} oya ihtiyaç var.",
+    "pause_vote_fail": "Oylama başarısız oldu.",
+    "resumed": "Müzik devam ettirildi.",
+    "paused": "Müzik duraklatıldı."
+  },
+  "skip": {
+    "no_queue": "Şu anda oynatılan bir müzik yok.",
+    "not_in_the_same_voice": "Bot ile aynı ses kanalında olmak zorundasın.",
+    "skip_vote": "**{{track}}**, **{{user}}** tarafından atlanmak için oylamaya sunuldu. Kullanıcılar ✅ veya ❌ ile oylamak zorundadır. Şarkıyı atlamak için {{count}} oya ihtiyaç var.",
+    "skip_vote_success": "Şarkı atlandı.",
+    "skip_vote_fail": "Oylama başarısız oldu."
   }
 }

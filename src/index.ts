@@ -1,5 +1,5 @@
 //TODO: Handle emojis
-import { Client, Collection, EmbedBuilder, IntentsBitField, Partials, PermissionsBitField } from "discord.js";
+import { Client, Collection, EmbedBuilder, GatewayIntentBits, Partials, PermissionsBitField } from "discord.js";
 import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
@@ -10,8 +10,8 @@ import FsBackend from "i18next-fs-backend";
 import pg from "pg";
 import logger from "./lib/Logger.js";
 import { Player } from "discord-player";
-import { SpotifyExtractor } from "discord-player-spotify";
 import { YoutubeiExtractor } from "discord-player-youtubei";
+import { SoundcloudExtractor } from "discord-player-soundcloud";
 import process from "node:process";
 import { CronJob } from "cron";
 import checkPunishments from "./utils/checkPunishments.js";
@@ -26,19 +26,23 @@ const __dirname = path.dirname(__filename);
 
 const client = new Client({
   intents: [
-    IntentsBitField.Flags.Guilds,
-    IntentsBitField.Flags.GuildMessages,
-    IntentsBitField.Flags.GuildMembers,
-    IntentsBitField.Flags.GuildModeration,
-    IntentsBitField.Flags.GuildVoiceStates,
-    IntentsBitField.Flags.DirectMessages,
-    IntentsBitField.Flags.MessageContent,
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildModeration,
+    GatewayIntentBits.GuildVoiceStates,
+    GatewayIntentBits.DirectMessages,
+    GatewayIntentBits.MessageContent,
   ],
   partials: [Partials.Channel],
 });
 const player = new Player(client);
-await player.extractors.register(SpotifyExtractor, {});
-await player.extractors.register(YoutubeiExtractor, {});
+await player.extractors.register(YoutubeiExtractor, {
+  streamOptions: {
+    useClient: "WEB",
+  },
+});
+await player.extractors.register(SoundcloudExtractor, {});
 const pgClient = new PgClient({
   user: process.env.DB_USER,
   host: "localhost",
@@ -133,10 +137,7 @@ player.events.on("emptyChannel", async (queue) => {
   const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [queue.metadata.guild.id]);
   if (!rows.length) return;
   const t = client.i18next.getFixedT(rows[0].language, "events", "emptyChannel");
-  const embed = new EmbedBuilder()
-    .setDescription(t("embed.description"))
-    .setTitle(t("events:emptyChannel.embed.title"))
-    .setColor("Red");
+  const embed = new EmbedBuilder().setDescription(t("embed.description")).setTitle(t("embed.title")).setColor("Red");
   queue.metadata.channel.send({ embeds: [embed] });
 });
 
@@ -148,6 +149,24 @@ player.events.on("emptyQueue", async (queue) => {
   queue.metadata.channel.send({ embeds: [embed] });
 });
 await client.login(process.env.TOKEN);
+
+player.events.on("playerError", async (queue, error) => {
+  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [queue.metadata.guild.id]);
+  if (!rows.length) return;
+  const t = client.i18next.getFixedT(rows[0].language, "events", "playerError");
+  const embed = new EmbedBuilder()
+    .setDescription(t("embed.description"))
+    .setTitle(t("embed.title"))
+    .setColor("Red")
+    .addFields([
+      {
+        name: t("embed.fieldName0"),
+        value: error.message,
+      },
+    ]);
+  queue.metadata.channel.send({ embeds: [embed] });
+});
+
 CronJob.from({
   cronTime: "*/5 * * * *",
   onTick: () => checkPunishments(client),

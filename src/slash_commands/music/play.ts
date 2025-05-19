@@ -73,11 +73,9 @@ export default {
             guild: interaction.guild,
             channel: interaction.channel,
           },
-          leaveOnEndCooldown: 1000 * 60 * 5, // 5 minutes
+          leaveOnEnd: true,
         },
         requestedBy: interaction.user,
-        searchEngine: "youtube",
-        fallbackSearchEngine: "spotifySearch",
       });
       await interaction.editReply(t("playing", { query: result.track.title }));
     } catch (error) {

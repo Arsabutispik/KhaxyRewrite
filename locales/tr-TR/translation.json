@@ -224,5 +224,22 @@
     "close_message": "{{user.tag}} ({{user.id}}) ile olan modmail konuşması #{{thread_id}} {{closer.tag}} tarafından kapatıldı.\n Kullanıcı tarafından **{{messages.user}}** mesaj, kullanıcıya **{{messages.staff}}**, **{{messages.internal}}** iç mesaj gönderildi.",
     "preparing_close": "Kapatılıyor...",
     "thread_closed_dm": "{{guild}} sunucusundaki mod mail konuşmanız kapatıldı."
+  },
+  "vote": {
+    "not_eligible": "Oy verme işlemi için uygun değilsin.",
+    "already_voted": "Zaten oy verdin.",
+    "voted_yes": "Onay verdin.",
+    "voted_no": "Onay vermedin.",
+    "no_votes": "Bu oylama için hiç oy verilmedi.",
+    "embed": {
+      "title": "Oylama Devam Ediyor",
+      "description": "**{{totalUsers}}** kullanıcı ile oylama başlatıldı. **{{requiredVotes}}** oylama kabul edilmesi için gerekli. Şu ana kadar **{{yesVotes}}** onay verdi ve **{{noVotes}}** onay vermedi böylelikle toplamda **{{totalVotes}}** kişi oy verdi.",
+      "fields": {
+        "yes": "✅ Evet",
+        "no": "❌ Hayır",
+        "voted": "🗳️ Oy Verildi",
+        "required": "\uD83D\uDCCA Gerekli Oy"
+      }
+    }
   }
 }
