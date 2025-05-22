@@ -1,4 +1,3 @@
-//TODO: Handle emojis
 import { Client, Collection, EmbedBuilder, GatewayIntentBits, Partials, PermissionsBitField } from "discord.js";
 import dotenv from "dotenv";
 import path from "path";
@@ -39,8 +38,9 @@ const client = new Client({
 const player = new Player(client);
 await player.extractors.register(YoutubeiExtractor, {
   streamOptions: {
-    useClient: "WEB",
+    useClient: "WEB_EMBEDDED",
   },
+  generateWithPoToken: true,
 });
 await player.extractors.register(SoundcloudExtractor, {});
 const pgClient = new PgClient({
