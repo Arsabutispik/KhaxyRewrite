@@ -8,6 +8,7 @@ import {
   MessageComponentInteraction,
   ComponentType,
   EmbedBuilder,
+  InteractionContextType,
 } from "discord.js";
 import roleConfig from "../../config_functions/role-config.js";
 import registerConfig from "../../config_functions/register-config.js";
@@ -27,7 +28,7 @@ export default {
       tr: "Sunucunuzun ayarlarını yapılandırın.",
     })
     .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
-    .setContexts(0)
+    .setContexts(InteractionContextType.Guild)
     .addStringOption((option) =>
       option
         .setName("setting")

@@ -9,6 +9,7 @@ import {
   PermissionsBitField,
   SlashCommandBuilder,
   MessageFlagsBitField,
+  InteractionContextType,
 } from "discord.js";
 import dayjs from "dayjs";
 import dayjsduration from "dayjs/plugin/duration.js";
@@ -22,7 +23,7 @@ export default {
   data: new SlashCommandBuilder()
     .setName("close")
     .setDescription("Close the mod mail thread")
-    .setContexts(0)
+    .setContexts(InteractionContextType.Guild)
     .setDefaultMemberPermissions(PermissionsBitField.Flags.ModerateMembers)
     .addNumberOption((option) =>
       option

@@ -1,5 +1,5 @@
 import { SlashCommandBase } from "../../../@types/types";
-import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { EmbedBuilder, InteractionContextType, SlashCommandBuilder } from "discord.js";
 import { Guilds } from "../../../@types/DatabaseTypes";
 import { useQueue } from "discord-player";
 import ProgressBar from "string-progressbar";
@@ -14,7 +14,7 @@ export default {
     .setDescriptionLocalizations({
       tr: "Şu anda çalan şarkıyı gösterir.",
     })
-    .setContexts(0),
+    .setContexts(InteractionContextType.Guild),
   async execute(interaction) {
     const { rows } = await interaction.client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
       interaction.guildId,

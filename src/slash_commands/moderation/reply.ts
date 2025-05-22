@@ -1,5 +1,5 @@
 import { SlashCommandBase } from "../../../@types/types";
-import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
+import { InteractionContextType, MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { toStringId } from "../../utils/utils.js";
 import logger from "../../lib/Logger.js";
 import { Guilds, Mod_mail_messages, Mod_mail_threads } from "../../../@types/DatabaseTypes";
@@ -15,7 +15,7 @@ export default {
     .setDescriptionLocalizations({
       tr: "Mod mail için bir cevap gönderin.",
     })
-    .setContexts(0)
+    .setContexts(InteractionContextType.Guild)
     .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageMessages)
     .addStringOption((option) =>
       option

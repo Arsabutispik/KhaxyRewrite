@@ -1,5 +1,11 @@
 import { SlashCommandBase } from "../../../@types/types";
-import { ChannelType, MessageFlags, PermissionsBitField, SlashCommandBuilder } from "discord.js";
+import {
+  ChannelType,
+  InteractionContextType,
+  MessageFlags,
+  PermissionsBitField,
+  SlashCommandBuilder,
+} from "discord.js";
 import { Guilds } from "../../../@types/DatabaseTypes";
 import { toStringId } from "../../utils/utils.js";
 import dayjs from "dayjs";
@@ -18,7 +24,7 @@ export default {
     .setDescriptionLocalizations({
       tr: "Moderatör mesajları için yeni bir kanal oluştur.",
     })
-    .setContexts(0)
+    .setContexts(InteractionContextType.Guild)
     .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageMessages)
     .addUserOption((option) =>
       option

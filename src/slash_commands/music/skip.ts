@@ -1,5 +1,5 @@
 import { SlashCommandBase } from "../../../@types/types";
-import { MessageFlags, PermissionsBitField, SlashCommandBuilder } from "discord.js";
+import { InteractionContextType, MessageFlags, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { useQueue } from "discord-player";
 import { Guilds } from "../../../@types/DatabaseTypes";
 import { toStringId, vote } from "../../utils/utils.js";
@@ -10,6 +10,7 @@ export default {
     .setNameLocalizations({
       tr: "atla",
     })
+    .setContexts(InteractionContextType.Guild)
     .setDescription("Skip the current song in the queue.")
     .setDescriptionLocalizations({
       tr: "Sıradaki şarkıyı atla.",

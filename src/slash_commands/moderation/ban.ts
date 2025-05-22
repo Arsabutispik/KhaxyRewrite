@@ -1,5 +1,5 @@
 import { SlashCommandBase } from "../../../@types/types";
-import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
+import { InteractionContextType, MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import dayjs from "dayjs";
 import dayjsduration from "dayjs/plugin/duration.js";
 import relativeTime from "dayjs/plugin/relativeTime.js";
@@ -22,7 +22,7 @@ export default {
     .setDescriptionLocalizations({
       tr: "Sunucudan bir kullanıcıyı yasaklar.",
     })
-    .setContexts(0)
+    .setContexts(InteractionContextType.Guild)
     .setDefaultMemberPermissions(PermissionsBitField.Flags.BanMembers)
     .addUserOption((option) =>
       option

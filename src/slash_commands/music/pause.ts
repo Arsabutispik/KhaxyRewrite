@@ -1,4 +1,4 @@
-import { MessageFlags, PermissionsBitField, SlashCommandBuilder } from "discord.js";
+import { InteractionContextType, MessageFlags, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { useTimeline } from "discord-player";
 import { Guilds } from "../../../@types/DatabaseTypes";
 import { SlashCommandBase } from "../../../@types/types";
@@ -14,7 +14,7 @@ export default {
     .setDescriptionLocalizations({
       tr: "Şu anda çalan parçayı duraklat/başlat.",
     })
-    .setContexts(0),
+    .setContexts(InteractionContextType.Guild),
   async execute(interaction) {
     const { rows } = await interaction.client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
       interaction.guildId,

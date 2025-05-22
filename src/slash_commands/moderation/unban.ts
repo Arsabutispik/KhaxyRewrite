@@ -1,5 +1,5 @@
 import { SlashCommandBase } from "../../../@types/types";
-import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
+import { InteractionContextType, MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import logger from "../../lib/Logger.js";
 import modLog from "../../utils/modLog.js";
 import { Guilds } from "../../../@types/DatabaseTypes";
@@ -16,7 +16,7 @@ export default {
     .setDescriptionLocalizations({
       tr: "Bir kullanıcının yasağını kaldırır",
     })
-    .setContexts(0)
+    .setContexts(InteractionContextType.Guild)
     .setDefaultMemberPermissions(PermissionsBitField.Flags.BanMembers)
     .addUserOption((option) =>
       option

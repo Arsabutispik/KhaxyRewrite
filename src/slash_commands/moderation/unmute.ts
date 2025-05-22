@@ -1,5 +1,5 @@
 import { SlashCommandBase } from "../../../@types/types";
-import { MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
+import { InteractionContextType, MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import logger from "../../lib/Logger.js";
 import modLog from "../../utils/modLog.js";
 import { toStringId } from "../../utils/utils.js";
@@ -14,7 +14,7 @@ export default {
     .setDescriptionLocalizations({
       tr: "Bir kullanıcının susturmasını kaldırır",
     })
-    .setContexts(0)
+    .setContexts(InteractionContextType.Guild)
     .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageRoles)
     .addUserOption((option) =>
       option

@@ -1,5 +1,5 @@
 import { SlashCommandBase } from "../../../@types/types";
-import { MessageFlags, PermissionsBitField, SlashCommandBuilder } from "discord.js";
+import { InteractionContextType, MessageFlags, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { Guilds } from "../../../@types/DatabaseTypes";
 import { useMainPlayer } from "discord-player";
 import logger from "../../lib/Logger.js";
@@ -15,7 +15,7 @@ export default {
     .setDescriptionLocalizations({
       tr: "Sesli kanalda bir şarkı çal.",
     })
-    .setContexts(0)
+    .setContexts(InteractionContextType.Guild)
     .addStringOption((option) =>
       option
         .setName("query")
