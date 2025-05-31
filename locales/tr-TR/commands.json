@@ -160,7 +160,7 @@
       }
     }
   },
-  "close" : {
+  "close": {
     "no_thread": "Bu bir mod mail kanalı değil.",
     "no_time": "Bir zaman birimi belirtilmedi.",
     "no_duration": "Bir süre belirtilmedi.",
@@ -244,5 +244,13 @@
     "loop_vote": "**{{user}}** {{state}}. Kullanıcılar ✅ veya ❌ ile oylamak zorundadır. Şarkıyı döngüye almak için {{count}} oya ihtiyaç var.",
     "loop_vote_success": "Şarkı döngüye alındı.",
     "loop_vote_fail": "Oylama başarısız oldu."
+  },
+  "list": {
+    "no_queue": "Şu anda oynatılan bir müzik yok.",
+    "embed": {
+      "title": "Şarkı Listesi",
+      "description": "Şu anda oynatılan müzik **[{{track.title}}]({{track.url}})**\n{{duration}}\n\n**Şarkı Listesi:**\n{{queue}}",
+      "footer": "Şarkıyı atlamak için /atla komutunu kullanabilirsiniz."
+    }
   }
 }

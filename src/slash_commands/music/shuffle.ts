@@ -2,7 +2,7 @@ import { SlashCommandBase } from "../../../@types/types";
 import { SlashCommandBuilder, InteractionContextType, MessageFlags, PermissionsBitField } from "discord.js";
 import { Guilds } from "../../../@types/DatabaseTypes";
 import { useQueue } from "discord-player";
-import { toStringId, vote } from "../../utils/utils";
+import { toStringId, vote } from "../../utils/utils.js";
 
 export default {
   data: new SlashCommandBuilder()

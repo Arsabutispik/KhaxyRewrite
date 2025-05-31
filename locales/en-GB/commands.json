@@ -244,5 +244,13 @@
     "loop_vote": "**{{user}}** started a vote to {{state}}. Users have to react with ✅ or ❌ to vote. {{count}} vote(s) needed to loop the song.",
     "loop_vote_success": "The song has been looped.",
     "loop_vote_fail": "The song has not been looped."
+  },
+  "list": {
+    "no_queue": "Currently, no song is playing.",
+    "embed": {
+      "title": "Page {{page}} of {{total}}",
+      "description": "Currently Playing **[{{track.title}}]({{track.url}})**\n{{duration}}\n\n**Queue:**\n{{queue}}",
+      "footer": "Use /skip to skip the current song."
+    }
   }
 }
