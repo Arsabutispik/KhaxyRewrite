@@ -1,4 +1,4 @@
-import { EventBase } from "../../@types/types";
+import { EventBase, ModMailMessageSentTo, ModMailMessageType, ModMailThreadStatus } from "../../@types/types";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -23,8 +23,8 @@ export default {
       if (message.author.bot) return;
       const client = message.client;
       const { rows } = await client.pgClient.query<Mod_mail_threads>(
-        "SELECT * FROM mod_mail_threads WHERE user_id = $1 AND status = 'open'",
-        [message.author.id],
+        "SELECT * FROM mod_mail_threads WHERE user_id = $1 AND status = $2",
+        [message.author.id, ModMailThreadStatus.OPEN],
       );
       if (rows.length === 0) {
         const shared_guilds = client.guilds.cache.filter(
@@ -135,7 +135,7 @@ export default {
           try {
             await client.pgClient.query<Mod_mail_threads>(
               "INSERT INTO mod_mail_threads (channel_id, guild_id, user_id, status, created_at) VALUES ($1, $2, $3, $4, $5)",
-              [channel.id, guild.id, message.author.id, "open", new Date().toISOString()],
+              [channel.id, guild.id, message.author.id, ModMailThreadStatus.OPEN, new Date().toISOString()],
             );
           } catch (e) {
             logger.error({ message: "Error inserting mod mail thread", error: e });
@@ -149,11 +149,11 @@ export default {
               [
                 message.author.id,
                 new Date().toISOString(),
-                "user",
+                ModMailMessageType.USER,
                 message.attachments.size
                   ? message.content + "\n" + message.attachments.map((a) => a.url).join("\n")
                   : message.content,
-                "thread",
+                ModMailMessageSentTo.THREAD,
                 channel.id,
                 message.id,
               ],
@@ -163,9 +163,9 @@ export default {
               [
                 client.user!.id,
                 new Date().toISOString(),
-                "client",
+                ModMailMessageType.CLIENT,
                 bot_message.content,
-                "thread",
+                ModMailMessageSentTo.THREAD,
                 channel.id,
                 bot_message.id,
               ],
@@ -286,7 +286,7 @@ export default {
         try {
           await client.pgClient.query<Mod_mail_threads>(
             "INSERT INTO mod_mail_threads (channel_id, guild_id, user_id, status, created_at) VALUES ($1, $2, $3, $4, $5)",
-            [channel.id, guild.id, message.author.id, "open", new Date().toISOString()],
+            [channel.id, guild.id, message.author.id, ModMailThreadStatus.OPEN, new Date().toISOString()],
           );
         } catch (e) {
           logger.error({
@@ -306,11 +306,11 @@ export default {
             [
               message.author.id,
               new Date().toISOString(),
-              "user",
+              ModMailMessageType.USER,
               message.attachments.size
                 ? message.content + "\n" + message.attachments.map((a) => a.url).join("\n")
                 : message.content,
-              "thread",
+              ModMailMessageSentTo.THREAD,
               channel.id,
               message.id,
             ],
@@ -320,9 +320,9 @@ export default {
             [
               client.user!.id,
               new Date().toISOString(),
-              "client",
+              ModMailMessageType.CLIENT,
               bot_message.content,
-              "thread",
+              ModMailMessageSentTo.THREAD,
               channel.id,
               bot_message.id,
             ],
@@ -363,11 +363,11 @@ export default {
             [
               message.author.id,
               new Date().toISOString(),
-              "user",
+              ModMailMessageType.USER,
               message.attachments.size
                 ? message.content + "\n" + message.attachments.map((a) => a.url).join("\n")
                 : message.content,
-              "thread",
+              ModMailMessageSentTo.THREAD,
               channel.id,
               message.id,
             ],
@@ -405,11 +405,11 @@ export default {
           [
             message.author.id,
             new Date().toISOString(),
-            message.author.bot ? "client" : "staff",
+            message.author.bot ? ModMailMessageType.CLIENT : ModMailMessageType.USER,
             message.attachments.size
               ? message.content + "\n" + message.attachments.map((a) => a.url).join("\n")
               : message.content,
-            "thread",
+            ModMailMessageSentTo.THREAD,
             message.channel.id,
             message.id,
           ],

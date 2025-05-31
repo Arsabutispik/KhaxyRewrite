@@ -252,5 +252,11 @@
       "description": "Şu anda oynatılan müzik **[{{track.title}}]({{track.url}})**\n{{duration}}\n\n**Şarkı Listesi:**\n{{queue}}",
       "footer": "Şarkıyı atlamak için /atla komutunu kullanabilirsiniz."
     }
+  },
+  "suspend": {
+    "no_thread": "Bu bir mod mail kanalı değil.",
+    "already_suspended": "Bu mod mail kanalı zaten askıya alınmış.",
+    "suspended": "Mod mail kanalı askıya alındı.",
+    "error": "Mod mail kanalı askıya alınırken hata oluştu. Bot geliştiricilerine bildirildi."
   }
 }

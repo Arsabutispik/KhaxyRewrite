@@ -1,4 +1,4 @@
-import { SlashCommandBase } from "../../../@types/types";
+import { ModMailMessageSentTo, ModMailMessageType, ModMailThreadStatus, SlashCommandBase } from "../../../@types/types";
 import { InteractionContextType, MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { toStringId } from "../../utils/utils.js";
 import logger from "../../lib/Logger.js";
@@ -74,7 +74,7 @@ export default {
     }
     const t = client.i18next.getFixedT(guild_config.language, "commands", "reply");
     if (!threads) return interaction.reply(t("no_thread"));
-    if (threads.status === "suspended") return interaction.reply(t("suspended"));
+    if (threads.status === ModMailThreadStatus.SUSPENDED) return interaction.reply(t("suspended"));
     const message = interaction.options.getString("message", true);
     const anonymous = interaction.options.getBoolean("anonymous");
     const member = await interaction.guild!.members.fetch(toStringId(threads.user_id)).catch(() => null);
@@ -85,64 +85,31 @@ export default {
       [interaction.channelId],
     );
     if (!messages) return interaction.reply(t("no_messages"));
-    if (anonymous) {
-      const { id } = await member.send({
-        content: `\`${messages.filter((row) => row.author_type === "staff").length + 1}\` **(Anonymous)**: ${message}`,
-        files: interaction.options.getAttachment("attachment")
-          ? [interaction.options.getAttachment("attachment")!]
-          : [],
+    const { id } = await member.send({
+      content: `\`${messages.filter((row) => row.author_type === "staff").length + 1}\` **(${interaction.member.roles.highest.name})** **[${anonymous ? "(Anonymous)" : interaction.member.user.tag}]**: ${message}`,
+      files: interaction.options.getAttachment("attachment") ? [interaction.options.getAttachment("attachment")!] : [],
+    });
+    try {
+      await client.pgClient.query(
+        "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, sent_to, channel_id, message_id) VALUES ($1 ,$2, $3, $4, $5, $6, $7)",
+        [
+          interaction.member.id,
+          new Date(),
+          ModMailMessageType.STAFF,
+          interaction.options.getAttachment("attachment")
+            ? `${message} ${interaction.options.getAttachment("attachment")?.url}`
+            : message,
+          ModMailMessageSentTo.USER,
+          interaction.channel!.id,
+          id,
+        ],
+      );
+    } catch (e) {
+      logger.error({
+        message: "Error while inserting a new mod mail message.",
+        error: e,
       });
-      try {
-        await client.pgClient.query(
-          "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, sent_to, channel_id, message_id) VALUES ($1 ,$2, $3, $4, $5, $6, $7)",
-          [
-            interaction.member.id,
-            new Date(),
-            "staff",
-            interaction.options.getAttachment("attachment")
-              ? `${message} ${interaction.options.getAttachment("attachment")?.url}`
-              : message,
-            "user",
-            interaction.channel!.id,
-            id,
-          ],
-        );
-      } catch (e) {
-        logger.error({
-          message: "Error while inserting a new mod mail message.",
-          error: e,
-        });
-        return interaction.reply(t("error"));
-      }
-    } else {
-      const { id } = await member.send({
-        content: `\`${messages.filter((row) => row.author_type === "staff").length + 1}\` **(${interaction.member.roles.highest.name})** **[${interaction.member.user.tag}]**: ${message}`,
-        files: interaction.options.getAttachment("attachment")
-          ? [interaction.options.getAttachment("attachment")!]
-          : [],
-      });
-      try {
-        await client.pgClient.query(
-          "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, sent_to, channel_id, message_id) VALUES ($1 ,$2, $3, $4, $5, $6, $7)",
-          [
-            interaction.member.id,
-            new Date(),
-            "staff",
-            interaction.options.getAttachment("attachment")
-              ? `${message} ${interaction.options.getAttachment("attachment")?.url}`
-              : message,
-            "user",
-            interaction.channel!.id,
-            id,
-          ],
-        );
-      } catch (e) {
-        logger.error({
-          message: "Error while inserting a new mod mail message.",
-          error: e,
-        });
-        return interaction.reply(t("error"));
-      }
+      return interaction.reply(t("error"));
     }
     await interaction.editReply({ content: t("success") });
     await interaction.channel!.send({

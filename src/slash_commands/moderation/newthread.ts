@@ -1,4 +1,4 @@
-import { SlashCommandBase } from "../../../@types/types";
+import { ModMailMessageSentTo, ModMailMessageType, ModMailThreadStatus, SlashCommandBase } from "../../../@types/types";
 import {
   ChannelType,
   InteractionContextType,
@@ -86,8 +86,8 @@ export default {
       });
     }
     const { rows: thread_rows } = await interaction.client.pgClient.query<Guilds>(
-      "SELECT * FROM mod_mail_threads WHERE guild_id = $1 AND user_id = $2 AND status = 'open'",
-      [interaction.guildId, user.id],
+      "SELECT * FROM mod_mail_threads WHERE guild_id = $1 AND user_id = $2 AND status = $3",
+      [interaction.guildId, user.id, ModMailThreadStatus.OPEN],
     );
     if (thread_rows.length > 0) {
       return interaction.editReply({
@@ -153,11 +153,19 @@ export default {
     try {
       await interaction.client.pgClient.query(
         "INSERT INTO mod_mail_threads (guild_id, user_id, channel_id, created_at, status) VALUES ($1, $2, $3, $4, $5)",
-        [interaction.guildId, user.id, channel.id, bot_message.createdAt, "open"],
+        [interaction.guildId, user.id, channel.id, bot_message.createdAt, ModMailThreadStatus.OPEN],
       );
       await interaction.client.pgClient.query(
         "INSERT INTO mod_mail_messages (author_id, sent_at, message_id, channel_id, sent_to, author_type, content) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-        [interaction.user.id, dm.createdAt, dm.id, channel.id, "user", "staff", message],
+        [
+          interaction.user.id,
+          dm.createdAt,
+          dm.id,
+          channel.id,
+          ModMailMessageSentTo.USER,
+          ModMailMessageType.STAFF,
+          message,
+        ],
       );
       await interaction.client.pgClient.query(
         "INSERT INTO mod_mail_messages (author_id, sent_at, message_id, channel_id, sent_to, author_type, content) VALUES ($1, $2, $3, $4, $5, $6, $7)",
@@ -166,8 +174,8 @@ export default {
           bot_message.createdAt,
           bot_message.id,
           channel.id,
-          "thread",
-          "client",
+          ModMailMessageSentTo.THREAD,
+          ModMailMessageType.CLIENT,
           bot_message.content,
         ],
       );

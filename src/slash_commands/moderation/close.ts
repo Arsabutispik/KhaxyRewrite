@@ -1,4 +1,4 @@
-import { SlashCommandBase } from "../../../@types/types";
+import { ModMailThreadStatus, SlashCommandBase } from "../../../@types/types";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -142,10 +142,10 @@ export default {
         await interaction.reply(t("close_duration", { duration: long_duration }));
       }
     } else {
-      await client.pgClient.query(
-        "UPDATE mod_mail_threads SET status = 'closed' WHERE channel_id = $1 AND status <> 'closed'",
-        [interaction.channel!.id],
-      );
+      await client.pgClient.query("UPDATE mod_mail_threads SET status = $2 WHERE channel_id = $1 AND status <> $2", [
+        interaction.channel!.id,
+        ModMailThreadStatus.CLOSED,
+      ]);
       const modmail_log_channel = interaction.guild.channels.cache.get(toStringId(guild_config.mod_mail_channel_id));
       if (modmail_log_channel) {
         const user = await client.users.fetch(toStringId(rows[0].user_id)).catch(() => null);
