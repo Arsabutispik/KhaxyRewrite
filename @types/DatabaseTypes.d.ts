@@ -60,7 +60,7 @@ export type Guilds = {
   register_join_message: string;
   colour_name_of_the_day: string;
   join_message: string;
-  language: string;
+  language: "en-UK" | "tr-TR";
   leave_message: string;
   mod_mail_message: string;
   bump_leaderboard_channel_id: bigint;

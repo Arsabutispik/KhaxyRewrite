@@ -229,5 +229,20 @@
     "skip_vote": "**{{track}}**, **{{user}}** tarafından atlanmak için oylamaya sunuldu. Kullanıcılar ✅ veya ❌ ile oylamak zorundadır. Şarkıyı atlamak için {{count}} oya ihtiyaç var.",
     "skip_vote_success": "Şarkı atlandı.",
     "skip_vote_fail": "Oylama başarısız oldu."
+  },
+  "shuffle": {
+    "no_queue": "Şu anda oynatılan bir müzik yok.",
+    "not_enough_tracks": "Şarkı listesinin karıştırılması için yeterli şarkı yok.",
+    "not_in_same_voice": "Bot ile aynı ses kanalında olmak zorundasın.",
+    "shuffle_vote": "**{{user}}** tarafından şarkı sırası karıştırılmak için oylama başlatıldı. Kullanıcılar ✅ veya ❌ ile oylamak zorundadır. Şarkı listesini karıştırmak için {{count}} oya ihtiyaç var.",
+    "shuffle_vote_success": "Şarkı listesi karıştırıldı.",
+    "shuffle_vote_fail": "Oylama başarısız oldu."
+  },
+  "loop": {
+    "no_queue": "Şu anda oynatılan bir müzik yok.",
+    "not_in_same_voice": "Bot ile aynı ses kanalında olmak zorundasın.",
+    "loop_vote": "**{{user}}** {{state}}. Kullanıcılar ✅ veya ❌ ile oylamak zorundadır. Şarkıyı döngüye almak için {{count}} oya ihtiyaç var.",
+    "loop_vote_success": "Şarkı döngüye alındı.",
+    "loop_vote_fail": "Oylama başarısız oldu."
   }
 }

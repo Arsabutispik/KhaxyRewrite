@@ -229,5 +229,20 @@
     "skip_vote": "**{{user}}** started a vote to skip the song **{{track}}**. Users have to react with ✅ or ❌ to vote. {{count}} vote(s) needed to skip the song.",
     "skip_vote_success": "The song has been skipped.",
     "skip_vote_fail": "The song has not been skipped."
+  },
+  "shuffle": {
+    "no_queue": "Currently, no song is playing.",
+    "not_enough_tracks": "Not enough tracks in the queue to shuffle.",
+    "not_in_same_voice": "You need to be in the same voice channel as the bot.",
+    "shuffle_vote": "**{{user}}** started a vote to shuffle the queue. Users have to react with ✅ or ❌ to vote. {{count}} vote(s) needed to shuffle the queue.",
+    "shuffle_vote_success": "The queue has been shuffled.",
+    "shuffle_vote_fail": "The queue has not been shuffled."
+  },
+  "loop": {
+    "no_queue": "Currently, no song is playing.",
+    "not_in_same_voice": "You need to be in the same voice channel as the bot.",
+    "loop_vote": "**{{user}}** started a vote to {{state}}. Users have to react with ✅ or ❌ to vote. {{count}} vote(s) needed to loop the song.",
+    "loop_vote_success": "The song has been looped.",
+    "loop_vote_fail": "The song has not been looped."
   }
 }
