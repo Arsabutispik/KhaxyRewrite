@@ -258,5 +258,11 @@
     "already_suspended": "Bu mod mail kanalı zaten askıya alınmış.",
     "suspended": "Mod mail kanalı askıya alındı.",
     "error": "Mod mail kanalı askıya alınırken hata oluştu. Bot geliştiricilerine bildirildi."
+  },
+  "close-cancel": {
+    "no_thread": "Bu bir mod mail kanalı değil.",
+    "not_closing": "Bu mod mail kanalı kapatılma için işaretlenmemiş.",
+    "cancelled": "Mod mail kanalı kapatma işlemi iptal edildi.",
+    "error": "Mod mail kanalı kapatma işlemi iptal edilirken hata oluştu. Bot geliştiricilerine bildirildi."
   }
 }

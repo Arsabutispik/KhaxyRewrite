@@ -258,5 +258,11 @@
     "already_suspended": "This mod mail thread is already suspended.",
     "suspended": "This mod mail thread has been suspended. You can no longer reply to the user.",
     "error": "An error occurred while suspending the thread. Developers have been notified."
+  },
+  "close-cancel": {
+    "no_thread": "This is not a mod mail thread.",
+    "not_closing": "This mod mail thread is not marked for close.",
+    "cancelled": "The closing of this mod mail thread has been cancelled.",
+    "error": "An error occurred while cancelling the close. Developers have been notified."
   }
 }
