@@ -1,9 +1,9 @@
-import { ModMailMessageSentTo, ModMailMessageType, ModMailThreadStatus, SlashCommandBase } from "../../../@types/types";
+import { SlashCommandBase } from "../../../@types/types";
 import { InteractionContextType, MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { toStringId } from "../../utils/utils.js";
 import logger from "../../lib/Logger.js";
 import { Guilds, Mod_mail_messages, Mod_mail_threads } from "../../../@types/DatabaseTypes";
-
+import { ModMailMessageSentTo, ModMailMessageType, ModMailThreadStatus } from "../../lib/Enums.js";
 export default {
   memberPermissions: [PermissionsBitField.Flags.ManageMessages],
   data: new SlashCommandBuilder()

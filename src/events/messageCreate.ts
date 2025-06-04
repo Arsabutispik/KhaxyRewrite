@@ -1,4 +1,4 @@
-import { EventBase, ModMailMessageSentTo, ModMailMessageType, ModMailThreadStatus } from "../../@types/types";
+import { EventBase } from "../../@types/types";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -16,6 +16,7 @@ import dayjs from "dayjs";
 import logger from "../lib/Logger.js";
 import { bumpLeaderboard, toStringId } from "../utils/utils.js";
 import relativeTime from "dayjs/plugin/relativeTime.js";
+import { ModMailThreadStatus, ModMailMessageSentTo, ModMailMessageType } from "../lib/Enums.js";
 export default {
   name: Events.MessageCreate,
   async execute(message) {

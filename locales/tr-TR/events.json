@@ -39,7 +39,8 @@
     }
   },
   "guildMemberRemove": {
-    "noReason": "Sebep belirtilmedi."
+    "noReason": "Sebep belirtilmedi.",
+    "userLeft": "**Kullanıcı {{guild}} sunucusundan ayrıldı**"
   },
   "messageCreate": {
     "mod_mail": {

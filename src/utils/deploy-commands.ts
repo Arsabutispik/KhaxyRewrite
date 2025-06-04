@@ -93,5 +93,6 @@ const rest = new REST().setToken(process.env.TOKEN);
       error: error,
       discord: false,
     });
+    console.error(error);
   }
 })();

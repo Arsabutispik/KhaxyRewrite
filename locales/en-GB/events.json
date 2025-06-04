@@ -39,7 +39,8 @@
     }
   },
   "guildMemberRemove": {
-    "noReason": "No reason provided."
+    "no_reason": "No reason provided.",
+    "user_left": "**User has left {{guild}}**"
   },
   "messageCreate": {
     "mod_mail": {

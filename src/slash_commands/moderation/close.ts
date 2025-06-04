@@ -1,4 +1,5 @@
-import { ModMailThreadStatus, SlashCommandBase } from "../../../@types/types";
+import { SlashCommandBase } from "../../../@types/types";
+import { ModMailThreadStatus } from "../../lib/Enums.js";
 import {
   ActionRowBuilder,
   ButtonBuilder,

@@ -4,6 +4,8 @@ import { replacePlaceholders, toStringId } from "../utils/utils.js";
 import dayjs from "dayjs";
 import modLog from "../utils/modLog.js";
 import relativeTime from "dayjs/plugin/relativeTime.js";
+import { Mod_mail_threads } from "../../@types/DatabaseTypes";
+import { ModMailThreadStatus } from "../lib/Enums.js";
 
 export default {
   name: Events.GuildMemberRemove,
@@ -57,10 +59,29 @@ export default {
           action: "KICK",
           user: member.user,
           moderator: executor!,
-          reason: reason ?? member.client.i18next.getFixedT(guild_config.language)("events:guildMemberRemove.noReason"),
+          reason:
+            reason ?? member.client.i18next.getFixedT(guild_config.language)("events:guildMemberRemove.no_reason"),
         },
         member.client,
       );
+    }
+    const { rows: thread_rows } = await member.client.pgClient.query<Mod_mail_threads>(
+      "SELECT * FROM mod_mail_threads WHERE user_id = $1 and status in ($2, $3)",
+      [member.id, ModMailThreadStatus.OPEN, ModMailThreadStatus.SUSPENDED],
+    );
+    for (const thread of thread_rows) {
+      await member.client.pgClient.query(
+        "UPDATE mod_mail_threads SET status = $1, close_date = $2 WHERE channel_id = $3",
+        [ModMailThreadStatus.CLOSED, new Date(), thread.channel_id],
+      );
+      const channel = member.guild.channels.cache.get(toStringId(thread.channel_id));
+      if (channel?.isTextBased()) {
+        await channel.send(
+          member.client.i18next.getFixedT(guild_config.language)("events:guildMemberRemove.user_left", {
+            guild: member.guild.name,
+          }),
+        );
+      }
     }
   },
 } satisfies EventBase<Events.GuildMemberRemove>;

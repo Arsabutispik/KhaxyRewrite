@@ -1,4 +1,4 @@
-import { ModMailMessageSentTo, ModMailMessageType, ModMailThreadStatus, SlashCommandBase } from "../../../@types/types";
+import { SlashCommandBase } from "../../../@types/types";
 import {
   ChannelType,
   InteractionContextType,
@@ -11,7 +11,7 @@ import { toStringId } from "../../utils/utils.js";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime.js";
 import logger from "../../lib/Logger.js";
-
+import { ModMailMessageSentTo, ModMailMessageType, ModMailThreadStatus } from "../../lib/Enums.js";
 export default {
   memberPermissions: [PermissionsBitField.Flags.ManageMessages],
   clientPermissions: [PermissionsBitField.Flags.ManageChannels],
