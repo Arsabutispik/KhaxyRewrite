@@ -70,10 +70,10 @@ export default {
       [member.id, ModMailThreadStatus.OPEN, ModMailThreadStatus.SUSPENDED],
     );
     for (const thread of thread_rows) {
-      await member.client.pgClient.query(
-        "UPDATE mod_mail_threads SET status = $1, close_date = $2 WHERE channel_id = $3",
-        [ModMailThreadStatus.CLOSED, new Date(), thread.channel_id],
-      );
+      await member.client.pgClient.query("UPDATE mod_mail_threads SET status = $1 WHERE channel_id = $2", [
+        ModMailThreadStatus.CLOSED,
+        thread.channel_id,
+      ]);
       const channel = member.guild.channels.cache.get(toStringId(thread.channel_id));
       if (channel?.isTextBased()) {
         await channel.send(
