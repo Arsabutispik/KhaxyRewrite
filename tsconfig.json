@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "esnext",
     "module": "ESNext",
-    "lib": ["dom", "es6", "ESNext", "esnext.asynciterable"],
+    "moduleResolution": "bundler",
+    "lib": ["dom", "esnext", "esnext.asynciterable"],
     "skipLibCheck": true,
     "sourceMap": true,
     "outDir": "./dist",
-    "moduleResolution": "node",
     "removeComments": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -28,9 +28,10 @@
       "@customTypes": ["src/types/index.ts"],
       "@utils": ["src/utils/index.ts"],
       "@lib": ["src/lib/index.ts"],
-      "@configFunctions": ["src/config_functions/index.ts"],
-    }
+      "@configFunctions": ["src/config_functions/index.ts"]
+    },
+    "types": ["vitest"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "test/**/*", "tests/**/*"],
   "exclude": ["node_modules", "dist", "test", "tests"]
 }

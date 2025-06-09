@@ -1,4 +1,4 @@
-import { SlashCommandBase } from "@customTypes";
+import type { SlashCommandBase } from "@customTypes";
 import { ModMailThreadStatus } from "@constants";
 import {
   ActionRowBuilder,

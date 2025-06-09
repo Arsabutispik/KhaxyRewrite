@@ -38,3 +38,6 @@ jobs:
 
       - name: Validate i18n keys
         run: node scripts/ValidateI18nKeys.js
+
+      - name: Run Tests
+        run: pnpm test

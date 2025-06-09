@@ -12,7 +12,7 @@ import {
 import type { guilds as Guilds } from "@prisma/client";
 import { dynamicChannel } from "./register-config.js";
 import { dynamicRole } from "./role-config.js";
-import { TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { toStringId } from "@utils";
 import { getGuildConfig, updateGuildConfig } from "@database";
 

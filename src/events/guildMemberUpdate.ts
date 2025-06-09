@@ -1,4 +1,4 @@
-import { EventBase } from "@customTypes";
+import type { EventBase } from "@customTypes";
 import { AuditLogEvent, Events } from "discord.js";
 import { sleep, toStringId, modLog } from "@utils";
 import dayjs from "dayjs";

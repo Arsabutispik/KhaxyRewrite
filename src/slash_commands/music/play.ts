@@ -1,4 +1,4 @@
-import { SlashCommandBase } from "@customTypes";
+import type { SlashCommandBase } from "@customTypes";
 import { InteractionContextType, MessageFlags, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { useMainPlayer } from "discord-player";
 import { logger } from "@lib";

@@ -1,4 +1,5 @@
-import Transport, { TransportStreamOptions } from "winston-transport";
+import Transport from "winston-transport";
+import type { TransportStreamOptions } from "winston-transport";
 /* eslint-disable */
 
 export class DiscordTransport extends Transport {

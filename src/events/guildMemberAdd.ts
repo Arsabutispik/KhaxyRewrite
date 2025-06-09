@@ -1,4 +1,4 @@
-import { EventBase } from "@customTypes";
+import type { EventBase } from "@customTypes";
 import { ChannelType, Events, PermissionsBitField } from "discord.js";
 import { replacePlaceholders, toStringId } from "@utils";
 import { logger } from "@lib";

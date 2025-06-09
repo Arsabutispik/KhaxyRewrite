@@ -1,4 +1,4 @@
-import { SlashCommandBase } from "@customTypes";
+import type { SlashCommandBase } from "@customTypes";
 import { EmbedBuilder, InteractionContextType, SlashCommandBuilder } from "discord.js";
 import { useQueue } from "discord-player";
 import ProgressBar from "string-progressbar";

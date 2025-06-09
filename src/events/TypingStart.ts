@@ -1,4 +1,4 @@
-import { EventBase } from "@customTypes";
+import type { EventBase } from "@customTypes";
 import { ChannelType, Events } from "discord.js";
 import { toStringId } from "@utils";
 import { getModMailThreadByUser } from "@database";

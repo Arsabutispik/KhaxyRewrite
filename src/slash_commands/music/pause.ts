@@ -1,6 +1,6 @@
 import { InteractionContextType, MessageFlags, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { useTimeline } from "discord-player";
-import { SlashCommandBase } from "@customTypes";
+import type { SlashCommandBase } from "@customTypes";
 import { toStringId, vote } from "@utils";
 import { getGuildConfig } from "@database";
 

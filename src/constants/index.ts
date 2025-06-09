@@ -1,3 +1,3 @@
-export * from "./mod-mail.js";
-export * from "./punishments.js";
-export * from "./infraction.js";
+export * from "./mod-mail";
+export * from "./punishments";
+export * from "./infraction";

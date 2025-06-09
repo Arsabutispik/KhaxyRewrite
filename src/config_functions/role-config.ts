@@ -9,7 +9,7 @@ import {
   StringSelectMenuInteraction,
 } from "discord.js";
 import type { guilds as Guilds } from "@prisma/client";
-import { TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { toStringId } from "@utils";
 import { getGuildConfig, updateGuildConfig } from "@database";
 

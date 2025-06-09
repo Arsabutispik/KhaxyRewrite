@@ -1,4 +1,4 @@
-import { infractionParameters } from "@customTypes";
+import type { infractionParameters } from "@customTypes";
 import { createInfraction, getGuildConfig, deleteInfraction, updateInfraction } from "@database";
 
 export async function addInfraction({ guild, member, reason, type, moderator }: infractionParameters) {

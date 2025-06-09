@@ -1,4 +1,4 @@
-import { SlashCommandBase } from "@customTypes";
+import type { SlashCommandBase } from "@customTypes";
 import { EmbedBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { useQueue } from "discord-player";
 import _ from "lodash";

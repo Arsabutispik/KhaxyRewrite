@@ -1,4 +1,4 @@
-import { EventBase } from "@customTypes";
+import type { EventBase } from "@customTypes";
 import {
   ActionRowBuilder,
   ButtonBuilder,

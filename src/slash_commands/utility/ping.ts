@@ -1,5 +1,5 @@
 import { MessageFlags, SlashCommandBuilder } from "discord.js";
-import { SlashCommandBase } from "@customTypes";
+import type { SlashCommandBase } from "@customTypes";
 
 export default {
   data: new SlashCommandBuilder().setName("ping").setDescription("Check the bot's latency"),

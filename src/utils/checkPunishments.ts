@@ -1,10 +1,9 @@
 import dayjs from "dayjs";
 import { logger } from "@lib";
-import { toStringId, modLog } from "./index.js";
+import { toStringId, modLog } from "./index";
 import { Client } from "discord.js";
 import { deleteExpiredPunishments, getExpiredPunishments, getGuildConfig } from "@database";
 import { PunishmentType } from "@constants";
-
 export async function checkPunishments(client: Client) {
   // Fetch punishments that have expired
   const punishments = await getExpiredPunishments();
@@ -71,12 +70,17 @@ export async function checkPunishments(client: Client) {
         continue;
       }
       if (punishment.previous_roles) {
-        for (const role of punishment.previous_roles) {
-          if (!member.guild.roles.cache.get(toStringId(role)))
-            punishment.previous_roles?.splice(punishment.previous_roles?.indexOf(role), 1);
+        for (const role of [...punishment.previous_roles]) {
+          // spread operator to clone the array
+          if (!member.guild.roles.cache.get(toStringId(role))) {
+            const idx = punishment.previous_roles.indexOf(role);
+            if (idx !== -1) punishment.previous_roles.splice(idx, 1);
+          }
         }
+        console.log(punishment.previous_roles);
         await member.roles.add(punishment.previous_roles.map((role) => toStringId(role)));
       }
+
       if (guild_config.mute_role_id && guild.roles.cache.has(toStringId(guild_config.mute_role_id)))
         await member.roles.remove(toStringId(guild_config.mute_role_id));
     }

@@ -8,7 +8,7 @@ import {
 } from "discord.js";
 import { getGuildConfig, updateGuildConfig } from "@database";
 import type { guilds as Guilds } from "@prisma/client";
-import { TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { dynamicChannel, dynamicMessage } from "./register-config.js";
 
 export async function miscConfig(interaction: ChatInputCommandInteraction<"cached">) {

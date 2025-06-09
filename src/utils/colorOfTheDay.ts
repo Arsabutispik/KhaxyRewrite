@@ -1,4 +1,5 @@
-import { Client, ColorResolvable, Guild, PermissionsBitField } from "discord.js";
+import { Client, Guild, PermissionsBitField } from "discord.js";
+import type { ColorResolvable } from "discord.js";
 import { ntc, toStringId } from "@utils";
 import dayjs from "dayjs";
 import { logger } from "@lib";

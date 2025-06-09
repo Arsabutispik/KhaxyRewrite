@@ -1,5 +1,5 @@
 import { ActivityType, Events } from "discord.js";
-import { EventBase } from "@customTypes";
+import type { EventBase } from "@customTypes";
 import { logger } from "@lib";
 import { loadEmojis, recoverMissedCronjob } from "@utils";
 export default {
