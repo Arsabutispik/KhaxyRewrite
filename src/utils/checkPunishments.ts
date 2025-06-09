@@ -77,7 +77,6 @@ export async function checkPunishments(client: Client) {
             if (idx !== -1) punishment.previous_roles.splice(idx, 1);
           }
         }
-        console.log(punishment.previous_roles);
         await member.roles.add(punishment.previous_roles.map((role) => toStringId(role)));
       }
 

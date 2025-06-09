@@ -388,7 +388,6 @@ describe("checkPunishments", () => {
     mockClient.guilds.cache.set("123", mockGuild);
     mockGuild.members.cache.set("456", mockMember);
     await utils.checkPunishments(mockClient);
-    console.log("After checkPunishments previous_roles:", mockedExpiredPunishments[0].previous_roles);
 
     // After checkPunishments, "missingRole" should be removed from previous_roles
     expect(mockedExpiredPunishments[0].previous_roles).toEqual(["role1"]);
