@@ -1,14 +1,13 @@
-import { SlashCommandBase } from "../../../@types/types";
+import { SlashCommandBase } from "@customTypes";
 import { InteractionContextType, MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import dayjs from "dayjs";
 import dayjsduration from "dayjs/plugin/duration.js";
 import relativeTime from "dayjs/plugin/relativeTime.js";
-import modLog from "../../utils/modLog.js";
+import { modLog, toStringId, addInfraction } from "@utils";
 import "dayjs/locale/tr.js";
-import logger from "../../lib/Logger.js";
-import { toStringId } from "../../utils/utils.js";
-import { Guilds } from "../../../@types/DatabaseTypes";
-import { addInfraction } from "../../utils/infractionHandler.js";
+import { logger } from "@lib";
+import { createPunishment, getGuildConfig } from "@database";
+import { InfractionType, PunishmentType } from "@constants";
 
 export default {
   memberPermissions: [PermissionsBitField.Flags.BanMembers],
@@ -75,10 +74,7 @@ export default {
     dayjs.extend(dayjsduration);
     dayjs.extend(relativeTime);
     const client = interaction.client;
-    const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE guild_id = $1", [
-      interaction.guild!.id,
-    ]);
-    const guild_config = rows[0];
+    const guild_config = await getGuildConfig(interaction.guildId);
     if (!guild_config) {
       await interaction.reply({
         content: "This server is not registered in the database. This shouldn't happen, please contact developers",
@@ -131,22 +127,18 @@ export default {
       });
 
       try {
-        await interaction.client.pgClient.query(
-          "INSERT INTO punishments (expires, type, user_id, guild_id, staff_id, created_at) VALUES ($1, $2, $3, $4, $5, $6)",
-          [
-            new Date(Date.now() + dayjsduration.asMilliseconds()),
-            "ban",
-            user.id,
-            interaction.guild!.id,
-            interaction.user.id,
-            new Date(),
-          ],
-        );
+        await createPunishment(interaction.guildId, {
+          type: PunishmentType.BAN,
+          created_at: new Date(),
+          expires_at: new Date(Date.now() + dayjsduration.asMilliseconds()),
+          user_id: BigInt(user.id),
+          staff_id: BigInt(interaction.user.id),
+        });
         await addInfraction({
           guild: interaction.guild!,
           member: user.id,
           reason,
-          type: "ban",
+          type: InfractionType.BAN,
           moderator: interaction.user.id,
           client,
         });
@@ -233,7 +225,7 @@ export default {
           guild: interaction.guild,
           member: user.id,
           reason,
-          type: "ban",
+          type: InfractionType.BAN,
           moderator: interaction.user.id,
           client,
         });

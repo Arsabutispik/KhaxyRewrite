@@ -1,9 +1,9 @@
-import { SlashCommandBase } from "../../../@types/types";
+import { SlashCommandBase } from "@customTypes";
 import { InteractionContextType, MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
-import { toStringId } from "../../utils/utils.js";
-import logger from "../../lib/Logger.js";
-import { Guilds, Mod_mail_messages, Mod_mail_threads } from "../../../@types/DatabaseTypes";
-import { ModMailMessageSentTo, ModMailMessageType, ModMailThreadStatus } from "../../lib/Enums.js";
+import { toStringId } from "@utils";
+import { logger } from "@lib";
+import { ModMailMessageSentTo, ModMailMessageType, ModMailThreadStatus } from "@constants";
+import { createModMailMessage, getGuildConfig, getModMailMessages, getModMailThread } from "@database";
 export default {
   memberPermissions: [PermissionsBitField.Flags.ManageMessages],
   data: new SlashCommandBuilder()
@@ -56,15 +56,7 @@ export default {
     ),
   async execute(interaction) {
     const client = interaction.client;
-    const { rows: thread_rows } = await client.pgClient.query<Mod_mail_threads>(
-      "SELECT * FROM mod_mail_threads WHERE channel_id = $1",
-      [interaction.channelId],
-    );
-    const threads = thread_rows[0];
-    const { rows: guild_rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
-      interaction.guildId,
-    ]);
-    const guild_config = guild_rows[0];
+    const guild_config = await getGuildConfig(interaction.guildId);
     if (!guild_config) {
       await interaction.reply({
         content: "This server is not registered in the database. This shouldn't happen, please contact developers",
@@ -73,37 +65,31 @@ export default {
       return;
     }
     const t = client.i18next.getFixedT(guild_config.language, "commands", "reply");
-    if (!threads) return interaction.reply(t("no_thread"));
-    if (threads.status === ModMailThreadStatus.SUSPENDED) return interaction.reply(t("suspended"));
+    const mod_mail_thread = await getModMailThread(interaction.channelId);
+    if (!mod_mail_thread) return interaction.reply(t("no_thread"));
+    if (mod_mail_thread.status === ModMailThreadStatus.SUSPENDED) return interaction.reply(t("suspended"));
     const message = interaction.options.getString("message", true);
     const anonymous = interaction.options.getBoolean("anonymous");
-    const member = await interaction.guild!.members.fetch(toStringId(threads.user_id)).catch(() => null);
+    const member = await interaction.guild!.members.fetch(toStringId(mod_mail_thread.user_id)).catch(() => null);
     if (!member) return interaction.reply(t("member_not_found"));
     await interaction.deferReply({ flags: MessageFlagsBitField.Flags.Ephemeral });
-    const { rows: messages } = await client.pgClient.query<Mod_mail_messages>(
-      "SELECT * FROM mod_mail_messages WHERE channel_id = $1",
-      [interaction.channelId],
-    );
+    const messages = await getModMailMessages(interaction.channelId);
     if (!messages) return interaction.reply(t("no_messages"));
     const { id } = await member.send({
       content: `\`${messages.filter((row) => row.author_type === "staff").length + 1}\` **(${interaction.member.roles.highest.name})** **[${anonymous ? "(Anonymous)" : interaction.member.user.tag}]**: ${message}`,
       files: interaction.options.getAttachment("attachment") ? [interaction.options.getAttachment("attachment")!] : [],
     });
     try {
-      await client.pgClient.query(
-        "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, sent_to, channel_id, message_id) VALUES ($1 ,$2, $3, $4, $5, $6, $7)",
-        [
-          interaction.member.id,
-          new Date(),
-          ModMailMessageType.STAFF,
-          interaction.options.getAttachment("attachment")
-            ? `${message} ${interaction.options.getAttachment("attachment")?.url}`
-            : message,
-          ModMailMessageSentTo.USER,
-          interaction.channel!.id,
-          id,
-        ],
-      );
+      await createModMailMessage(interaction.channelId, {
+        author_id: BigInt(interaction.member.id),
+        sent_at: new Date(),
+        author_type: ModMailMessageType.STAFF,
+        content: interaction.options.getAttachment("attachment")
+          ? `${message} ${interaction.options.getAttachment("attachment")?.url}`
+          : message,
+        sent_to: ModMailMessageSentTo.USER,
+        message_id: BigInt(id),
+      });
     } catch (e) {
       logger.error({
         message: "Error while inserting a new mod mail message.",

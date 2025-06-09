@@ -3,10 +3,9 @@ import relativeTime from "dayjs/plugin/relativeTime.js";
 import "dayjs/locale/en.js";
 import "dayjs/locale/tr.js";
 import { ChannelType, Client, Guild, PartialUser, User } from "discord.js";
-import logger from "../lib/Logger.js";
-import process from "node:process";
-import { Guilds } from "../../@types/DatabaseTypes";
-import { toStringId } from "./utils.js";
+import { logger } from "@lib";
+import { toStringId } from "@utils";
+import { createGuildConfig, getGuildConfig, updateGuildConfig } from "@database";
 
 // Define the possible actions for the mod log
 type actions =
@@ -21,7 +20,7 @@ type actions =
   | "TIMEOUT"
   | "UNMUTE";
 
-export default async (
+export async function modLog(
   data: {
     guild: Guild;
     user: User | PartialUser;
@@ -32,22 +31,33 @@ export default async (
     caseID?: number;
   },
   client: Client,
-) => {
+) {
   const { guild, user, action, moderator, reason, duration, caseID } = data;
   // Fetch guild configuration from the database
-  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [guild.id]);
-  const guild_data = rows[0];
+  const guild_data = await getGuildConfig(guild.id);
   // If no guild configuration is found, create a new one
   if (!guild_data) {
     try {
-      logger.warn(`Guild config for ${guild.id} not found. Creating a new one...`);
-      await client.pgClient.query(
-        "INSERT INTO guilds (id, language, case_id, days_to_kick, default_expiry, mod_mail_message) VALUES ($1, 'en-GB', 1, 0, 0, 'TThank you for your message! Our mod team will reply to you here as soon as possible.')",
-        [guild.id, process.env.PASSPHRASE],
-      );
-      logger.info(`Guild config for ${guild.id} created successfully.`);
+      logger.log({
+        level: "warning",
+        message: `No guild config found for ${guild.id}. Creating a new one.`,
+        discord: false,
+      });
+      await createGuildConfig(guild.id, {});
+      logger.log({
+        level: "info",
+        message: `Guild config for ${guild.id} created successfully.`,
+        discord: false,
+      });
     } catch (error) {
-      logger.error(error);
+      logger.log({
+        level: "error",
+        message: `Error creating guild config for ${guild.id}`,
+        error: error,
+        meta: {
+          guildID: guild.id,
+        },
+      });
     }
     return { message: client.i18next.getFixedT("en")("mod_log.function_errors.no_guild_config"), type: "WARNING" };
   }
@@ -126,13 +136,18 @@ export default async (
       await channel.send({ content: message });
     }
   } catch (error) {
-    logger.error(error);
-    logger.info(
-      `Modlog channel for ${guild.name} (${guild.id}) not found. Deleting the modlog channel id from the database...`,
-    );
+    logger.log({
+      level: "error",
+      message: `Modlog channel for ${guild.name} (${guild.id}) not found. Deleting the modlog channel id from the database...`,
+      error: error,
+    });
     try {
-      await client.pgClient.query("UPDATE guilds SET mod_log_channel_id = NULL WHERE id = $1", [guild.id]);
-      logger.info(`Modlog channel id for ${guild.id} deleted successfully.`);
+      await updateGuildConfig(guild.id, { mod_log_channel_id: null });
+      logger.log({
+        level: "info",
+        message: `Modlog channel ID deleted for ${guild.name} (${guild.id})`,
+        discord: false,
+      });
     } catch (error) {
       logger.error(error);
     }
@@ -142,7 +157,7 @@ export default async (
   // Update the case ID in the database if the action is not "CHANGES"
   if (action !== "CHANGES") {
     try {
-      await client.pgClient.query("UPDATE guilds SET case_id = $1 WHERE id = $2", [caseNumber + 1, guild.id]);
+      await updateGuildConfig(guild.id, { case_id: caseNumber + 1 });
     } catch (error) {
       logger.log({
         level: "error",
@@ -156,4 +171,4 @@ export default async (
       return { message: t("mod_log.function_errors.case_id_error"), type: "ERROR" };
     }
   }
-};
+}

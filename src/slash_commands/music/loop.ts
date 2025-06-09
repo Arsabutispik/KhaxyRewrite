@@ -1,8 +1,8 @@
-import { SlashCommandBase } from "../../../@types/types";
+import { SlashCommandBase } from "@customTypes";
 import { InteractionContextType, MessageFlags, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { QueueRepeatMode, useQueue } from "discord-player";
-import { Guilds } from "../../../@types/DatabaseTypes";
-import { toStringId, vote } from "../../utils/utils.js";
+import { toStringId, vote } from "@utils";
+import { getGuildConfig } from "@database";
 
 export default {
   data: new SlashCommandBuilder()
@@ -51,10 +51,7 @@ export default {
         ),
     ),
   async execute(interaction) {
-    const { rows } = await interaction.client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
-      interaction.guild.id,
-    ]);
-    const guild_config = rows[0];
+    const guild_config = await getGuildConfig(interaction.guildId);
     if (!guild_config) {
       return interaction.reply({
         content: "This server is not registered in the database. This shouldn't happen, please contact developers",
@@ -76,18 +73,6 @@ export default {
       });
     }
     const loopMode = interaction.options.getNumber("mode", true) as 0 | 1 | 2;
-    const state = {
-      "en-UK": {
-        [QueueRepeatMode.OFF]: "turn off the loop",
-        [QueueRepeatMode.TRACK]: "loop the current track",
-        [QueueRepeatMode.QUEUE]: "loop the entire queue",
-      },
-      "tr-TR": {
-        [QueueRepeatMode.OFF]: "döngüyü kapatmak istiyor",
-        [QueueRepeatMode.TRACK]: "şu anki parçayı döngüye almak istiyor",
-        [QueueRepeatMode.QUEUE]: "tüm sırayı döngüye almak istiyor",
-      },
-    };
     const filter = interaction.member.voice.channel.members.filter(
       (member) =>
         !member.user.bot && !member.voice.selfDeaf && !member.voice.serverDeaf && member.id !== interaction.member.id,
@@ -110,7 +95,7 @@ export default {
         content: t("loop_vote", {
           user: interaction.user.toString(),
           count: requiredVotes,
-          state: state[guild_config.language][loopMode],
+          state: t(`state.${loopMode}`),
         }),
         withResponse: true,
       });

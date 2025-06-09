@@ -1,8 +1,8 @@
-import { SlashCommandBase } from "../../../@types/types";
+import { SlashCommandBase } from "@customTypes";
 import { SlashCommandBuilder, InteractionContextType, MessageFlags, PermissionsBitField } from "discord.js";
-import { Guilds } from "../../../@types/DatabaseTypes";
 import { useQueue } from "discord-player";
-import { toStringId, vote } from "../../utils/utils.js";
+import { toStringId, vote } from "@utils";
+import { getGuildConfig } from "@database";
 
 export default {
   data: new SlashCommandBuilder()
@@ -16,10 +16,7 @@ export default {
     })
     .setContexts(InteractionContextType.Guild),
   async execute(interaction) {
-    const { rows } = await interaction.client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
-      interaction.guild.id,
-    ]);
-    const guild_config = rows[0];
+    const guild_config = await getGuildConfig(interaction.guildId);
     if (!guild_config) {
       return interaction.reply({
         content: "This server is not registered in the database. This shouldn't happen, please contact developers",

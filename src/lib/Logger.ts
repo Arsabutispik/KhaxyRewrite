@@ -1,5 +1,5 @@
 import { createLogger, format, transports } from "winston";
-import DiscordTransport from "./DiscordTransport.js";
+import { DiscordTransport } from "./DiscordTransport.js";
 import "dotenv/config.js";
 import _ from "lodash";
 
@@ -28,4 +28,4 @@ const logger = createLogger({
   ],
   format: format.combine(format.metadata(), format.timestamp()),
 });
-export default logger;
+export { logger };

@@ -1,7 +1,7 @@
 import Transport, { TransportStreamOptions } from "winston-transport";
 /* eslint-disable */
 
-export default class DiscordTransport extends Transport {
+export class DiscordTransport extends Transport {
   // Webhook obtained from Discord
   private readonly webhook: string;
 

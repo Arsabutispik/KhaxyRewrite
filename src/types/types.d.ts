@@ -8,16 +8,14 @@ import {
   Snowflake,
   Client,
 } from "discord.js";
-import { Client as PgClient } from "pg";
 import { i18n } from "i18next";
-import PlayerConfig from "../src/lib/PlayerConfig";
+import { Config } from "@lib";
 declare module "discord.js" {
   interface Client {
     slashCommands: Collection<string, SlashCommandBase>;
-    pgClient: PgClient;
     i18next: i18n;
     allEmojis: Collection<string, { name: string; format: string }>;
-    config: typeof PlayerConfig;
+    config: typeof Config;
   }
 }
 export interface SlashCommandBase {

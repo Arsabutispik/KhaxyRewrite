@@ -1,8 +1,8 @@
 import { InteractionContextType, MessageFlags, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { useTimeline } from "discord-player";
-import { Guilds } from "../../../@types/DatabaseTypes";
-import { SlashCommandBase } from "../../../@types/types";
-import { toStringId, vote } from "../../utils/utils.js";
+import { SlashCommandBase } from "@customTypes";
+import { toStringId, vote } from "@utils";
+import { getGuildConfig } from "@database";
 
 export default {
   data: new SlashCommandBuilder()
@@ -16,10 +16,7 @@ export default {
     })
     .setContexts(InteractionContextType.Guild),
   async execute(interaction) {
-    const { rows } = await interaction.client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
-      interaction.guildId,
-    ]);
-    const guild_config = rows[0];
+    const guild_config = await getGuildConfig(interaction.guildId);
     if (!guild_config) {
       await interaction.reply({
         content: "This server is not configured yet.",

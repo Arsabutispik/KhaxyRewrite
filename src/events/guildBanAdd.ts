@@ -1,17 +1,14 @@
-import { EventBase } from "../../@types/types";
+import { EventBase } from "@customTypes";
 import { AuditLogEvent, Events, PermissionsBitField } from "discord.js";
-import modLog from "../utils/modLog.js";
-import logger from "../lib/Logger.js";
-import { toStringId } from "../utils/utils.js";
-import { Guilds } from "../../@types/DatabaseTypes";
+import { modLog, toStringId } from "@utils";
+import { logger } from "@lib";
+import { getGuildConfig } from "@database";
 
 export default {
   name: Events.GuildBanAdd,
   async execute(ban) {
-    // Fetch guild data from the database
-    const { rows } = await ban.client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [ban.guild.id]);
-    // Extract the guild configuration from the database result
-    const guild_config = rows[0];
+    // Get the guild data from the database
+    const guild_config = await getGuildConfig(ban.guild.id);
 
     // If no guild data is found, exit the function
     if (!guild_config) return;

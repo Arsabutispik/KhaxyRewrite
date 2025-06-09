@@ -7,12 +7,11 @@ import {
   StringSelectMenuBuilder,
 } from "discord.js";
 import { dynamicChannel, dynamicMessage } from "./register-config.js";
-import { Guilds } from "../../@types/DatabaseTypes";
+import { getGuildConfig } from "@database";
 
-export default async function welcomeLeaveConfig(interaction: ChatInputCommandInteraction<"cached">) {
+export async function welcomeLeaveConfig(interaction: ChatInputCommandInteraction<"cached">) {
   const client = interaction.client;
-  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guildId]);
-  const guild_config = rows[0];
+  const guild_config = await getGuildConfig(interaction.guildId);
   if (!guild_config) {
     await interaction.reply({
       content: "Guild config not found. Please contact the bot developers as this shouldn't happen.",

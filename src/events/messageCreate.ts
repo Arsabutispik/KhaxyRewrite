@@ -1,4 +1,4 @@
-import { EventBase } from "../../@types/types";
+import { EventBase } from "@customTypes";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -11,37 +11,36 @@ import {
   ButtonStyle,
   EmbedBuilder,
 } from "discord.js";
-import { Bump_leaderboard, Guilds, Mod_mail_threads } from "../../@types/DatabaseTypes";
 import dayjs from "dayjs";
-import logger from "../lib/Logger.js";
-import { bumpLeaderboard, toStringId } from "../utils/utils.js";
+import { logger } from "@lib";
+import { bumpLeaderboard, toStringId } from "@utils";
 import relativeTime from "dayjs/plugin/relativeTime.js";
-import { ModMailThreadStatus, ModMailMessageSentTo, ModMailMessageType } from "../lib/Enums.js";
+import { ModMailThreadStatus, ModMailMessageSentTo, ModMailMessageType } from "@constants";
+import {
+  createModMailMessage,
+  createModMailThread,
+  getGuildConfig,
+  getModMailThread,
+  getModMailThreadsByUser,
+  updateBumpLeaderboard,
+} from "@database";
 export default {
   name: Events.MessageCreate,
   async execute(message) {
     if (message.channel.type === ChannelType.DM) {
       if (message.author.bot) return;
       const client = message.client;
-      const { rows } = await client.pgClient.query<Mod_mail_threads>(
-        "SELECT * FROM mod_mail_threads WHERE user_id = $1 AND status = $2",
-        [message.author.id, ModMailThreadStatus.OPEN],
-      );
-      if (rows.length === 0) {
+      const threads = await getModMailThreadsByUser(message.author.id, ModMailThreadStatus.OPEN);
+      if (threads.length === 0) {
         const shared_guilds = client.guilds.cache.filter(
           async (guild) =>
             guild.members.cache.has(message.author.id) &&
-            guild.channels.cache.get(
-              (
-                await client.pgClient.query<Guilds>("SELECT mod_mail_channel_id FROM guilds WHERE id = $1", [guild.id])
-              ).rows[0]!.mod_mail_channel_id.toString(),
-            ),
+            guild.channels.cache.get((await getGuildConfig(guild.id))?.mod_mail_channel_id?.toString() || ""),
         );
         if (shared_guilds.size === 0) return;
         if (shared_guilds.size === 1) {
           const guild = shared_guilds.first()!;
-          const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [guild.id]);
-          const guild_config = rows[0];
+          const guild_config = await getGuildConfig(guild.id);
           if (!guild_config) {
             await message.reply("The server data is unavailable.");
             return;
@@ -134,10 +133,12 @@ export default {
             return;
           }
           try {
-            await client.pgClient.query<Mod_mail_threads>(
-              "INSERT INTO mod_mail_threads (channel_id, guild_id, user_id, status, created_at) VALUES ($1, $2, $3, $4, $5)",
-              [channel.id, guild.id, message.author.id, ModMailThreadStatus.OPEN, new Date().toISOString()],
-            );
+            await createModMailThread(guild.id, {
+              channel_id: BigInt(channel.id),
+              user_id: BigInt(message.author.id),
+              status: ModMailThreadStatus.OPEN,
+              created_at: new Date().toISOString(),
+            });
           } catch (e) {
             logger.error({ message: "Error inserting mod mail thread", error: e });
             await message.reply(t("error_inserting"));
@@ -145,32 +146,14 @@ export default {
           }
 
           try {
-            await client.pgClient.query(
-              "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, sent_to, channel_id, message_id) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-              [
-                message.author.id,
-                new Date().toISOString(),
-                ModMailMessageType.USER,
-                message.attachments.size
-                  ? message.content + "\n" + message.attachments.map((a) => a.url).join("\n")
-                  : message.content,
-                ModMailMessageSentTo.THREAD,
-                channel.id,
-                message.id,
-              ],
-            );
-            await client.pgClient.query(
-              "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, sent_to, channel_id, message_id) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-              [
-                client.user!.id,
-                new Date().toISOString(),
-                ModMailMessageType.CLIENT,
-                bot_message.content,
-                ModMailMessageSentTo.THREAD,
-                channel.id,
-                bot_message.id,
-              ],
-            );
+            await createModMailMessage(channel.id, {
+              author_id: BigInt(message.author.id),
+              sent_at: new Date().toISOString(),
+              author_type: ModMailMessageType.USER,
+              content: bot_message.content,
+              sent_to: ModMailMessageSentTo.THREAD,
+              message_id: BigInt(message.id),
+            });
           } catch (e) {
             logger.error({ message: "Error inserting mod mail message", error: e });
             await message.reply(t("error_inserting"));
@@ -219,8 +202,7 @@ export default {
           await message_component.editReply({ content: "The server you selected is not available", components: [] });
           return;
         }
-        const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [guild.id]);
-        const guild_config = rows[0];
+        const guild_config = await getGuildConfig(guild.id);
         if (!guild_config) {
           await message_component.editReply({ content: "The server you selected is not available", components: [] });
           return;
@@ -285,10 +267,12 @@ export default {
           return;
         }
         try {
-          await client.pgClient.query<Mod_mail_threads>(
-            "INSERT INTO mod_mail_threads (channel_id, guild_id, user_id, status, created_at) VALUES ($1, $2, $3, $4, $5)",
-            [channel.id, guild.id, message.author.id, ModMailThreadStatus.OPEN, new Date().toISOString()],
-          );
+          await createModMailThread(guild.id, {
+            channel_id: BigInt(channel.id),
+            user_id: BigInt(message.author.id),
+            status: ModMailThreadStatus.OPEN,
+            created_at: new Date().toISOString(),
+          });
         } catch (e) {
           logger.error({
             message: "Error upon inserting mod mail thread",
@@ -302,32 +286,24 @@ export default {
           `**[${message.author.tag}]**: ${message.content}\n${message.attachments?.map((attachment) => attachment.url).join("\n")}`,
         );
         try {
-          await client.pgClient.query(
-            "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, sent_to, channel_id, message_id) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-            [
-              message.author.id,
-              new Date().toISOString(),
-              ModMailMessageType.USER,
-              message.attachments.size
-                ? message.content + "\n" + message.attachments.map((a) => a.url).join("\n")
-                : message.content,
-              ModMailMessageSentTo.THREAD,
-              channel.id,
-              message.id,
-            ],
-          );
-          await client.pgClient.query(
-            "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, sent_to, channel_id, message_id) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-            [
-              client.user!.id,
-              new Date().toISOString(),
-              ModMailMessageType.CLIENT,
-              bot_message.content,
-              ModMailMessageSentTo.THREAD,
-              channel.id,
-              bot_message.id,
-            ],
-          );
+          await createModMailMessage(channel.id, {
+            author_id: BigInt(message.author.id),
+            sent_at: new Date().toISOString(),
+            author_type: ModMailMessageType.USER,
+            content: message.attachments.size
+              ? message.content + "\n" + message.attachments.map((a) => a.url).join("\n")
+              : message.content,
+            sent_to: ModMailMessageSentTo.THREAD,
+            message_id: BigInt(message.id),
+          });
+          await createModMailMessage(channel.id, {
+            author_id: BigInt(client.user!.id),
+            sent_at: new Date().toISOString(),
+            author_type: ModMailMessageType.CLIENT,
+            content: bot_message.content,
+            sent_to: ModMailMessageSentTo.THREAD,
+            message_id: BigInt(bot_message.id),
+          });
         } catch (e) {
           logger.error({
             message: "Error upon inserting mod mail message",
@@ -336,10 +312,7 @@ export default {
           await message_component.followUp({ content: t("error_inserting"), components: [] });
         }
       } else {
-        const { rows: guild_rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
-          rows[0].guild_id,
-        ]);
-        const guild_config = guild_rows[0];
+        const guild_config = await getGuildConfig(threads[0].guild_id.toString());
         if (!guild_config) {
           await message.reply("The server data is unavailable.");
           return;
@@ -349,7 +322,7 @@ export default {
           await message.reply("The server is unavailable.");
           return;
         }
-        const channel = guild.channels.cache.get(toStringId(rows[0].channel_id));
+        const channel = guild.channels.cache.get(toStringId(threads[0].channel_id));
         if (!channel || !channel.isTextBased()) {
           await message.reply("The channel is unavailable.");
           return;
@@ -359,20 +332,16 @@ export default {
           await channel.send(
             `**[${message.author.tag}]**: ${message.content}\n${message.attachments?.map((attachment) => attachment.url).join("\n")}`,
           );
-          await client.pgClient.query(
-            "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, sent_to, channel_id, message_id) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-            [
-              message.author.id,
-              new Date().toISOString(),
-              ModMailMessageType.USER,
-              message.attachments.size
-                ? message.content + "\n" + message.attachments.map((a) => a.url).join("\n")
-                : message.content,
-              ModMailMessageSentTo.THREAD,
-              channel.id,
-              message.id,
-            ],
-          );
+          await createModMailMessage(channel.id, {
+            author_id: BigInt(message.author.id),
+            sent_at: new Date().toISOString(),
+            author_type: ModMailMessageType.USER,
+            content: message.attachments.size
+              ? message.content + "\n" + message.attachments.map((a) => a.url).join("\n")
+              : message.content,
+            sent_to: ModMailMessageSentTo.THREAD,
+            message_id: BigInt(message.id),
+          });
         } catch (e) {
           logger.error({
             message: "Error upon inserting mod mail message",
@@ -383,38 +352,32 @@ export default {
         }
         await message.react(client.allEmojis.get(client.config.Emojis.confirm)!.format);
       }
-    } else if (message.inGuild() && message.channel.type === ChannelType.GuildText) {
+    } else if (
+      message.inGuild() &&
+      message.channel.type === ChannelType.GuildText &&
+      (await getModMailThread(message.channel.id))
+    ) {
       if (message.author.bot) return;
       const client = message.client;
-      const { rows: guild_rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
-        message.guild.id,
-      ]);
-      const guild_config = guild_rows[0];
+      const guild_config = await getGuildConfig(message.guild.id);
       if (!guild_config) {
         await message.reply("This server is not in the database.");
         return;
       }
       const t = client.i18next.getFixedT(guild_config.language, "events", "messageCreate.mod_mail");
-      const { rows } = await client.pgClient.query<Mod_mail_threads>(
-        "SELECT * FROM mod_mail_threads WHERE channel_id = $1",
-        [message.channel.id],
-      );
-      if (!rows[0]) return;
+      const thread = await getModMailThread(message.channel.id);
+      if (!thread) return;
       try {
-        await client.pgClient.query(
-          "INSERT INTO mod_mail_messages (author_id, sent_at, author_type, content, sent_to, channel_id, message_id) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-          [
-            message.author.id,
-            new Date().toISOString(),
-            message.author.bot ? ModMailMessageType.CLIENT : ModMailMessageType.USER,
-            message.attachments.size
-              ? message.content + "\n" + message.attachments.map((a) => a.url).join("\n")
-              : message.content,
-            ModMailMessageSentTo.THREAD,
-            message.channel.id,
-            message.id,
-          ],
-        );
+        await createModMailMessage(message.channel.id, {
+          author_id: BigInt(message.author.id),
+          sent_at: new Date().toISOString(),
+          author_type: message.author.bot ? ModMailMessageType.CLIENT : ModMailMessageType.STAFF,
+          content: message.attachments.size
+            ? message.content + "\n" + message.attachments.map((a) => a.url).join("\n")
+            : message.content,
+          sent_to: ModMailMessageSentTo.THREAD,
+          message_id: BigInt(message.id),
+        });
       } catch (e) {
         logger.error({
           message: "Error upon inserting mod mail message",
@@ -425,10 +388,7 @@ export default {
       }
     }
     if (!message.inGuild()) return;
-    const { rows: guild_rows } = await message.client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
-      message.guild.id,
-    ]);
-    const guild_config = guild_rows[0];
+    const guild_config = await getGuildConfig(message.guild.id);
     if (!guild_config) return;
     const leaderboard = guild_config.bump_leaderboard_channel_id;
     if (
@@ -437,21 +397,7 @@ export default {
       message.author.id === "302050872383242240" &&
       message.channel.id === toStringId(leaderboard)
     ) {
-      const rows = await message.client.pgClient.query<Bump_leaderboard>(
-        "SELECT * FROM bump_leaderboard WHERE guild_id = $1 AND user_id = $2",
-        [message.guild.id, message.author.id],
-      );
-      if (rows.rowCount === 0) {
-        await message.client.pgClient.query(
-          "INSERT INTO bump_leaderboard (guild_id, user_id, bump_count) VALUES ($1, $2, $3)",
-          [message.guild.id, message.author.id, 1],
-        );
-      } else {
-        await message.client.pgClient.query(
-          "UPDATE bump_leaderboard SET bump_count = bump_count + 1 WHERE guild_id = $1 AND user_id = $2",
-          [message.guild.id, message.author.id],
-        );
-      }
+      await updateBumpLeaderboard(message.guild.id, message.author.id);
       await message.delete();
       const result = await bumpLeaderboard(message.client, message.guild.id, message.author);
       if (result?.error) {

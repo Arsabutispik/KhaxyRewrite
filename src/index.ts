@@ -3,23 +3,17 @@ import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath, pathToFileURL } from "url";
-import { RegisterSlashCommands } from "./utils/registry.js";
-import i18next from "i18next";
-import FsBackend from "i18next-fs-backend";
-import pg from "pg";
-import logger from "./lib/Logger.js";
+import i18next, { initI18n } from "./i18n/index.js";
+import { logger } from "@lib";
 import { Player } from "discord-player";
 import { YoutubeiExtractor } from "discord-player-youtubei";
 import { SoundcloudExtractor } from "discord-player-soundcloud";
 import process from "node:process";
 import { CronJob } from "cron";
-import checkPunishments from "./utils/checkPunishments.js";
-import colorOfTheDay from "./utils/colorOfTheDay.js";
-import checkExpiredThreads from "./utils/checkExpiredThreads.js";
-import { Guilds } from "../@types/DatabaseTypes";
+import { checkPunishments, colorUpdate, checkExpiredThreads, RegisterSlashCommands } from "@utils";
+import { getGuildConfig } from "@database";
 
 dotenv.config();
-const { Client: PgClient } = pg;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -35,6 +29,8 @@ const client = new Client({
   ],
   partials: [Partials.Channel],
 });
+await initI18n();
+client.i18next = i18next;
 const player = new Player(client);
 await player.extractors.register(YoutubeiExtractor, {
   streamOptions: {
@@ -43,55 +39,9 @@ await player.extractors.register(YoutubeiExtractor, {
   generateWithPoToken: true,
 });
 await player.extractors.register(SoundcloudExtractor, {});
-const pgClient = new PgClient({
-  user: process.env.DB_USER,
-  host: "localhost",
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: 5432,
-});
-(async () => {
-  await pgClient.connect();
-  const res = await pgClient.query("SELECT $1::text as connected", ["Connection to postgres successful!"]);
-  logger.log({
-    level: "info",
-    message: res.rows[0].connected,
-    discord: false,
-  });
-})();
-await i18next.use(FsBackend).init(
-  {
-    initAsync: false,
-    fallbackLng: "en-GB",
-    lng: "en-GB",
-    preload: ["en-GB", "tr-TR"],
-    ns: ["translation", "events", "permissions", "commands"],
-    defaultNS: "translation",
-    backend: {
-      loadPath: "locales/{{lng}}/{{ns}}.json",
-    },
-    interpolation: { escapeValue: false },
-    load: "currentOnly",
-  },
-  (err) => {
-    if (err)
-      return logger.log({
-        level: "error",
-        message: err,
-        discord: false,
-      });
-    logger.log({
-      level: "info",
-      message: "i18next has been initialized.",
-      discord: false,
-    });
-    client.i18next = i18next;
-  },
-);
 client.slashCommands = new Collection();
-client.pgClient = pgClient;
-client.config = (await import("./lib/PlayerConfig.js")).default;
 client.allEmojis = new Collection();
+client.config = (await import("@lib")).Config;
 await RegisterSlashCommands(client);
 const eventsPath = path.join(__dirname, "events");
 const eventFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith(".js"));
@@ -106,9 +56,9 @@ for (const file of eventFiles) {
   }
 }
 player.events.on("playerStart", async (queue, track) => {
-  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [queue.metadata.guild.id]);
-  if (!rows.length) return;
-  const t = client.i18next.getFixedT(rows[0].language);
+  const guild_config = await getGuildConfig(queue.guild.id);
+  if (!guild_config) return;
+  const t = client.i18next.getFixedT(guild_config.language);
   const embed = new EmbedBuilder()
     .setAuthor({ name: t("events:playerStart.embed.author"), url: track.url })
     .setColor("Random")
@@ -134,26 +84,26 @@ player.events.on("playerStart", async (queue, track) => {
 });
 
 player.events.on("emptyChannel", async (queue) => {
-  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [queue.metadata.guild.id]);
-  if (!rows.length) return;
-  const t = client.i18next.getFixedT(rows[0].language, "events", "emptyChannel");
+  const guild_config = await getGuildConfig(queue.guild.id);
+  if (!guild_config) return;
+  const t = client.i18next.getFixedT(guild_config.language, "events", "emptyChannel");
   const embed = new EmbedBuilder().setDescription(t("embed.description")).setTitle(t("embed.title")).setColor("Red");
   queue.metadata.channel.send({ embeds: [embed] });
 });
 
 player.events.on("emptyQueue", async (queue) => {
-  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [queue.metadata.guild.id]);
-  if (!rows.length) return;
-  const t = client.i18next.getFixedT(rows[0].language, "events", "emptyQueue");
+  const guild_config = await getGuildConfig(queue.guild.id);
+  if (!guild_config) return;
+  const t = client.i18next.getFixedT(guild_config.language, "events", "emptyQueue");
   const embed = new EmbedBuilder().setDescription(t("embed.description")).setTitle(t("embed.title")).setColor("Red");
   queue.metadata.channel.send({ embeds: [embed] });
 });
 await client.login(process.env.TOKEN);
 
 player.events.on("playerError", async (queue, error) => {
-  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [queue.metadata.guild.id]);
-  if (!rows.length) return;
-  const t = client.i18next.getFixedT(rows[0].language, "events", "playerError");
+  const guild_config = await getGuildConfig(queue.guild.id);
+  if (!guild_config) return;
+  const t = client.i18next.getFixedT(guild_config.language, "events", "playerError");
   const embed = new EmbedBuilder()
     .setDescription(t("embed.description"))
     .setTitle(t("embed.title"))
@@ -183,7 +133,7 @@ CronJob.from({
 });
 CronJob.from({
   cronTime: "0 0 0 * * *",
-  onTick: () => colorOfTheDay(client),
+  onTick: () => colorUpdate(client),
   onComplete: () => {
     logger.log({
       level: "info",

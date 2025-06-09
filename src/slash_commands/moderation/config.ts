@@ -1,4 +1,4 @@
-import { SlashCommandBase } from "../../../@types/types";
+import { SlashCommandBase } from "@customTypes";
 import {
   MessageFlagsBitField,
   PermissionsBitField,
@@ -10,12 +10,8 @@ import {
   EmbedBuilder,
   InteractionContextType,
 } from "discord.js";
-import roleConfig from "../../config_functions/role-config.js";
-import registerConfig from "../../config_functions/register-config.js";
-import welcomeLeaveConfig from "../../config_functions/welcome-leave-config.js";
-import moderationConfig from "../../config_functions/moderation-config.js";
-import miscConfig from "../../config_functions/misc-config.js";
-import { Guilds } from "../../../@types/DatabaseTypes";
+import { miscConfig, moderationConfig, registerConfig, roleConfig, welcomeLeaveConfig } from "@configFunctions";
+import { getGuildConfig } from "@database";
 export default {
   memberPermissions: [PermissionsBitField.Flags.Administrator],
   data: new SlashCommandBuilder()
@@ -80,8 +76,7 @@ export default {
     ),
   async execute(interaction) {
     const client = interaction.client;
-    const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
-    const guild_config = rows[0];
+    const guild_config = await getGuildConfig(interaction.guildId);
     if (!guild_config) {
       await interaction.reply({
         content: "This server is not registered in the database. This shouldn't happen, please contact developers",
@@ -133,9 +128,7 @@ export default {
         if (setting === "register") {
           embed
             .setTitle(t("embed.register.title"))
-            .setURL(
-              "https://ispik.gitbook.io/khaxy/${guild_config.language}/configuration-documentation/register-settings",
-            )
+            .setURL("https://docs.khaxy.net/${guild_config.language}/configuration/register-settings")
             .addFields(
               {
                 name: t("embed.register.fields.register_join_channel"),
@@ -169,9 +162,7 @@ export default {
         } else if (setting === "welcome-leave") {
           embed
             .setTitle(t("embed.welcome_leave.title"))
-            .setURL(
-              "https://ispik.gitbook.io/khaxy/${guild_config.language}/configuration-documentation/welcome-leave-settings",
-            )
+            .setURL("https://docs.khaxy.net/${guild_config.language}/configuration/welcome-leave-settings")
             .addFields(
               {
                 name: t("embed.welcome_leave.fields.welcome_channel"),
@@ -203,9 +194,7 @@ export default {
         } else if (setting === "moderation") {
           embed
             .setTitle(t("embed.moderation.title"))
-            .setURL(
-              "https://ispik.gitbook.io/khaxy/${guild_config.language}/configuration-documentation/moderation-settings",
-            )
+            .setURL("https://docs.khaxy.net/${guild_config.language}/configuration/moderation-settings")
             .addFields(
               {
                 name: t("embed.moderation.fields.mod_log_channel"),
@@ -243,7 +232,7 @@ export default {
         } else if (setting === "role") {
           embed
             .setTitle(t("embed.role.title"))
-            .setURL(`https://ispik.gitbook.io/khaxy/${guild_config.language}/configuration-documentation/role-settings`)
+            .setURL(`https://docs.khaxy.net/${guild_config.language}/configuration/role-settings`)
             .addFields(
               {
                 name: t("embed.role.fields.color_of_the_day"),
@@ -285,9 +274,7 @@ export default {
           };
           embed
             .setTitle(t("embed.misc.title"))
-            .setURL(
-              "https://ispik.gitbook.io/khaxy/${guild_config.language}/configuration-documentation/miscellaneous-settings",
-            )
+            .setURL("https://docs.khaxy.net/${guild_config.language}/configuration/miscellaneous-settings")
             .addFields(
               {
                 name: t("embed.misc.fields.language"),

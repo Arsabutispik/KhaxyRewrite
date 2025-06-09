@@ -1,17 +1,15 @@
-import { specificGuildColorUpdate } from "./colorOfTheDay.js";
-import logger from "../lib/Logger.js";
-import { specificGuildUnregisteredPeopleUpdate } from "./checkUnregisteredPeople.js";
-import { Cronjobs } from "../../@types/DatabaseTypes";
-import { toStringId } from "./utils.js";
+import { logger } from "@lib";
+import { toStringId, specificGuildUnregisteredPeopleUpdate, specificGuildColorUpdate } from "@utils";
 import { Client } from "discord.js";
+import { getCronJobs } from "@database";
 
-export default async (client: Client) => {
+export async function recoverMissedCronjob(client: Client) {
   // Fetch all cron jobs from the database
-  const { rows } = await client.pgClient.query<Cronjobs>("SELECT * FROM cronjobs");
+  const cronjobs = await getCronJobs();
 
-  for (const cronjob of rows) {
+  for (const cronjob of cronjobs) {
     // Check if the color cron job has been missed
-    if (new Date(cronjob.color_time).getTime() < Date.now()) {
+    if (cronjob.color_time && new Date(cronjob.color_time).getTime() < Date.now()) {
       logger.log({
         level: "info",
         message: `Missed color cron job, recovering...`,
@@ -20,7 +18,7 @@ export default async (client: Client) => {
       // Recover the missed color cron job
       await specificGuildColorUpdate(client, toStringId(cronjob.id));
     }
-    if (new Date(cronjob.unregistered_people_time ?? new Date()).getTime() < Date.now()) {
+    if (cronjob.unregistered_people_time && new Date(cronjob.unregistered_people_time).getTime() < Date.now()) {
       logger.log({
         level: "info",
         message: `Missed unregistered people cron job for ${cronjob.id}, recovering...`,
@@ -30,4 +28,4 @@ export default async (client: Client) => {
       await specificGuildUnregisteredPeopleUpdate(client, toStringId(cronjob.id));
     }
   }
-};
+}

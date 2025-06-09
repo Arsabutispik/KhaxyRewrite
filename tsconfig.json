@@ -21,9 +21,16 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "resolveJsonModule": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@database": ["src/database/index.ts"],
+      "@constants": ["src/constants/index.ts"],
+      "@customTypes": ["src/types/index.ts"],
+      "@utils": ["src/utils/index.ts"],
+      "@lib": ["src/lib/index.ts"],
+      "@configFunctions": ["src/config_functions/index.ts"],
+    }
   },
-  "include": ["./src/**/*", "@types",
-    "./locales/**/*"
-  ],
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "test", "tests"]
 }

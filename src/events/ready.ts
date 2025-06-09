@@ -1,8 +1,7 @@
 import { ActivityType, Events } from "discord.js";
-import { EventBase } from "../../@types/types";
-import { loadEmojis } from "../lib/PlayerConfig.js";
-import logger from "../lib/Logger.js";
-import recoverMissedCronjob from "../utils/recoverMissedCronjob.js";
+import { EventBase } from "@customTypes";
+import { logger } from "@lib";
+import { loadEmojis, recoverMissedCronjob } from "@utils";
 export default {
   name: Events.ClientReady,
   once: true,

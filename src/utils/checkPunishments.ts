@@ -1,46 +1,43 @@
-import modlog from "./modLog.js";
 import dayjs from "dayjs";
-import { Guilds, Punishments } from "../../@types/DatabaseTypes";
-import logger from "../lib/Logger.js";
-import { toStringId } from "./utils.js";
+import { logger } from "@lib";
+import { toStringId, modLog } from "./index.js";
 import { Client } from "discord.js";
+import { deleteExpiredPunishments, getExpiredPunishments, getGuildConfig } from "@database";
+import { PunishmentType } from "@constants";
 
-export default async (client: Client) => {
+export async function checkPunishments(client: Client) {
   // Fetch punishments that have expired
-  const { rows } = await client.pgClient.query<Punishments>("SELECT * FROM punishments WHERE expires < NOW()");
-  for (const result of rows) {
-    const guild = client.guilds.cache.get(toStringId(result.guild_id));
+  const punishments = await getExpiredPunishments();
+  for (const punishment of punishments) {
+    const guild = client.guilds.cache.get(toStringId(punishment.guild_id));
     if (!guild) {
       logger.log({
         level: "warn",
-        message: `Guild ${result.guild_id} not found in cache`,
+        message: `Guild ${punishment.guild_id} not found in cache`,
         discord: false,
       });
       continue;
     }
     await guild.members.fetch();
     // Fetch guild configuration
-    const { rows } = await client.pgClient.query<Guilds>(
-      "SELECT language, mute_get_all_roles, mute_role_id FROM guilds WHERE id = $1",
-      [guild.id],
-    );
-    if (!rows[0]) {
+    const guild_config = await getGuildConfig(guild.id);
+    if (!guild_config) {
       logger.log({
         level: "warn",
-        message: `Guild ${result.guild_id} not found in database`,
+        message: `Guild ${punishment.guild_id} not found in database`,
         discord: false,
       });
       continue;
     }
 
-    const user = await client.users.fetch(toStringId(result.user_id));
+    const user = await client.users.fetch(toStringId(punishment.user_id));
 
-    const staff = await client.users.fetch(toStringId(result.staff_id));
-    const expiresDate = dayjs(result.expires);
-    const createdAtDate = dayjs(result.created_at);
+    const staff = await client.users.fetch(toStringId(punishment.staff_id));
+    const expiresDate = dayjs(punishment.expires_at);
+    const createdAtDate = dayjs(punishment.created_at);
     const duration = dayjs(expiresDate.diff(createdAtDate));
 
-    if (result.type === "ban") {
+    if (punishment.type === PunishmentType.BAN) {
       // If the punishment is a ban, unban the user
       if (!guild.bans.cache.get(user.id)) {
         logger.log({
@@ -50,19 +47,19 @@ export default async (client: Client) => {
         });
         continue;
       }
-      await guild.members.unban(user, client.i18next.getFixedT(rows[0].language)("commands:ban.expired"));
-      await modlog(
+      await guild.members.unban(user, client.i18next.getFixedT(guild_config.language)("commands:ban.expired"));
+      await modLog(
         {
           guild,
           user: user,
           action: "BAN_EXPIRED",
           moderator: staff,
-          reason: client.i18next.getFixedT(rows[0].language)("commands:ban.expired"),
+          reason: client.i18next.getFixedT(guild_config.language)("commands:ban.expired"),
           duration,
         },
         client,
       );
-    } else if (result.type === "mute") {
+    } else if (punishment.type === PunishmentType.MUTE) {
       const member = guild.members.cache.get(user.id);
       // If the punishment is a mute, remove the mute role and restore previous roles
       if (!member) {
@@ -73,19 +70,17 @@ export default async (client: Client) => {
         });
         continue;
       }
-      if (rows[0].mute_get_all_roles) {
-        if (result.previous_roles) {
-          for (const role of result.previous_roles) {
-            if (!member.guild.roles.cache.get(toStringId(role)))
-              result.previous_roles?.splice(result.previous_roles?.indexOf(role), 1);
-          }
-          await member.roles.add(result.previous_roles.map((role) => toStringId(role)));
+      if (punishment.previous_roles) {
+        for (const role of punishment.previous_roles) {
+          if (!member.guild.roles.cache.get(toStringId(role)))
+            punishment.previous_roles?.splice(punishment.previous_roles?.indexOf(role), 1);
         }
+        await member.roles.add(punishment.previous_roles.map((role) => toStringId(role)));
       }
-      if (rows[0].mute_role_id && guild.roles.cache.has(toStringId(rows[0].mute_role_id)))
-        await member.roles.remove(toStringId(rows[0].mute_role_id));
+      if (guild_config.mute_role_id && guild.roles.cache.has(toStringId(guild_config.mute_role_id)))
+        await member.roles.remove(toStringId(guild_config.mute_role_id));
     }
   }
   // Delete expired punishments from the database
-  await client.pgClient.query("DELETE FROM punishments WHERE expires < $1", [new Date()]);
-};
+  await deleteExpiredPunishments();
+}

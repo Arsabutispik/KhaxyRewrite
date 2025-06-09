@@ -1,75 +1,36 @@
-import { Client, ColorResolvable, PermissionsBitField } from "discord.js";
-import ntc from "./ntc.js";
+import { Client, ColorResolvable, Guild, PermissionsBitField } from "discord.js";
+import { ntc, toStringId } from "@utils";
 import dayjs from "dayjs";
-import { Guilds } from "../../@types/DatabaseTypes";
-import logger from "../lib/Logger.js";
-import { toStringId } from "./utils.js";
-
-export default async (client: Client) => {
+import { logger } from "@lib";
+import { getGuildConfig, getGuilds, updateCronJob, updateGuildConfig } from "@database";
+import type { guilds as Guilds } from "@prisma/client";
+export async function colorUpdate(client: Client) {
   // Fetch guild configurations from the database
-  const result = await client.pgClient.query<Guilds>("SELECT * FROM guilds");
-  const rows = result.rows;
-  for (const row of rows) {
-    const { colour_id_of_the_day, colour_name_of_the_day, id } = row;
-    const guild = client.guilds.cache.get(toStringId(id));
+  const guilds = await getGuilds();
+  for (const guild_data of guilds) {
+    const guild = client.guilds.cache.get(toStringId(guild_data.id));
     if (!guild) continue;
-    if (!guild.members.me) continue;
-    // Check if the bot has permission to manage roles
-    if (!guild.members.me.permissions.has(PermissionsBitField.Flags.ManageRoles)) continue;
-    const role = guild.roles.cache.find((role) => role.id === toStringId(colour_id_of_the_day));
-    if (!role) continue;
-    // Check if the bot's highest role is higher than the target role
-    if (role.position >= guild.members.me.roles.highest.position) continue;
-    const name = role.name.replace(colour_name_of_the_day, "");
-    // Generate a random color
-    const x = Math.round(0xffffff * Math.random()).toString(16);
-    const y = 6 - x.length;
-    const z = "000000";
-    const z1 = z.substring(0, y);
-    const color = `#${z1 + x}` as ColorResolvable;
-    const result = ntc.name(color);
-    const colorName = result[1];
-    try {
-      // Update the color name in the database
-      await client.pgClient.query("UPDATE guilds SET colour_name_of_the_day = $1 WHERE id = $2", [colorName, id]);
-      // Edit the role with the new color and name
-      await role.edit({
-        name: `${colorName} ${name}`,
-        color: color,
-        reason: "Color of the day has been updated.",
-      });
-      // Update the color change time in the database
-      const query = `
-            UPDATE cronjobs
-            SET color_time = $1
-            WHERE id = $2`;
-      await client.pgClient.query(query, [dayjs().add(1, "day").toISOString(), id]);
-    } catch (error) {
-      logger.log({
-        level: "error",
-        message: "Error updating color of the day",
-        error: error,
-        meta: {
-          guildID: id,
-        },
-      });
-    }
+    await proccesColorUpdate(guild, guild_data);
   }
-};
+}
 
 export async function specificGuildColorUpdate(client: Client, guildId: string) {
   // Fetch guild configuration for the specific guild
-  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [guildId]);
-  if (rows.length === 0) {
+  const guild_config = await getGuildConfig(guildId);
+  if (!guild_config) {
     logger.warn(`Guild config for ${guildId} not found.`);
     return;
   }
-  const { colour_id_of_the_day, colour_name_of_the_day, id } = rows[0];
-  const guild = client.guilds.cache.get(toStringId(id));
+  const guild = client.guilds.cache.get(toStringId(guild_config.id));
   if (!guild) {
-    logger.warn(`Guild ${id} not found.`);
+    logger.warn(`Guild ${guild_config.id} not found.`);
     return;
   }
+  await proccesColorUpdate(guild, guild_config);
+}
+
+async function proccesColorUpdate(guild: Guild, config: Guilds) {
+  const { colour_id_of_the_day, colour_name_of_the_day, id } = config;
   if (!guild.members.me) {
     logger.warn(`Bot is not in guild ${id}.`);
     return;
@@ -100,7 +61,9 @@ export async function specificGuildColorUpdate(client: Client, guildId: string) 
   const colorName = cresult[1];
   try {
     // Update the color name in the database
-    await client.pgClient.query("UPDATE guilds SET colour_name_of_the_day = $1 WHERE id = $2", [colorName, id]);
+    await updateGuildConfig(guild.id, {
+      colour_name_of_the_day: colour_name_of_the_day,
+    });
     // Edit the role with the new color and name
     await role.edit({
       name: `${name}${colorName}`,
@@ -108,11 +71,9 @@ export async function specificGuildColorUpdate(client: Client, guildId: string) 
       reason: "Color of the day has been updated.",
     });
     // Update the color change time in the database
-    const query = `
-      UPDATE cronjobs
-      SET color_time = $1
-      WHERE id = $2`;
-    await client.pgClient.query(query, [dayjs().add(1, "day").toISOString(), id]);
+    await updateCronJob(guild.id, {
+      color_time: dayjs().add(1, "day").toDate(),
+    });
   } catch (error) {
     logger.log({
       level: "error",

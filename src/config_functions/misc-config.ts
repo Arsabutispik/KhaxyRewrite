@@ -6,14 +6,14 @@ import {
   MessageFlagsBitField,
   StringSelectMenuBuilder,
 } from "discord.js";
-import { Guilds } from "../../@types/DatabaseTypes";
+import { getGuildConfig, updateGuildConfig } from "@database";
+import type { guilds as Guilds } from "@prisma/client";
 import { TFunction } from "i18next";
 import { dynamicChannel, dynamicMessage } from "./register-config.js";
 
-export default async function miscConfig(interaction: ChatInputCommandInteraction<"cached">) {
+export async function miscConfig(interaction: ChatInputCommandInteraction<"cached">) {
   const client = interaction.client;
-  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
-  const guild_config = rows[0];
+  const guild_config = await getGuildConfig(interaction.guildId!);
   if (!guild_config) {
     await interaction.reply({
       content: "No guild config found. Running a simple command should create one.",
@@ -143,10 +143,9 @@ async function languageConfig(interaction: MessageComponentInteraction, data: Gu
     return;
   }
   await message_component.deferUpdate();
-  await client.pgClient.query("UPDATE guilds SET language = $1 WHERE id = $2", [
-    message_component.values[0],
-    message_component.guild.id,
-  ]);
+  await updateGuildConfig(message_component.guildId, {
+    language: message_component.values[0],
+  });
   const new_t = client.i18next.getFixedT(message_component.values[0], null, "misc_config");
   await message_component.editReply({
     content: new_t("language.set", { language: langs[message_component.values[0]] }),

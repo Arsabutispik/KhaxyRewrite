@@ -243,7 +243,12 @@
     "not_in_same_voice": "You need to be in the same voice channel as the bot.",
     "loop_vote": "**{{user}}** started a vote to {{state}}. Users have to react with ✅ or ❌ to vote. {{count}} vote(s) needed to loop the song.",
     "loop_vote_success": "The song has been looped.",
-    "loop_vote_fail": "The song has not been looped."
+    "loop_vote_fail": "The song has not been looped.",
+    "state": {
+      "0": "turn off the loop",
+      "1": "loop the current track",
+      "2": "loop the entire queue"
+    }
   },
   "list": {
     "no_queue": "Currently, no song is playing.",

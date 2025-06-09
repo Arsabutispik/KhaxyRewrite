@@ -1694,4 +1694,4 @@ const ntc = {
   ],
 };
 ntc.init();
-export default ntc;
+export { ntc };

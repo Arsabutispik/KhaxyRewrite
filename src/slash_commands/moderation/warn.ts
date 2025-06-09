@@ -1,10 +1,9 @@
-import { SlashCommandBase } from "../../../@types/types";
+import { SlashCommandBase } from "@customTypes";
 import { InteractionContextType, MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
-import logger from "../../lib/Logger.js";
-import modLog from "../../utils/modLog.js";
-import { Guilds } from "../../../@types/DatabaseTypes";
-import { toStringId } from "../../utils/utils.js";
-import { addInfraction } from "../../utils/infractionHandler.js";
+import { logger } from "@lib";
+import { modLog, toStringId, addInfraction } from "@utils";
+import { getGuildConfig } from "@database";
+import { InfractionType } from "@constants";
 
 export default {
   memberPermissions: [PermissionsBitField.Flags.ManageGuild],
@@ -45,8 +44,7 @@ export default {
     ),
   async execute(interaction) {
     const client = interaction.client;
-    const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
-    const guild_config = rows[0];
+    const guild_config = await getGuildConfig(interaction.guildId);
     if (!guild_config) {
       await interaction.reply({
         content: "This server is not registered in the database. This shouldn't happen, please contact developers",
@@ -83,7 +81,7 @@ export default {
         client: interaction.client,
         reason: reason,
         moderator: interaction.user.id,
-        type: "warn",
+        type: InfractionType.WARN,
       });
     } catch (error) {
       await interaction.reply(t("database_error"));

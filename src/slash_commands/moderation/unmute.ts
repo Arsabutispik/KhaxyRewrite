@@ -1,9 +1,9 @@
-import { SlashCommandBase } from "../../../@types/types";
+import { SlashCommandBase } from "@customTypes";
 import { InteractionContextType, MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
-import logger from "../../lib/Logger.js";
-import modLog from "../../utils/modLog.js";
-import { toStringId } from "../../utils/utils.js";
-import { Guilds, Punishments } from "../../../@types/DatabaseTypes";
+import { logger } from "@lib";
+import { modLog, toStringId } from "@utils";
+import { deletePunishment, getGuildConfig, getLatestPunishmentByUserAndType } from "@database";
+import { PunishmentType } from "@constants";
 
 export default {
   memberPermissions: [PermissionsBitField.Flags.ManageRoles],
@@ -41,8 +41,7 @@ export default {
     ),
   async execute(interaction) {
     const client = interaction.client;
-    const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
-    const guild_config = rows[0];
+    const guild_config = await getGuildConfig(interaction.guildId);
     if (!guild_config) {
       await interaction.reply({
         content: "This server is not registered in the database. This shouldn't happen, please contact developers",
@@ -61,11 +60,8 @@ export default {
       return;
     }
     const reason = interaction.options.getString("reason") || t("no_reason");
-    const { rows: punishment_rows } = await client.pgClient.query<Punishments>(
-      "SELECT * FROM punishments WHERE guild_id = $1 AND user_id = $2",
-      [interaction.guild.id, member.id],
-    );
-    const punishment = punishment_rows[0];
+    const punishment = await getLatestPunishmentByUserAndType(interaction.guildId, member.id, PunishmentType.MUTE);
+
     if (!punishment && member.roles.cache.has(toStringId(guild_config.mute_role_id))) {
       await interaction.reply({ content: t("muted_no_punishment"), flags: MessageFlagsBitField.Flags.Ephemeral });
       await member.roles.remove(toStringId(guild_config.mute_role_id));
@@ -89,7 +85,7 @@ export default {
       }
     }
     try {
-      await client.pgClient.query("DELETE FROM punishments WHERE user_id = $1", [punishment.user_id]);
+      await deletePunishment(interaction.guildId, member.id, PunishmentType.MUTE);
     } catch (error) {
       await interaction.reply({ content: t("database_error"), flags: MessageFlagsBitField.Flags.Ephemeral });
       logger.error({

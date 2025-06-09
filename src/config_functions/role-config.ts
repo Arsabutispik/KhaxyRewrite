@@ -8,9 +8,10 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
 } from "discord.js";
-import { Guilds } from "../../@types/DatabaseTypes";
+import type { guilds as Guilds } from "@prisma/client";
 import { TFunction } from "i18next";
-import { toStringId } from "../utils/utils.js";
+import { toStringId } from "@utils";
+import { getGuildConfig, updateGuildConfig } from "@database";
 
 type RoleType =
   | "member_role_id"
@@ -21,17 +22,17 @@ type RoleType =
   | "dj_role_id"
   | "staff_role_id";
 
-export default async function roleConfig(interaction: ChatInputCommandInteraction<"cached">) {
+export async function roleConfig(interaction: ChatInputCommandInteraction<"cached">) {
   const client = interaction.client;
-  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guildId]);
-  if (rows.length === 0) {
+  const guild_config = await getGuildConfig(interaction.guildId);
+  if (!guild_config) {
     await interaction.reply({
       content: "Unexpected database error. This should not have happened. Please contact the bot developers",
       flags: MessageFlagsBitField.Flags.Ephemeral,
     });
     return;
   }
-  const t = client.i18next.getFixedT(rows[0].language, null, "role_config");
+  const t = client.i18next.getFixedT(guild_config.language, null, "role_config");
   const select_menu = new StringSelectMenuBuilder()
     .setCustomId("role_config")
     .setMinValues(1)
@@ -105,7 +106,7 @@ export default async function roleConfig(interaction: ChatInputCommandInteractio
     return;
   }
   await message_component.deferUpdate();
-  await dynamicRole(message_component.values[0] as RoleType, message_component, rows[0], t);
+  await dynamicRole(message_component.values[0] as RoleType, message_component, guild_config, t);
 }
 
 export async function dynamicRole(
@@ -138,10 +139,11 @@ export async function dynamicRole(
     });
     return;
   }
-  const client = message_component.client;
   await message_component.deferUpdate();
   if (message_component.values.length === 0) {
-    await client.pgClient.query(`UPDATE guilds SET ${role} = NULL WHERE id = $1`, [message_component.guildId]);
+    await updateGuildConfig(message_component.guildId, {
+      [role]: null,
+    });
     await message_component.editReply({
       content: t(`${role}.unset`),
       components: [],
@@ -158,10 +160,9 @@ export async function dynamicRole(
       });
       return;
     }
-    await client.pgClient.query(`UPDATE guilds SET ${role} = $1 WHERE id = $2`, [
-      message_component.values[0],
-      message_component.guildId,
-    ]);
+    await updateGuildConfig(message_component.guildId, {
+      [role]: message_component.values[0],
+    });
     await message_component.editReply({
       content: t(`${role}.set`, {
         role: message_component.guild!.roles.cache.get(message_component.values[0])!.toString(),

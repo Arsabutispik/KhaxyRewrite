@@ -1,20 +1,17 @@
-import { EventBase } from "../../@types/types";
+import { EventBase } from "@customTypes";
 import { AuditLogEvent, Events, PermissionsBitField } from "discord.js";
-import { replacePlaceholders, toStringId } from "../utils/utils.js";
+import { replacePlaceholders, toStringId, modLog } from "@utils";
 import dayjs from "dayjs";
-import modLog from "../utils/modLog.js";
 import relativeTime from "dayjs/plugin/relativeTime.js";
-import { Mod_mail_threads } from "../../@types/DatabaseTypes";
-import { ModMailThreadStatus } from "../lib/Enums.js";
+import { ModMailThreadStatus } from "@constants";
+import { getGuildConfig, getModMailThreadsByUser, updateModMailThread } from "@database";
 
 export default {
   name: Events.GuildMemberRemove,
   once: false,
   async execute(member) {
     // Fetch guild data from the database
-    const { rows } = await member.client.pgClient.query("SELECT * FROM guilds WHERE id = $1", [member.guild.id]);
-    // Extract the guild configuration from the database result
-    const guild_config = rows[0];
+    const guild_config = await getGuildConfig(member.guild.id);
     dayjs.extend(relativeTime);
     const replacements = {
       "{user}": member.toString(),
@@ -65,15 +62,11 @@ export default {
         member.client,
       );
     }
-    const { rows: thread_rows } = await member.client.pgClient.query<Mod_mail_threads>(
-      "SELECT * FROM mod_mail_threads WHERE user_id = $1 and status in ($2, $3)",
-      [member.id, ModMailThreadStatus.OPEN, ModMailThreadStatus.SUSPENDED],
-    );
+    const thread_rows = await getModMailThreadsByUser(member.user.id);
     for (const thread of thread_rows) {
-      await member.client.pgClient.query("UPDATE mod_mail_threads SET status = $1 WHERE channel_id = $2", [
-        ModMailThreadStatus.CLOSED,
-        thread.channel_id,
-      ]);
+      await updateModMailThread(thread.channel_id, {
+        status: ModMailThreadStatus.CLOSED,
+      });
       const channel = member.guild.channels.cache.get(toStringId(thread.channel_id));
       if (channel?.isTextBased()) {
         await channel.send(

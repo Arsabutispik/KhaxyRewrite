@@ -1,8 +1,8 @@
-import { SlashCommandBase } from "../../../@types/types";
+import { SlashCommandBase } from "@customTypes";
 import { InteractionContextType, MessageFlags, PermissionsBitField, SlashCommandBuilder } from "discord.js";
-import { Guilds } from "../../../@types/DatabaseTypes";
 import { useMainPlayer } from "discord-player";
-import logger from "../../lib/Logger.js";
+import { logger } from "@lib";
+import { getGuildConfig } from "@database";
 
 export default {
   clientPermissions: [PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak],
@@ -30,10 +30,7 @@ export default {
     ),
   async execute(interaction) {
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-    const { rows: guild_rows } = await interaction.client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
-      interaction.guildId,
-    ]);
-    const guild_config = guild_rows[0];
+    const guild_config = await getGuildConfig(interaction.guildId);
     if (!guild_config) {
       return interaction.editReply({
         content: "This server is not configured yet.",
@@ -70,7 +67,6 @@ export default {
       const result = await player.play(voiceChannel, query, {
         nodeOptions: {
           metadata: {
-            guild: interaction.guild,
             channel: interaction.channel,
           },
           leaveOnEnd: true,

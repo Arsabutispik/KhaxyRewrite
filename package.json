@@ -5,19 +5,13 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "deploy-commands": "npx tsc && node dist/utils/deploy-commands.js",
-    "start": "npx tsc && pnpm db-setup && node .",
-    "generate-schema": "node scripts/GenerateSchema.js",
-    "db-migrate": "node scripts/migrate.js",
-    "db-setup": "node scripts/SetupDb.js",
-    "db-stop": "node scripts/StopDb.js",
-    "migrate-create": "node scripts/CreateMigrations.js",
-    "migrate-up": "node-pg-migrate up",
-    "migrate-down": "node-pg-migrate down",
+    "deploy-commands": "tsc && tsc-alias && node dist/utils/deploy-commands.js",
+    "start": "tsc && tsc-alias && prisma migrate dev && node .",
     "validate-translations": "node scripts/ValidateI18nKeys.js"
   },
   "dependencies": {
     "@discord-player/extractor": "^7.1.0",
+    "@prisma/client": "^6.9.0",
     "bgutils-js": "^3.2.0",
     "chalk": "^5.4.1",
     "cron": "^3.5.0",
@@ -30,7 +24,6 @@
     "i18next": "^24.2.3",
     "i18next-fs-backend": "^2.6.0",
     "lodash": "^4.17.21",
-    "pg": "^8.16.0",
     "string-progressbar": "^1.0.4",
     "winston": "^3.17.0",
     "winston-transport": "^4.9.0"
@@ -38,8 +31,6 @@
   "devDependencies": {
     "@eslint/js": "^9.27.0",
     "@types/lodash": "^4.17.17",
-    "@types/ms": "^2.1.0",
-    "@types/pg": "^8.15.2",
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
     "eslint": "^9.27.0",
@@ -48,8 +39,9 @@
     "eslint-plugin-jsonc": "^2.20.1",
     "globals": "^15.15.0",
     "jsonc-eslint-parser": "^2.4.0",
-    "node-pg-migrate": "^7.9.1",
     "prettier": "^3.5.3",
+    "prisma": "^6.9.0",
+    "tsc-alias": "^1.8.16",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.32.1"
   },

@@ -1,18 +1,14 @@
-import { EventBase } from "../../@types/types";
+import { EventBase } from "@customTypes";
 import { AuditLogEvent, Events } from "discord.js";
-import { sleep, toStringId } from "../utils/utils.js";
-import modlog from "../utils/modLog.js";
+import { sleep, toStringId, modLog } from "@utils";
 import dayjs from "dayjs";
-import { Guilds } from "../../@types/DatabaseTypes";
+import { getGuildConfig } from "@database";
 
 export default {
   name: Events.GuildMemberUpdate,
   once: false,
   async execute(oldMember, newMember) {
-    const { rows } = await oldMember.client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
-      oldMember.guild.id,
-    ]);
-    const guild_config = rows[0];
+    const guild_config = await getGuildConfig(oldMember.guild.id);
     if (!guild_config) return;
     const modlog_channel = await oldMember.guild.channels
       .fetch(toStringId(guild_config.mod_log_channel_id))
@@ -27,7 +23,7 @@ export default {
       const log = fetchedLogs.entries.first();
       if (Date.now() - log!.createdTimestamp >= 5000) return;
       if (!log) {
-        await modlog(
+        await modLog(
           {
             guild: oldMember.guild,
             user: newMember.user,
@@ -39,7 +35,7 @@ export default {
           oldMember.client,
         );
       } else {
-        await modlog(
+        await modLog(
           {
             guild: oldMember.guild,
             user: newMember.user,

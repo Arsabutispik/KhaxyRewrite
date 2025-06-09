@@ -1,31 +1,26 @@
-import { EventBase } from "../../@types/types";
+import { EventBase } from "@customTypes";
 import { ChannelType, Events, PermissionsBitField } from "discord.js";
-import { Punishments } from "../../@types/DatabaseTypes";
-import { replacePlaceholders, toStringId } from "../utils/utils.js";
-import logger from "../lib/Logger.js";
+import { replacePlaceholders, toStringId } from "@utils";
+import { logger } from "@lib";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime.js";
+import { getPunishmentsByUser, getGuildConfig } from "@database";
 
 export default {
   name: Events.GuildMemberAdd,
   async execute(member) {
     // Fetch guild data from the database
-    const { rows } = await member.client.pgClient.query("SELECT * FROM guilds WHERE id = $1", [member.guild.id]);
-    // Extract the guild configuration from the database result
-    const guild_config = rows[0];
+    const guild_config = await getGuildConfig(member.guild.id);
 
     // If no guild data is found, exit the function
     if (!guild_config) return;
 
     // Fetch punishment data for the member from the database
-    const { rows: punishment_rows } = await member.client.pgClient.query<Punishments>(
-      "SELECT * FROM punishments WHERE guild_id = $1 AND user_id = $2 AND type = $3",
-      [member.guild.id, member.id, "mute"],
-    );
+    const punishments = await getPunishmentsByUser(member.guild.id, member.id);
 
     // If punishment data exists and the mute role is present, assign the mute role to the member
     if (
-      punishment_rows.length > 0 &&
+      punishments.length > 0 &&
       guild_config.mute_role_id &&
       member.guild.roles.cache.has(toStringId(guild_config.mute_role_id))
     ) {

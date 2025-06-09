@@ -5,20 +5,16 @@ import i18nJson from "eslint-plugin-i18n-json";
 import jsoncParser from "jsonc-eslint-parser";
 
 export default [
-  // ✅ Ignore compiled files, scripts folder, and eslint.config.js
   {
-    name: "ignore-config",
     ignores: ["dist/", "node_modules/", "scripts/", "eslint.config.js"],
   },
-  // ✅ TypeScript/JavaScript Files: Apply TypeScript ESLint rules
   {
-    name: "typescript-config",
-    files: ["**/*.{js,mjs,cjs,ts}"],
+    files: ["**/*.{js,ts}"],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
       globals: globals.node,
-      parser: tsParser, // ✅ Correctly pass the TypeScript parser
+      parser: tsParser,
       parserOptions: {
         project: "./tsconfig.json",
       },
@@ -27,15 +23,15 @@ export default [
       "@typescript-eslint": tseslint,
     },
     rules: {
-      ...tseslint.configs.recommended.rules, // ✅ Apply TS rules
+      ...tseslint.configs.recommended.rules,
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": ["warn"],
     },
   },
-  // ✅ JSON Files: Apply i18n rules with JSON parser
   {
-    name: "i18n-json-config",
     files: ["locales/**/*.json"],
     languageOptions: {
-      parser: jsoncParser, // ✅ Use JSON parser
+      parser: jsoncParser,
     },
     plugins: {
       "i18n-json": i18nJson,

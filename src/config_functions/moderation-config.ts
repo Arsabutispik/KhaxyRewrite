@@ -9,16 +9,16 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
 } from "discord.js";
-import { Guilds } from "../../@types/DatabaseTypes";
+import type { guilds as Guilds } from "@prisma/client";
 import { dynamicChannel } from "./register-config.js";
 import { dynamicRole } from "./role-config.js";
 import { TFunction } from "i18next";
-import { toStringId } from "../utils/utils.js";
+import { toStringId } from "@utils";
+import { getGuildConfig, updateGuildConfig } from "@database";
 
-export default async function moderationConfig(interaction: ChatInputCommandInteraction<"cached">) {
+export async function moderationConfig(interaction: ChatInputCommandInteraction<"cached">) {
   const client = interaction.client;
-  const { rows } = await client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [interaction.guild.id]);
-  const guild_data = rows[0];
+  const guild_data = await getGuildConfig(interaction.guildId);
   if (!guild_data) {
     await interaction.reply({
       content: "Unexpected database error. This should not have happened. Please contact the bot developers",
@@ -120,7 +120,6 @@ export default async function moderationConfig(interaction: ChatInputCommandInte
   }
 }
 async function modMailChannel(interaction: StringSelectMenuInteraction<"cached">, data: Guilds, t: TFunction) {
-  const client = interaction.client;
   if (data.mod_mail_channel_id && interaction.guild.channels.cache.has(toStringId(data.mod_mail_channel_id))) {
     await interaction.deferUpdate();
     await interaction.editReply({
@@ -155,10 +154,10 @@ async function modMailChannel(interaction: StringSelectMenuInteraction<"cached">
       type: ChannelType.GuildText,
       permissionOverwrites: permissions,
     });
-    await client.pgClient.query(
-      "UPDATE guilds SET mod_mail_channel_id = $1, mod_mail_parent_channel_id = $2 WHERE id = $3",
-      [child.id, parent.id, interaction.guildId],
-    );
+    await updateGuildConfig(interaction.guildId, {
+      mod_mail_channel_id: BigInt(child.id),
+      mod_mail_parent_channel_id: BigInt(parent.id),
+    });
     await interaction.deferUpdate();
     await interaction.editReply({
       content: t("mod_mail_channel.set", { channel: child.toString() }),
@@ -168,16 +167,19 @@ async function modMailChannel(interaction: StringSelectMenuInteraction<"cached">
 }
 
 async function muteGetAllRoles(interaction: StringSelectMenuInteraction<"cached">, data: Guilds, t: TFunction) {
-  const client = interaction.client;
   if (data.mute_get_all_roles) {
-    await client.pgClient.query("UPDATE guilds SET mute_get_all_roles = FALSE WHERE id = $1", [interaction.guildId]);
+    await updateGuildConfig(interaction.guildId, {
+      mute_get_all_roles: false,
+    });
     await interaction.deferUpdate();
     await interaction.editReply({
       content: t("mute_get_all_roles.false"),
       components: [],
     });
   } else {
-    await client.pgClient.query("UPDATE guilds SET mute_get_all_roles = TRUE WHERE id = $1", [interaction.guildId]);
+    await updateGuildConfig(interaction.guildId, {
+      mute_get_all_roles: true,
+    });
     await interaction.deferUpdate();
     await interaction.editReply({
       content: t("mute_get_all_roles.true"),
@@ -187,7 +189,6 @@ async function muteGetAllRoles(interaction: StringSelectMenuInteraction<"cached"
 }
 
 async function registerDayLimit(interaction: StringSelectMenuInteraction<"cached">, data: Guilds, t: TFunction) {
-  const client = interaction.client;
   const string_select = new StringSelectMenuBuilder()
     .setCustomId("register_day_limit")
     .setMinValues(1)
@@ -245,10 +246,9 @@ async function registerDayLimit(interaction: StringSelectMenuInteraction<"cached
     await reply.edit({ content: t("timeout"), components: [] });
     return;
   }
-  await client.pgClient.query("UPDATE guilds SET days_to_kick = $1 WHERE id = $2", [
-    message_component.values[0],
-    interaction.guildId,
-  ]);
+  await updateGuildConfig(interaction.guildId, {
+    days_to_kick: parseInt(message_component.values[0]),
+  });
   await message_component.deferUpdate();
   await message_component.editReply({
     content: t("register_day_limit.success", { days: message_component.values[0] }),
@@ -257,7 +257,6 @@ async function registerDayLimit(interaction: StringSelectMenuInteraction<"cached
 }
 
 async function defaultExpiry(interaction: StringSelectMenuInteraction<"cached">, data: Guilds, t: TFunction) {
-  const client = interaction.client;
   const string_select = new StringSelectMenuBuilder()
     .setCustomId("default_expiry")
     .setMinValues(1)
@@ -315,10 +314,9 @@ async function defaultExpiry(interaction: StringSelectMenuInteraction<"cached">,
     await reply.edit({ content: t("timeout"), components: [] });
     return;
   }
-  await client.pgClient.query("UPDATE guilds SET default_expiry = $1 WHERE id = $2", [
-    message_component.values[0],
-    interaction.guildId,
-  ]);
+  await updateGuildConfig(interaction.guildId, {
+    default_expiry: parseInt(message_component.values[0]),
+  });
   await message_component.deferUpdate();
   await message_component.editReply({
     content: t("default_expiry.success", { days: message_component.values[0] }),

@@ -1,4 +1,4 @@
-import { SlashCommandBase } from "../../../@types/types";
+import { SlashCommandBase } from "@customTypes";
 import {
   ChannelType,
   InteractionContextType,
@@ -6,12 +6,12 @@ import {
   PermissionsBitField,
   SlashCommandBuilder,
 } from "discord.js";
-import { Guilds } from "../../../@types/DatabaseTypes";
-import { toStringId } from "../../utils/utils.js";
+import { toStringId } from "@utils";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime.js";
-import logger from "../../lib/Logger.js";
-import { ModMailMessageSentTo, ModMailMessageType, ModMailThreadStatus } from "../../lib/Enums.js";
+import { logger } from "@lib";
+import { ModMailMessageSentTo, ModMailMessageType, ModMailThreadStatus } from "@constants";
+import { createModMailMessage, createModMailThread, getGuildConfig, getModMailThreadByUser } from "@database";
 export default {
   memberPermissions: [PermissionsBitField.Flags.ManageMessages],
   clientPermissions: [PermissionsBitField.Flags.ManageChannels],
@@ -53,10 +53,7 @@ export default {
   async execute(interaction) {
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
     const user = interaction.options.getUser("user", true);
-    const { rows: guild_rows } = await interaction.client.pgClient.query<Guilds>("SELECT * FROM guilds WHERE id = $1", [
-      interaction.guildId,
-    ]);
-    const guild_config = guild_rows[0];
+    const guild_config = await getGuildConfig(interaction.guildId);
     if (!guild_config) {
       return interaction.editReply({
         content: "This server is not configured yet.",
@@ -85,11 +82,8 @@ export default {
         content: t("modmail_channel_not_in_parent"),
       });
     }
-    const { rows: thread_rows } = await interaction.client.pgClient.query<Guilds>(
-      "SELECT * FROM mod_mail_threads WHERE guild_id = $1 AND user_id = $2 AND status = $3",
-      [interaction.guildId, user.id, ModMailThreadStatus.OPEN],
-    );
-    if (thread_rows.length > 0) {
+    const mod_mail_thread = await getModMailThreadByUser(user.id, ModMailThreadStatus.OPEN);
+    if (mod_mail_thread) {
       return interaction.editReply({
         content: t("thread_already_exists"),
       });
@@ -151,34 +145,28 @@ export default {
       `${t("created_by", { user: interaction.user.tag })} \`1\` **[${interaction.user.tag}]:** ${message}`,
     );
     try {
-      await interaction.client.pgClient.query(
-        "INSERT INTO mod_mail_threads (guild_id, user_id, channel_id, created_at, status) VALUES ($1, $2, $3, $4, $5)",
-        [interaction.guildId, user.id, channel.id, bot_message.createdAt, ModMailThreadStatus.OPEN],
-      );
-      await interaction.client.pgClient.query(
-        "INSERT INTO mod_mail_messages (author_id, sent_at, message_id, channel_id, sent_to, author_type, content) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-        [
-          interaction.user.id,
-          dm.createdAt,
-          dm.id,
-          channel.id,
-          ModMailMessageSentTo.USER,
-          ModMailMessageType.STAFF,
-          message,
-        ],
-      );
-      await interaction.client.pgClient.query(
-        "INSERT INTO mod_mail_messages (author_id, sent_at, message_id, channel_id, sent_to, author_type, content) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-        [
-          interaction.client.user.id,
-          bot_message.createdAt,
-          bot_message.id,
-          channel.id,
-          ModMailMessageSentTo.THREAD,
-          ModMailMessageType.CLIENT,
-          bot_message.content,
-        ],
-      );
+      await createModMailThread(interaction.guildId, {
+        user_id: BigInt(user.id),
+        created_at: dayjs().toDate(),
+        channel_id: BigInt(channel.id),
+        status: ModMailThreadStatus.OPEN,
+      });
+      await createModMailMessage(channel.id, {
+        author_id: BigInt(interaction.user.id),
+        sent_at: dm.createdAt,
+        message_id: BigInt(dm.id),
+        sent_to: ModMailMessageSentTo.USER,
+        author_type: ModMailMessageType.STAFF,
+        content: message,
+      });
+      await createModMailMessage(channel.id, {
+        author_id: BigInt(interaction.client.user.id),
+        sent_at: bot_message.createdAt,
+        message_id: BigInt(bot_message.id),
+        sent_to: ModMailMessageSentTo.THREAD,
+        author_type: ModMailMessageType.CLIENT,
+        content: bot_message.content,
+      });
     } catch (e) {
       logger.log({
         level: "error",

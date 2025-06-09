@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model bump_leaderboard {
+  guild_id   BigInt
+  user_id    BigInt
+  bump_count Int    @default(1)
+
+  @@id([guild_id, user_id])
+}
+
+model cronjobs {
+  id                       BigInt    @id
+  color_time               DateTime? @db.Timestamp(6)
+  unregistered_people_time DateTime? @db.Timestamp(6)
+}
+
+model guilds {
+  id                           BigInt   @id
+  mod_mail_channel_id          BigInt?
+  dj_role_id                   BigInt?
+  days_to_kick                 Int      @default(0)
+  default_expiry               Int      @default(0)
+  mod_mail_parent_channel_id   BigInt?
+  register_channel_id          BigInt?
+  member_role_id               BigInt?
+  mute_role_id                 BigInt?
+  mute_get_all_roles           Boolean?
+  join_channel_id              BigInt?
+  register_join_channel_id     BigInt?
+  mod_log_channel_id           BigInt?
+  colour_id_of_the_day         BigInt?
+  leave_channel_id             BigInt?
+  case_id                      Int      @default(1)
+  staff_role_id                BigInt?
+  male_role_id                 BigInt?
+  female_role_id               BigInt?
+  register_channel_clear       Boolean?
+  register_join_message        String?
+  colour_name_of_the_day       String?
+  join_message                 String?
+  language                     String   @default("en") @db.VarChar(5)
+  leave_message                String?
+  mod_mail_message             String   @default("Thank you for your message! Our mod team will reply to you here as soon as possible.")
+  bump_leaderboard_channel_id  BigInt?
+  last_bump_winner             String?
+  last_bump_winner_count       Int?
+  last_bump_winner_total_count Int?
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model infractions {
+  guild_id     BigInt
+  moderator_id BigInt
+  case_id      Int
+  user_id      BigInt
+  created_at   DateTime  @db.Timestamp(6)
+  expires_at   DateTime? @db.Timestamp(6)
+  reason       String
+  type         String
+
+  @@unique([guild_id, case_id])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model mod_mail_messages {
+  author_id        BigInt
+  sent_at          DateTime         @db.Timestamp(6)
+  message_id       BigInt           @id
+  channel_id       BigInt
+  sent_to          String
+  author_type      String
+  content          String
+  mod_mail_threads mod_mail_threads @relation(fields: [channel_id], references: [channel_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_mod_mail_thread")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model mod_mail_threads {
+  guild_id          BigInt
+  user_id           BigInt              @unique(map: "unique_mod_mail_threads_user_id")
+  channel_id        BigInt              @unique(map: "unique_channel_id")
+  close_date        DateTime?           @db.Timestamp(6)
+  created_at        DateTime            @db.Timestamp(6)
+  closed_at         DateTime?           @db.Timestamp(6)
+  status            String
+  closer_id         BigInt?
+  id                BigInt              @unique(map: "mod_mail_threads_pk") @default(autoincrement())
+  mod_mail_messages mod_mail_messages[]
+}
+
+model pgmigrations {
+  id     Int      @id @default(autoincrement())
+  name   String   @db.VarChar(255)
+  run_on DateTime @db.Timestamp(6)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model punishments {
+  guild_id       BigInt
+  created_at     DateTime  @db.Timestamp(6)
+  user_id        BigInt
+  expires_at        DateTime @db.Timestamp(6)
+  previous_roles BigInt[]
+  staff_id       BigInt
+  type           String
+
+  @@unique([guild_id, user_id, type], map: "unique_punishments")
+}
