@@ -6,7 +6,7 @@ import jsoncParser from "jsonc-eslint-parser";
 
 export default [
   {
-    ignores: ["dist/", "node_modules/", "scripts/", "eslint.config.js"],
+    ignores: ["dist/", "node_modules/", "scripts/", "eslint.config.js", "coverage/"],
   },
   {
     files: ["**/*.{js,ts}"],
