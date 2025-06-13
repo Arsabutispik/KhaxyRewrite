@@ -83,7 +83,7 @@ model mod_mail_messages {
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model mod_mail_threads {
   guild_id          BigInt
-  user_id           BigInt              @unique(map: "unique_mod_mail_threads_user_id")
+  user_id           BigInt
   channel_id        BigInt              @unique(map: "unique_channel_id")
   close_date        DateTime?           @db.Timestamp(6)
   created_at        DateTime            @db.Timestamp(6)
