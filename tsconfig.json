@@ -2,10 +2,11 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "ESNext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "lib": ["dom", "esnext", "esnext.asynciterable"],
     "skipLibCheck": true,
     "sourceMap": true,
+    "inlineSources": true,
     "outDir": "./dist",
     "removeComments": true,
     "noImplicitAny": true,
@@ -33,5 +34,5 @@
     "types": ["vitest"]
   },
   "include": ["src/**/*", "test/**/*", "tests/**/*", "vitest.config.ts"],
-  "exclude": ["node_modules", "dist", "test", "tests", "coverage"]
+  "exclude": ["node_modules", "dist", "coverage"]
 }

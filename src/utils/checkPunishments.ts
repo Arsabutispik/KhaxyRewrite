@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { logger } from "@lib";
-import { toStringId, modLog } from "./index";
+import { toStringId, modLog } from "./index.js";
 import { Client } from "discord.js";
 import { deleteExpiredPunishments, getExpiredPunishments, getGuildConfig } from "@database";
 import { PunishmentType } from "@constants";
