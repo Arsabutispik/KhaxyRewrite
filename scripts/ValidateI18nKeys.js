@@ -3,7 +3,7 @@ import path from "path";
 import chalk from "chalk";
 
 const baseLang = "en-GB";
-const localesDir = path.join(process.cwd(), "src", "locales");
+const localesDir = path.join(process.cwd(), "locales");
 
 function getKeys(obj, prefix = "") {
   return Object.keys(obj).reduce((res, key) => {

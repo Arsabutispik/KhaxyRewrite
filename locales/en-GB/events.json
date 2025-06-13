@@ -61,7 +61,7 @@
       "error_inserting": "An error occurred while attempting to insert the message into the database."
     }
   },
-  "messageEdit": {
+  "messageUpdate": {
     "message_edit": "***User edited their message.***\n```diff\n- {{oldContent}}\n+ {{newContent}}\n```"
   }
 }
