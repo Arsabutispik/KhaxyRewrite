@@ -1,7 +1,7 @@
 import type { SlashCommandBase } from "@customTypes";
 import { InteractionContextType, MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { logger } from "@lib";
-import { modLog, toStringId, addInfraction } from "@utils";
+import { modlog, toStringId, addInfraction } from "@utils";
 import { getGuildConfig } from "@database";
 import { InfractionType } from "@constants";
 
@@ -110,7 +110,7 @@ export default {
         }),
       );
     }
-    const result = await modLog(
+    const result = await modlog(
       {
         guild: interaction.guild,
         action: "WARNING",

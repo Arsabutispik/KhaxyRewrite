@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { logger } from "@lib";
-import { toStringId, modLog } from "./index.js";
+import { toStringId, modlog } from "./index.js";
 import { Client } from "discord.js";
 import { deleteExpiredPunishments, getExpiredPunishments, getGuildConfig } from "@database";
 import { PunishmentType } from "@constants";
@@ -47,7 +47,7 @@ export async function checkPunishments(client: Client) {
         continue;
       }
       await guild.members.unban(user, client.i18next.getFixedT(guild_config.language)("commands:ban.expired"));
-      await modLog(
+      await modlog(
         {
           guild,
           user: user,

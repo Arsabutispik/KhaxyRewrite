@@ -1,6 +1,6 @@
 import type { EventBase } from "@customTypes";
 import { AuditLogEvent, Events, PermissionsBitField } from "discord.js";
-import { replacePlaceholders, toStringId, modLog } from "@utils";
+import { replacePlaceholders, toStringId, modlog } from "@utils";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime.js";
 import { ModMailThreadStatus } from "@constants";
@@ -50,7 +50,7 @@ export default {
       if (dayjs().diff(createdTimestamp, "seconds") > 5) return;
       if (executor?.id === member.client.user?.id) return;
       if (target?.id !== member.id) return;
-      await modLog(
+      await modlog(
         {
           guild: member.guild,
           action: "KICK",

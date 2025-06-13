@@ -1,7 +1,7 @@
 import { Client, Guild, PermissionsBitField } from "discord.js";
 import dayjs from "dayjs";
 import { logger } from "@lib";
-import { toStringId, modLog } from "@utils";
+import { toStringId, modlog } from "@utils";
 import { getGuildConfig, getGuilds, updateCronJob } from "@database";
 import type { guilds as Guilds } from "@prisma/client";
 
@@ -74,7 +74,7 @@ async function processUnregisteredPeople(guild: Guild, config: Guilds, client: C
       .forEach((member) => {
         member.send(t("unregistered_member.kick_dm", { guild: guild.name, days: days_to_kick })).catch(() => {});
         member.kick(t("unregistered_member.initial", { days: days_to_kick })).catch(() => {});
-        modLog(
+        modlog(
           {
             guild,
             user: member.user,

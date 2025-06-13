@@ -1,6 +1,6 @@
 import type { EventBase } from "@customTypes";
 import { AutoModerationActionType, Events } from "discord.js";
-import { modLog } from "@utils";
+import { modlog } from "@utils";
 import dayjs from "dayjs";
 
 export default {
@@ -12,7 +12,7 @@ export default {
     // Check if the action type is Timeout
     if (execution.action.type === AutoModerationActionType.Timeout) {
       // Log the timeout action using the modlog utility
-      await modLog(
+      await modlog(
         {
           guild: execution.guild,
           user: execution.user!,

@@ -1,7 +1,7 @@
 import type { SlashCommandBase } from "@customTypes";
 import { InteractionContextType, MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { logger } from "@lib";
-import { modLog } from "@utils";
+import { modlog } from "@utils";
 import { getGuildConfig } from "@database";
 
 export default {
@@ -80,7 +80,7 @@ export default {
         user: interaction.user.id,
       });
     }
-    const result = await modLog(
+    const result = await modlog(
       {
         guild: interaction.guild,
         action: "UNBAN",

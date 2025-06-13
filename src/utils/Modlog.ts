@@ -21,7 +21,7 @@ type actions =
   | "TIMEOUT"
   | "UNMUTE";
 
-export async function modLog(
+export async function modlog(
   data: {
     guild: Guild;
     user: User | PartialUser;

@@ -3,7 +3,7 @@ import { InteractionContextType, MessageFlagsBitField, PermissionsBitField, Slas
 import dayjs from "dayjs";
 import dayjsduration from "dayjs/plugin/duration.js";
 import relativeTime from "dayjs/plugin/relativeTime.js";
-import { modLog, toStringId, addInfraction } from "@utils";
+import { modlog, toStringId, addInfraction } from "@utils";
 import "dayjs/locale/tr.js";
 import { logger } from "@lib";
 import { createPunishment, getGuildConfig } from "@database";
@@ -200,7 +200,7 @@ export default {
           user: `${interaction.user.tag} (${interaction.user.id})`,
         });
       }
-      const reply = await modLog(
+      const reply = await modlog(
         {
           guild: interaction.guild!,
           user,
@@ -279,7 +279,7 @@ export default {
           user: `${interaction.user.tag} (${interaction.user.id})`,
         });
       }
-      const reply = await modLog(
+      const reply = await modlog(
         {
           guild: interaction.guild!,
           user,

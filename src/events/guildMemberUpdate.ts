@@ -1,6 +1,6 @@
 import type { EventBase } from "@customTypes";
 import { AuditLogEvent, Events } from "discord.js";
-import { sleep, toStringId, modLog } from "@utils";
+import { sleep, toStringId, modlog } from "@utils";
 import dayjs from "dayjs";
 import { getGuildConfig } from "@database";
 
@@ -23,7 +23,7 @@ export default {
       const log = fetchedLogs.entries.first();
       if (Date.now() - log!.createdTimestamp >= 5000) return;
       if (!log) {
-        await modLog(
+        await modlog(
           {
             guild: oldMember.guild,
             user: newMember.user,
@@ -35,7 +35,7 @@ export default {
           oldMember.client,
         );
       } else {
-        await modLog(
+        await modlog(
           {
             guild: oldMember.guild,
             user: newMember.user,

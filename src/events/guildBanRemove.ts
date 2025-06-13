@@ -1,7 +1,7 @@
 import type { EventBase } from "@customTypes";
 import { AuditLogEvent, Events, PermissionsBitField } from "discord.js";
 import { logger } from "@lib";
-import { toStringId, modLog } from "@utils";
+import { toStringId, modlog } from "@utils";
 import { getGuildConfig } from "@database";
 
 export default {
@@ -19,7 +19,7 @@ export default {
 
     // If the bot does not have permission to view audit logs, log the unban without audit log details
     if (!ban.guild.members.me?.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
-      await modLog(
+      await modlog(
         {
           guild: ban.guild,
           action: "UNBAN",
@@ -42,7 +42,7 @@ export default {
 
       // If the target of the audit log entry does not match the unbanned user, log the unban with a mismatch reason
       if (entry.target?.id !== ban.user.id) {
-        await modLog(
+        await modlog(
           {
             guild: ban.guild,
             action: "UNBAN",
@@ -56,7 +56,7 @@ export default {
       }
 
       // Log the unban with details from the audit log entry
-      await modLog(
+      await modlog(
         {
           guild: ban.guild,
           action: "UNBAN",
@@ -68,7 +68,7 @@ export default {
       );
     } catch (error) {
       // If an error occurs while fetching audit logs, log the unban with an error reason
-      await modLog(
+      await modlog(
         {
           guild: ban.guild,
           action: "UNBAN",

@@ -1,6 +1,6 @@
 import type { EventBase } from "@customTypes";
 import { AuditLogEvent, Events, PermissionsBitField } from "discord.js";
-import { modLog, toStringId } from "@utils";
+import { modlog, toStringId } from "@utils";
 import { logger } from "@lib";
 import { getGuildConfig } from "@database";
 
@@ -19,7 +19,7 @@ export default {
 
     // If the bot does not have permission to view audit logs, log the ban without audit log details
     if (!ban.guild.members.me?.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
-      await modLog(
+      await modlog(
         {
           guild: ban.guild,
           action: "BAN",
@@ -42,7 +42,7 @@ export default {
 
       // If the target of the audit log entry does not match the banned user, log the ban with a mismatch reason
       if (entry.target?.id !== ban.user.id) {
-        await modLog(
+        await modlog(
           {
             guild: ban.guild,
             action: "BAN",
@@ -56,7 +56,7 @@ export default {
       }
 
       // Log the ban with details from the audit log entry
-      await modLog(
+      await modlog(
         {
           guild: ban.guild,
           action: "BAN",
@@ -68,7 +68,7 @@ export default {
       );
     } catch (error) {
       // If an error occurs while fetching audit logs, log the ban with an error reason
-      await modLog(
+      await modlog(
         {
           guild: ban.guild,
           action: "BAN",

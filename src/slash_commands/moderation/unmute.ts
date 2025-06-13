@@ -1,7 +1,7 @@
 import type { SlashCommandBase } from "@customTypes";
 import { InteractionContextType, MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { logger } from "@lib";
-import { modLog, toStringId } from "@utils";
+import { modlog, toStringId } from "@utils";
 import { deletePunishment, getGuildConfig, getLatestPunishmentByUserAndType } from "@database";
 import { PunishmentType } from "@constants";
 
@@ -118,7 +118,7 @@ export default {
     } catch {
       await interaction.reply(t("dm_error", { user: member.user.tag }));
     }
-    const result = await modLog(
+    const result = await modlog(
       {
         guild: interaction.guild,
         action: "UNMUTE",

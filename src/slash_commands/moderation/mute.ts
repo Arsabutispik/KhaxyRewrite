@@ -5,7 +5,7 @@ import dayjsduration from "dayjs/plugin/duration.js";
 import relativeTime from "dayjs/plugin/relativeTime.js";
 import { logger } from "@lib";
 import "dayjs/locale/tr.js";
-import { toStringId, modLog } from "@utils";
+import { toStringId, modlog } from "@utils";
 import { createPunishment, getGuildConfig, getLatestPunishmentByUserAndType } from "@database";
 import { PunishmentType } from "@constants";
 export default {
@@ -234,7 +234,7 @@ export default {
         }),
       });
     }
-    const result = await modLog(
+    const result = await modlog(
       {
         guild: interaction.guild,
         user: member.user,
