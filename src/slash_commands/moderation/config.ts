@@ -269,8 +269,8 @@ export default {
           await i.update({ embeds: [embed], components: [actionRow] });
         } else if (setting === "misc") {
           const selectedLanguage = {
-            tr: "Türkçe 🇹🇷",
-            en: "English 🇺🇸",
+            "tr-TR": "Türkçe 🇹🇷",
+            "en-GB": "English 🇬🇧",
           };
           embed
             .setTitle(t("embed.misc.title"))

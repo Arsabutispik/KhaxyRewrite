@@ -60,5 +60,8 @@
       "error_sending": "An error occurred while attempting to send the message.",
       "error_inserting": "An error occurred while attempting to insert the message into the database."
     }
+  },
+  "messageEdit": {
+    "message_edit": "User has edited their message in the mod mail thread.\n```diff\n- {{oldContent}}\n+ {{newContent}}\n```"
   }
 }
