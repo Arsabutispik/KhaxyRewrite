@@ -33,6 +33,6 @@
     },
     "types": ["vitest"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "vitest.config.ts"],
   "exclude": ["node_modules", "coverage"]
 }
