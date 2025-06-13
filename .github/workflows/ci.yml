@@ -89,4 +89,6 @@ jobs:
         with:
           version: '10.11.1'
       - run: pnpm install
+      - name: Generate Prisma Client
+        run: pnpm prisma generate
       - run: pnpm test
