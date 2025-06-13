@@ -60,5 +60,8 @@
       "error_sending": "Mesaj göndermeye çalışırken bir hata oluştu.",
       "error_inserting": "Mesajı veritabanına eklemeye çalışırken bir hata oluştu."
     }
+  },
+  "messageUpdate": {
+    "message_edit": "***Kullanıcı mesajını düzenledi.***\n```diff\n- {{oldContent}}\n+ {{newContent}}\n```"
   }
 }

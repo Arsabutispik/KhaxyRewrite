@@ -62,6 +62,6 @@
     }
   },
   "messageEdit": {
-    "message_edit": "User has edited their message in the mod mail thread.\n```diff\n- {{oldContent}}\n+ {{newContent}}\n```"
+    "message_edit": "***User edited their message.***\n```diff\n- {{oldContent}}\n+ {{newContent}}\n```"
   }
 }
