@@ -1,6 +1,6 @@
-# KhaxyRewrite
+# Khaxy
 
-KhaxyRewrite is a modern rewrite of the [Khaxy](https://github.com/Arsabutispik/Khaxy_Legacy) Discord bot, introducing SQL database support, internationalization (i18n), and improved customization. Built with TypeScript and Discord.js v14, it offers advanced moderation, music playback, and utility features for Discord servers.
+Khaxy is a modern rewrite of the [Khaxy_Legacy](https://github.com/Arsabutispik/Khaxy_Legacy) Discord bot, introducing SQL database support, internationalization (i18n), and improved customization. Built with TypeScript and Discord.js v14, it offers advanced moderation, music playback, and utility features for Discord servers.
 
 ## Features
 - **Advanced Moderation:** Automated punishments, infraction tracking, modmail, and more.
