@@ -5,6 +5,7 @@ const Emojis = {
   confirm: "1278053289992392795",
   reject: "1278053315334111353",
   ban: "1278053275429634162",
+  edit: "127805",
 };
 export const Config = {
   Emojis,

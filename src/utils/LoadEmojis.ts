@@ -3,7 +3,7 @@ import { logger } from "@lib";
 
 export async function loadEmojis(
   client: Client,
-  emojiObject: Array<{ name: string; id: string; fallBack: string }>,
+  emojiObject: Array<{ name: string; id: string; fallback: string }>,
 ): Promise<void> {
   try {
     const emojis = await client.application?.emojis.fetch();
@@ -16,7 +16,7 @@ export async function loadEmojis(
       for (const emoji of emojiObject) {
         client.allEmojis.set(emoji.id, {
           name: emoji.name,
-          format: emoji.fallBack,
+          format: emoji.fallback,
         });
       }
       return;
@@ -31,7 +31,7 @@ export async function loadEmojis(
         });
         client.allEmojis.set(emoji.id, {
           name: emoji.name,
-          format: emoji.fallBack,
+          format: emoji.fallback,
         });
       } else {
         if (fetchedEmoji.animated) {

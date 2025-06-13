@@ -7,36 +7,41 @@ export default {
   once: true,
   async execute(client) {
     await recoverMissedCronjob(client);
-    const emojis: Array<{ name: string; id: string; fallBack: string }> = [
+    const emojis: Array<{ name: string; id: string; fallback: string }> = [
       {
         name: "searchEmoji",
         id: client.config.Emojis.searchEmoji,
-        fallBack: "🔍",
+        fallback: "🔍",
       },
       {
         name: "gearSpinning",
         id: client.config.Emojis.gearSpinning,
-        fallBack: "⚙️",
+        fallback: "⚙️",
       },
       {
         name: "mailSent",
         id: client.config.Emojis.mailSent,
-        fallBack: "📩",
+        fallback: "📩",
       },
       {
         name: "confirm",
         id: client.config.Emojis.confirm,
-        fallBack: "✅",
+        fallback: "✅",
       },
       {
         name: "reject",
         id: client.config.Emojis.reject,
-        fallBack: "❌",
+        fallback: "❌",
       },
       {
         name: "ban",
         id: client.config.Emojis.ban,
-        fallBack: "🔨",
+        fallback: "🔨",
+      },
+      {
+        name: "edit",
+        id: client.config.Emojis.edit,
+        fallback: "✏️",
       },
     ];
     await loadEmojis(client, emojis);
