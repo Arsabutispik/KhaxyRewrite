@@ -5,7 +5,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "deploy-commands": "tsc && tsc-alias && node dist/utils/deploy-commands.js",
+    "deploy-commands": "tsc && tsc-alias && node --enable-source-maps dist/utils/deploy-commands.js",
     "start": "tsc && tsc-alias && prisma migrate deploy && node .",
     "validate-translations": "node scripts/ValidateI18nKeys.js",
     "test": "vitest",

@@ -14,7 +14,7 @@ declare module "discord.js" {
   interface Client {
     slashCommands: Collection<string, SlashCommandBase>;
     i18next: i18n;
-    allEmojis: Collection<string, { name: string; format: string }>;
+    allEmojis: Collection<string, { name: string; format: string; id?: string }>;
     config: typeof Config;
   }
 }

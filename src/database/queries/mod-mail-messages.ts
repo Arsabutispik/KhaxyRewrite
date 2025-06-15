@@ -20,17 +20,13 @@ export async function createModMailMessage(
 }
 
 export async function updateModMailMessage(
-  channelId: string,
   messageId: bigint | number | string,
-  message: Omit<Prisma.mod_mail_messagesCreateInput, "channel_id" | "mod_mail_threads">,
+  message: Partial<Prisma.mod_mail_messagesUpdateInput>,
 ): Promise<void> {
   if (Object.keys(message).length === 0) return;
 
   await prisma.mod_mail_messages.update({
     where: { message_id: BigInt(messageId) },
-    data: {
-      ...message,
-      channel_id: BigInt(channelId),
-    },
+    data: message,
   });
 }

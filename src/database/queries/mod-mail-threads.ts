@@ -48,7 +48,7 @@ export async function createModMailThread(
 
 export async function updateModMailThread(
   channelId: bigint | number | string,
-  thread: Omit<Prisma.mod_mail_threadsUpdateInput, "guild_id">,
+  thread: Partial<Prisma.mod_mail_threadsUpdateInput> & { status?: ModMailThreadStatus } = {},
 ): Promise<void> {
   if (Object.keys(thread).length === 0) return;
 

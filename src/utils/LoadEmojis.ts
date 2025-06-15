@@ -38,11 +38,13 @@ export async function loadEmojis(
           client.allEmojis.set(emoji.id, {
             name: emoji.name,
             format: `<a:${fetchedEmoji.name}:${fetchedEmoji.id}>`,
+            id: fetchedEmoji.id,
           });
         } else {
           client.allEmojis.set(emoji.id, {
             name: emoji.name,
             format: `<:${fetchedEmoji.name}:${fetchedEmoji.id}>`,
+            id: fetchedEmoji.id,
           });
         }
       }
