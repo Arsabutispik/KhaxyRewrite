@@ -10,6 +10,7 @@ import { getGuildConfig, updateGuildConfig } from "@database";
 import type { guilds as Guilds } from "@prisma/client";
 import type { TFunction } from "i18next";
 import { dynamicChannel, dynamicMessage } from "./register-config.js";
+import { localeFlags } from "@constants";
 
 export async function miscConfig(interaction: ChatInputCommandInteraction<"cached">) {
   const client = interaction.client;
@@ -86,10 +87,6 @@ export async function miscConfig(interaction: ChatInputCommandInteraction<"cache
 }
 
 async function languageConfig(interaction: MessageComponentInteraction, data: Guilds, t: TFunction) {
-  const langs: Record<string, string> = {
-    "en-GB": "English",
-    "tr-TR": "Türkçe",
-  };
   const client = interaction.client;
   const select_menu = new StringSelectMenuBuilder()
     .setCustomId("language")
@@ -98,13 +95,13 @@ async function languageConfig(interaction: MessageComponentInteraction, data: Gu
     .setOptions(
       [
         {
-          label: langs["en-GB"],
+          label: localeFlags["en-GB"],
           value: "en-GB",
           description: "English",
           emoji: "🇬🇧",
         },
         {
-          label: langs["tr-TR"],
+          label: localeFlags["tr-TR"],
           value: "tr-TR",
           description: "Türkçe",
           emoji: "🇹🇷",
@@ -148,7 +145,7 @@ async function languageConfig(interaction: MessageComponentInteraction, data: Gu
   });
   const new_t = client.i18next.getFixedT(message_component.values[0], null, "misc_config");
   await message_component.editReply({
-    content: new_t("language.set", { language: langs[message_component.values[0]] }),
+    content: new_t("language.set", { language: localeFlags[message_component.values[0]] }),
     components: [],
   });
 }

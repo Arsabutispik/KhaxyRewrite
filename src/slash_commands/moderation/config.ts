@@ -12,6 +12,8 @@ import {
 } from "discord.js";
 import { miscConfig, moderationConfig, registerConfig, roleConfig, welcomeLeaveConfig } from "@configFunctions";
 import { getGuildConfig } from "@database";
+import { localeFlags } from "@constants";
+
 export default {
   memberPermissions: [PermissionsBitField.Flags.Administrator],
   data: new SlashCommandBuilder()
@@ -268,17 +270,13 @@ export default {
           actionRow.setComponents(newSelectMenu);
           await i.update({ embeds: [embed], components: [actionRow] });
         } else if (setting === "misc") {
-          const selectedLanguage = {
-            "tr-TR": "Türkçe 🇹🇷",
-            "en-GB": "English 🇬🇧",
-          };
           embed
             .setTitle(t("embed.misc.title"))
             .setURL("https://docs.khaxy.net/${guild_config.language}/configuration/miscellaneous-settings")
             .addFields(
               {
                 name: t("embed.misc.fields.language"),
-                value: selectedLanguage[guild_config.language as keyof typeof selectedLanguage],
+                value: localeFlags[guild_config.language],
                 inline: true,
               },
               {
