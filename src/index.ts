@@ -78,7 +78,7 @@ player.events.on("playerStart", async (queue, track) => {
   if (track.thumbnail.length) embed.setThumbnail(track.thumbnail);
   if (
     queue.metadata.channel.isSendable() &&
-    queue.metadata.channel.permissionsFor(queue.metadata.guild.members.me).has(PermissionsBitField.Flags.SendMessages)
+    queue.metadata.channel.permissionsFor(queue.guild.members.me).has(PermissionsBitField.Flags.SendMessages)
   )
     queue.metadata.channel.send({ embeds: [embed] });
 });
