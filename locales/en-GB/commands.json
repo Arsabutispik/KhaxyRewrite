@@ -269,5 +269,12 @@
     "not_closing": "This mod mail thread is not marked for close.",
     "cancelled": "The closing of this mod mail thread has been cancelled.",
     "error": "An error occurred while cancelling the close. Developers have been notified."
+  },
+  "unsuspend": {
+    "no_thread": "This is not a mod mail thread.",
+    "not_suspended": "This mod mail thread is not suspended.",
+    "user_has_open_threads": "User has a open thread. You can't unsuspend this thread.",
+    "unsuspended": "This mod mail thread has been unsuspended. You can now reply to the user.",
+    "error": "An error occurred while unsuspending the thread. Developers have been notified."
   }
 }
