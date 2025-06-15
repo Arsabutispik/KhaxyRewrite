@@ -127,10 +127,11 @@ export default {
             return o;
           }),
         );
+        const docs_url = process.env.DOCS_URL || "https://docs.khaxy.net";
         if (setting === "register") {
           embed
             .setTitle(t("embed.register.title"))
-            .setURL("https://docs.khaxy.net/${guild_config.language}/configuration/register-settings")
+            .setURL(`${docs_url}/${guild_config.language.split("-")[0]}/configuration/register-settings`)
             .addFields(
               {
                 name: t("embed.register.fields.register_join_channel"),
@@ -164,7 +165,7 @@ export default {
         } else if (setting === "welcome-leave") {
           embed
             .setTitle(t("embed.welcome_leave.title"))
-            .setURL("https://docs.khaxy.net/${guild_config.language}/configuration/welcome-leave-settings")
+            .setURL(`${docs_url}/${guild_config.language.split("-")[0]}/configuration/welcome-leave-settings`)
             .addFields(
               {
                 name: t("embed.welcome_leave.fields.welcome_channel"),
@@ -196,7 +197,7 @@ export default {
         } else if (setting === "moderation") {
           embed
             .setTitle(t("embed.moderation.title"))
-            .setURL("https://docs.khaxy.net/${guild_config.language}/configuration/moderation-settings")
+            .setURL(`${docs_url}/${guild_config.language.split("-")[0]}/configuration/moderation-settings`)
             .addFields(
               {
                 name: t("embed.moderation.fields.mod_log_channel"),
@@ -234,7 +235,7 @@ export default {
         } else if (setting === "role") {
           embed
             .setTitle(t("embed.role.title"))
-            .setURL(`https://docs.khaxy.net/${guild_config.language}/configuration/role-settings`)
+            .setURL(`${docs_url}/${guild_config.language.split("-")[0]}/configuration/role-settings`)
             .addFields(
               {
                 name: t("embed.role.fields.color_of_the_day"),
@@ -272,7 +273,7 @@ export default {
         } else if (setting === "misc") {
           embed
             .setTitle(t("embed.misc.title"))
-            .setURL("https://docs.khaxy.net/${guild_config.language}/configuration/miscellaneous-settings")
+            .setURL(`${docs_url}/${guild_config.language.split("-")[0]}/configuration/miscellaneous-settings`)
             .addFields(
               {
                 name: t("embed.misc.fields.language"),
