@@ -136,6 +136,7 @@
     "initial": "Select the setting you want to update.",
     "timeout": "Message timed out. Please run the command again.",
     "channel_initial": "Select a channel below. If you want to remove the channel, press x and click elsewhere.",
+    "role_initial": "Select a role below. If you want to remove the role, press x and click elsewhere.",
     "role_too_high": "The role you selected is too high. Please select a role that is lower than the bot's role.",
     "mod_log_channel_id": {
       "label": "Set Mod Log Channel",

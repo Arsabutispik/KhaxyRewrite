@@ -114,17 +114,6 @@ export default {
       const long_duration = dayjs(dayjs().add(dayjsduration))
         .locale(guild_config.language || "en")
         .fromNow(true);
-      console.log("🔍 Logging insert values:");
-      console.log({
-        type: "TIMED_BAN",
-        user_id: user?.id,
-        guild_id: interaction.guild?.id,
-        moderator_id: interaction.user?.id,
-        created_at: new Date().toISOString(),
-        reason: reason,
-        case_id: guild_config?.case_id,
-        expires_at: new Date(Date.now() + dayjsduration.asMilliseconds()).toISOString(),
-      });
 
       try {
         await createPunishment(interaction.guildId, {

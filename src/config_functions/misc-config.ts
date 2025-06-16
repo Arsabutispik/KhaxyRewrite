@@ -57,11 +57,11 @@ export async function miscConfig(interaction: ChatInputCommandInteraction<"cache
   try {
     message_component = await reply.resource!.message!.awaitMessageComponent({
       filter,
-      time: 1000 * 60 * 5,
+      time: 1000 * 60,
       componentType: ComponentType.StringSelect,
     });
   } catch {
-    await reply.resource!.message!.edit({ content: t("timeout"), components: [] });
+    await reply.resource!.message!.edit({ content: t("timeout"), components: [] }).catch(() => null);
     return;
   }
   if (!message_component.inCachedGuild()) {
@@ -124,7 +124,7 @@ async function languageConfig(interaction: MessageComponentInteraction, data: Gu
   try {
     message_component = await result.awaitMessageComponent({
       filter,
-      time: 1000 * 60 * 5,
+      time: 1000 * 60,
       componentType: ComponentType.StringSelect,
     });
   } catch {

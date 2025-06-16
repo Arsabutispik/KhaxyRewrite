@@ -136,6 +136,7 @@
     "initial": "Güncellemek istediğiniz ayarı seçin.",
     "timeout": "Mesaj zaman aşımına uğradı. Lütfen komutu tekrar çalıştırın.",
     "channel_initial": "Aşağıdaki kanallardan birini seçin. Kanalı kaldırmak istiyorsanız x'e basın ve başka bir yere basın",
+    "role_initial": "Aşağıdaki rollerden birini seçin. Rolü kaldırmak istiyorsanız x'e basın ve başka bir yere basın",
     "role_too_high": "Verilen rol, botun sahip olduğu en yüksek rolün üstünde. Lütfen daha düşük bir rol seçin.",
     "mod_log_channel_id": {
       "label": "Moderasyon Log Kanalını Ayarla",

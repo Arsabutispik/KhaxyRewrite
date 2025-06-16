@@ -63,11 +63,11 @@ export async function welcomeLeaveConfig(interaction: ChatInputCommandInteractio
   try {
     message_component = await reply.resource!.message!.awaitMessageComponent({
       filter,
-      time: 15000,
+      time: 1000 * 60 * 5,
       componentType: ComponentType.StringSelect,
     });
   } catch {
-    await reply.resource!.message!.edit({ content: t("timeout"), components: [] });
+    await reply.resource!.message!.edit({ content: t("timeout"), components: [] }).catch(() => null);
     return;
   }
   if (!message_component.inCachedGuild()) {

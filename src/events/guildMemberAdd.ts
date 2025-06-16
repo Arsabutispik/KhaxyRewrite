@@ -40,13 +40,13 @@ export default {
     }
     dayjs.extend(relativeTime);
     const replacements = {
-      "{user}": member.toString(),
-      "{server}": member.guild.name,
-      "{memberCount}": member.guild.memberCount.toString(),
-      "{name}": member.user.username,
-      "{joinPosition}": (member.guild.memberCount - 1).toString(),
-      "{createdAt}": dayjs(member.user.createdAt).format("DD/MM/YYYY"),
-      "{createdAgo}": dayjs(member.user.createdAt).fromNow(),
+      user: member.toString(),
+      server: member.guild.name,
+      memberCount: member.guild.memberCount.toString(),
+      name: member.user.username,
+      joinPosition: (member.guild.memberCount - 1).toString(),
+      createdAt: dayjs(member.user.createdAt).format("DD/MM/YYYY"),
+      createdAgo: dayjs(member.user.createdAt).fromNow(),
     };
     // If a welcome message and channel are configured, send the welcome message to the channel
     if (

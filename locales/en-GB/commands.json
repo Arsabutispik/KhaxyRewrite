@@ -73,6 +73,7 @@
   "unban": {
     "no_reason": "No reason provided for unbanning.",
     "no_user": "User not found.",
+    "not_banned": "User is not banned.",
     "success": "{{confirm}} **{{user}}** has been unbanned (Case #{{case}}).",
     "error": "Error while unbanning the user. {{error}}"
   },

@@ -57,6 +57,13 @@ export default {
       await interaction.reply({ content: t("no_user"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
+    if (!interaction.guild.bans.cache.has(user.id)) {
+      await interaction.reply({
+        content: t("not_banned", { user: user.tag }),
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+      });
+      return;
+    }
     const reason = interaction.options.getString("reason") || t("no_reason");
     try {
       await interaction.guild.members.unban(user, reason);

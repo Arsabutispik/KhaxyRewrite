@@ -41,7 +41,7 @@ export async function moderationConfig(interaction: ChatInputCommandInteraction<
       {
         label: t("staff_role_id.label"),
         value: "staff_role",
-        description: t("staff_role.description"),
+        description: t("staff_role_id.description"),
         emoji: "🛡️",
       },
       {
@@ -86,7 +86,7 @@ export async function moderationConfig(interaction: ChatInputCommandInteraction<
       componentType: ComponentType.StringSelect,
     });
   } catch {
-    await reply.resource!.message!.edit({ content: t("timeout"), components: [] });
+    await reply.resource!.message!.edit({ content: t("timeout"), components: [] }).catch(() => null);
     return;
   }
   if (!message_component.inCachedGuild()) {

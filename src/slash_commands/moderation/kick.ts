@@ -1,7 +1,7 @@
 import type { SlashCommandBase } from "@customTypes";
 import { InteractionContextType, MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { logger } from "@lib";
-import { toStringId, addInfraction } from "@utils";
+import { toStringId, addInfraction, modlog } from "@utils";
 import { getGuildConfig } from "@database";
 import { InfractionType } from "@constants";
 
@@ -100,6 +100,30 @@ export default {
       moderator: interaction.user.id,
       client,
     });
+    try {
+      await member.send(
+        t("message.dm", {
+          confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
+          guild: interaction.guild.name,
+          reason,
+        }),
+      );
+      await interaction.reply(
+        t("message.success", {
+          user: member.user.tag,
+          case: guild_config.case_id,
+          confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
+        }),
+      );
+    } catch {
+      await interaction.reply(
+        t("message.fail", {
+          user: member.user.tag,
+          case: guild_config.case_id,
+          confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
+        }),
+      );
+    }
     if (clear) {
       try {
         await member.ban({ reason: `Softban- ${reason}`, deleteMessageSeconds: 604800 });
@@ -126,29 +150,16 @@ export default {
         });
       }
     }
-    try {
-      await member.send(
-        t("message.dm", {
-          confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
-          guild: interaction.guild.name,
-          reason,
-        }),
-      );
-      await interaction.reply(
-        t("message.success", {
-          user: member.user.tag,
-          case: guild_config.case_id,
-          confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
-        }),
-      );
-    } catch {
-      await interaction.reply(
-        t("message.fail", {
-          user: member.user.tag,
-          case: guild_config.case_id,
-          confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
-        }),
-      );
+    const reply = await modlog(
+      { guild: interaction.guild, action: "KICK", user: member.user, moderator: interaction.user, reason: reason },
+      interaction.client,
+    );
+    if (reply) {
+      if (interaction.replied) {
+        await interaction.followUp(reply.message);
+      } else {
+        await interaction.reply(reply.message);
+      }
     }
   },
 } as SlashCommandBase;

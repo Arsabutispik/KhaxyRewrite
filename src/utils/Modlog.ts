@@ -115,7 +115,12 @@ export async function modlog(
       message += t("mod_log.unban", { moderator, user, reason });
       break;
     case "BAN_EXPIRED":
-      message += t("mod_log.ban_expired", { moderator, user, reason });
+      message += t("mod_log.ban_expired", {
+        moderator,
+        user,
+        reason,
+        duration: dayjs(duration).locale(lang).fromNow(true),
+      });
       break;
     case "TIMEOUT":
       message += t("mod_log.timeout", {

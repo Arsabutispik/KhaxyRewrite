@@ -91,10 +91,7 @@ export async function roleConfig(interaction: ChatInputCommandInteraction<"cache
       time: 1000 * 60 * 5,
     });
   } catch {
-    await reply.resource!.message!.edit({
-      content: t("timeout"),
-      components: [],
-    });
+    await reply.resource!.message!.edit({ content: t("timeout"), components: [] }).catch(() => null);
     return;
   }
   if (!message_component.inCachedGuild()) {

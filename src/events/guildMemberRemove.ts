@@ -14,13 +14,13 @@ export default {
     const guild_config = await getGuildConfig(member.guild.id);
     dayjs.extend(relativeTime);
     const replacements = {
-      "{user}": member.toString(),
-      "{server}": member.guild.name,
-      "{memberCount}": member.guild.memberCount.toString(),
-      "{name}": member.user.username,
-      "{joinPosition}": (member.guild.memberCount - 1).toString(),
-      "{createdAt}": dayjs(member.user.createdAt).format("DD/MM/YYYY"),
-      "{createdAgo}": dayjs(member.user.createdAt).fromNow(),
+      user: member.toString(),
+      server: member.guild.name,
+      memberCount: member.guild.memberCount.toString(),
+      "nam}": member.user.username,
+      joinPosition: (member.guild.memberCount - 1).toString(),
+      createdAt: dayjs(member.user.createdAt).format("DD/MM/YYYY"),
+      createdAgo: dayjs(member.user.createdAt).fromNow(),
     };
     // If no guild data is found, exit the function
     if (!guild_config) return;
