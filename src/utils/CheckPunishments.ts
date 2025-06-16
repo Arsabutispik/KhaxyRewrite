@@ -34,11 +34,11 @@ export async function checkPunishments(client: Client) {
     const staff = await client.users.fetch(toStringId(punishment.staff_id));
     const expiresDate = dayjs(punishment.expires_at);
     const createdAtDate = dayjs(punishment.created_at);
-    const duration = dayjs(expiresDate.diff(createdAtDate));
-
+    const duration = dayjs(Date.now() - expiresDate.diff(createdAtDate));
     if (punishment.type === PunishmentType.BAN) {
       // If the punishment is a ban, unban the user
-      if (!guild.bans.cache.get(user.id)) {
+      const banned = await guild.bans.fetch(user.id).catch(() => null);
+      if (!banned) {
         logger.log({
           level: "warn",
           message: `User ${user.tag} is not banned in guild ${guild.name}`,

@@ -118,7 +118,7 @@ player.events.on("playerError", async (queue, error) => {
 });
 
 CronJob.from({
-  cronTime: "*/5 * * * *",
+  cronTime: "* * * * *",
   onTick: () => checkPunishments(client),
   start: true,
   timeZone: "UTC",
