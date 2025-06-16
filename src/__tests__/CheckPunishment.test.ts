@@ -37,6 +37,7 @@ const createMockGuild = (id: string) =>
     },
     bans: {
       cache: new Map(),
+      fetch: vi.fn(),
     },
     roles: {
       cache: new Collection<string, Role>(),
@@ -62,6 +63,9 @@ describe("checkPunishments", () => {
       if (id === "456") return mockUser;
       if (id === "789") return { id: "789" } as User; // Mock staff user
       return null;
+    });
+    (mockGuild.bans.fetch as unknown as ReturnType<typeof vi.fn>).mockImplementation((id) => {
+      return Promise.resolve(mockGuild.bans.cache.get(id) || null);
     });
     vi.mocked(getExpiredPunishments).mockResolvedValue([
       {
@@ -170,6 +174,9 @@ describe("checkPunishments", () => {
       if (id === "456") return mockUser;
       if (id === "789") return { id: "789" } as User; // Mock staff user
       return null;
+    });
+    (mockGuild.bans.fetch as unknown as ReturnType<typeof vi.fn>).mockImplementation((id) => {
+      return Promise.resolve(mockGuild.bans.cache.get(id) || null);
     });
     vi.mocked(getExpiredPunishments).mockResolvedValue([
       {
