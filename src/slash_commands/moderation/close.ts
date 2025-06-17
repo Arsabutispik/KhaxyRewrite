@@ -21,9 +21,16 @@ import { modMailLog, toStringId } from "@utils";
 import { getGuildConfig, getModMailThread, updateModMailThread } from "@database";
 export default {
   memberPermissions: [PermissionsBitField.Flags.ModerateMembers],
+  clientPermissions: [PermissionsBitField.Flags.ManageChannels],
   data: new SlashCommandBuilder()
     .setName("close")
+    .setNameLocalizations({
+      tr: "kapat",
+    })
     .setDescription("Close the mod mail thread")
+    .setDescriptionLocalizations({
+      tr: "Mod mail kanalını kapat",
+    })
     .setContexts(InteractionContextType.Guild)
     .setDefaultMemberPermissions(PermissionsBitField.Flags.ModerateMembers)
     .addNumberOption((option) =>

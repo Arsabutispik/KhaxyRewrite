@@ -1,0 +1,97 @@
+{
+  "ban": {
+    "title": "Kullanıcıyı Yasakla",
+    "description": "Kullanıcıyı sunucudan yasaklar. Belirli bir süreyle veya süresiz olarak.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}> `<kullanıcı> [süre] [vakit] [sebep]`",
+    "permissions": [
+      "Kullanıcı İzinleri: `Üyeleri Yasakla`",
+      "Bot İzinleri: `Üyeleri Yasakla`"
+    ],
+    "examples": [
+      "`/yasakla kullanıcı:@kullanıcı` - Kullanıcıyı süresiz olarak yasaklar.",
+      "`/yasakla kullanıcı:@kullanıcı süre:1 vakit:Gün` - Kullanıcıyı 1 gün boyunca yasaklar.",
+      "`/yasakla kullanıcı:@kullanıcı süre:1 vakit:Saat sebep:Spam yapma` - Kullanıcıyı 1 saat boyunca spam yaptığı için yasaklar."
+    ]
+  },
+  "close": {
+    "title": "Modmail İletişim Kanalını Kapat",
+    "description": "Geçerli modmail iletişim kanalını kapatır, daha fazla mesaj gönderilmesini engeller. Modmail kanalında kullanılmalıdır.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}>",
+    "permissions": [
+      "Kullanıcı İzinleri: `Mesajları Yönet`",
+      "Bot İzinleri: `Kanalları Yönet`"
+    ]
+  },
+  "close-cancel": {
+    "title": "Modmail İletişim Kanalını Kapatma İptali",
+    "description": "Modmail iletişim kanalını kapatma işlemini iptal eder. Modmail kanalında kullanılmalıdır.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}>",
+    "permissions": [
+      "Kullanıcı İzinleri: `Mesajları Yönet`"
+    ]
+  },
+  "config": {
+    "title": "Sunucu Ayarlarını Yapılandır",
+    "description": "Sunucu için modmail kanalları, hoş geldin mesajları ve daha fazlası gibi çeşitli ayarları yapılandırmanıza olanak tanır.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}>",
+    "permissions": [
+      "Kullanıcı İzinleri: `Yönetici`"
+    ],
+    "examples": [
+      "`/ayarlar ayar:Moderasyon Ayarları` - Sunucunun moderasyon ayarlarını yapılandırır.",
+      "`/ayarlar ayar:Gelen-Giden Ayarları` - Sunucunun hoş geldin-ayrılma ayarlarını yapılandırır."
+    ]
+  },
+  "kick": {
+    "title": "Kullanıcıyı At",
+    "description": "Kullanıcıyı sunucudan atar ve istenirse mesajlarını temizler.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}> `<kullanıcı> [sebep] [temizle]`",
+    "permissions": [
+      "Kullanıcı İzinleri: `Üyeleri At`",
+      "Bot İzinleri: `Üyeleri At`"
+    ],
+    "examples": [
+      "`/at kullanıcı:@kullanıcı` - Kullanıcıyı sunucudan atar.",
+      "`/at kullanıcı:@kullanıcı sebep:Spam yapma` - Kullanıcıyı sebep belirterek atar.",
+      "`/at kullanıcı:@kullanıcı temizle:True` - Kullanıcıyı atar ve mesajlarını temizler."
+    ]
+  },
+  "mute": {
+    "title": "Kullanıcıyı Sustur",
+    "description": "Kullanıcıyı sunucuda susturur, mesaj göndermesini engeller.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}> `<kullanıcı> <süre> <zaman> [sebep]`",
+    "permissions": [
+      "Kullanıcı İzinleri: `Rolleri Yönet`",
+      "Bot İzinleri: `Rolleri Yönet`"
+    ],
+    "examples": [
+      "`/sustur kullanıcı:@kullanıcı` - Kullanıcıyı süresiz olarak susturur.",
+      "`/sustur kullanıcı:@kullanıcı süre:1 vakit:Gün` - Kullanıcıyı 1 gün boyunca susturur.",
+      "`/sustur kullanıcı:@kullanıcı süre:1 vakit:Saat sebep:Spam yapma` - Kullanıcıyı 1 saat boyunca spam yaptığı için susturur."
+    ]
+  },
+  "newthread": {
+    "title": "Yeni Modmail İletişim Kanalı Oluştur",
+    "description": "Yeni bir modmail iletişim kanalı oluşturur. Bu komut, kullanıcıların modmail ile iletişim kurmasını sağlar.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}> `<kullanıcı> <mesaj>`",
+    "permissions": [
+      "Kullanıcı İzinleri: `Mesajları Yönet`",
+      "Bot İzinleri: `Kanalları Yönet`"
+    ],
+    "examples": [
+      "`/yeni-modmail kullanıcı:@kullanıcı mesaj:Modmail için bir sebep` - Kullanıcı için yeni bir modmail iletişim kanalı oluşturur."
+    ]
+  },
+  "register": {
+    "title": "Kullanıcıyı Kaydet",
+    "description": "Kullanıcıyı manuel olarak cinsiyetli veya cinsiyetsiz bir şekilde sunucuya kaydeder.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}> `<kullanıcı> <cinsiyet>`",
+    "permissions": [
+      "Kullanıcı İzinleri: `Rolleri Yönet`",
+      "Bot İzinleri: `Rolleri Yönet`"
+    ],
+    "examples": [
+      "`/kaydet kullanıcı:@kullanıcı cinisyet: Diğer \uD83E\uDDD1` - Kullanıcıyı üye rolüyle kaydeder."
+    ]
+  }
+}

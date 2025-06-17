@@ -18,7 +18,7 @@ export default {
   data: new SlashCommandBuilder()
     .setName("newthread")
     .setNameLocalizations({
-      tr: "yeni-modmesaj",
+      tr: "yeni-modmail",
     })
     .setDescription("Create a new thread for moderation messages.")
     .setDescriptionLocalizations({

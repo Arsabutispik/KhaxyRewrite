@@ -26,6 +26,9 @@ export default {
     .addUserOption((option) =>
       option
         .setName("user")
+        .setNameLocalizations({
+          tr: "kullanıcı",
+        })
         .setDescription("The user to ban.")
         .setDescriptionLocalizations({
           tr: "Yasaklanacak kullanıcı.",

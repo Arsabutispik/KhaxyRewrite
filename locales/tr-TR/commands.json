@@ -277,5 +277,11 @@
     "user_has_open_threads": "Kullanıcının açık mod mail kanalları var. Bu kanalı askıdan kaldıramazsınız.",
     "unsuspended": "Mod mail kanalı askıdan kaldırıldı",
     "error": "Mod mail kanalı askıdan kaldırılırken hata oluştu. Bot geliştiricilerine bildirildi."
+  },
+  "help": {
+    "command_usage": "Komut Kullanımı",
+    "permissions": "Gerekli İzinler",
+    "examples": "Örnekler",
+    "command_not_found": "Komut bulunamadı."
   }
 }

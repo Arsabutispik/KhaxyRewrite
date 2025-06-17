@@ -9,7 +9,7 @@ export async function initI18n() {
       fallbackLng: "en-GB",
       lng: "en-GB",
       preload: ["en-GB", "tr-TR"],
-      ns: ["translation", "events", "permissions", "commands"],
+      ns: ["translation", "events", "permissions", "commands", "help"],
       defaultNS: "translation",
       backend: {
         loadPath: "locales/{{lng}}/{{ns}}.json",

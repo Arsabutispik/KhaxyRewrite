@@ -10,6 +10,9 @@ export default {
   clientPermissions: [PermissionsBitField.Flags.KickMembers],
   data: new SlashCommandBuilder()
     .setName("kick")
+    .setNameLocalizations({
+      tr: "at",
+    })
     .setDescription("Kick a member from the server")
     .setDescriptionLocalizations({
       tr: "Sunucudan bir üyeyi atar",

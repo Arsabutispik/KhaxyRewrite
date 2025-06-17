@@ -1,0 +1,97 @@
+{
+  "ban": {
+    "title": "Ban User",
+    "description": "Bans the user from the server. With or without a given time.",
+    "usage": "Usage: </{{command.name}}:{{command.id}}> `<user> [reason] [duration] [time]`",
+    "permissions": [
+      "User Permissions: `Ban Members`",
+      "Bot Permissions: `Ban Members`"
+    ],
+    "examples": [
+      "`/ban user:@user` - Bans the user indefinitely.",
+      "`/ban user:@user duration:1 time:Day(s)` - Bans the user for 1 day.",
+      "`/ban user:@user reason:Spamming duration:1 time:Week(s)` - Bans the user for 1 week with a reason."
+    ]
+  },
+  "close": {
+    "title": "Close a Modmail Thread",
+    "description": "Closes the current modmail thread, preventing further messages. Must be used in a modmail channel.",
+    "usage": "Usage: </{{command.name}}:{{command.id}}>",
+    "permissions": [
+      "User Permissions: `Manage Messages`",
+      "Bot Permissions: `Manage Channels`"
+    ]
+  },
+  "close-cancel": {
+    "title": "Cancel Close",
+    "description": "Cancels the close action for a modmail thread, allowing further messages to be sent.",
+    "usage": "Usage: </{{command.name}}:{{command.id}}>",
+    "permissions": [
+      "User Permissions: `Manage Messages`"
+    ]
+  },
+  "config": {
+    "title": "Configure Server Settings",
+    "description": "Allows you to configure various settings for the server, such as modmail channels, welcome messages, and more.",
+    "usage": "Usage: </{{command.name}}:{{command.id}}> `[setting]`",
+    "permissions": [
+      "User Permissions: `Administrator`"
+      ],
+    "examples": [
+      "`/config setting:Moderation Settings` - Configures moderation settings for the server.",
+      "`/config setting:Welcome-Leave Settings` - Configures the welcome-leave settings for the server."
+    ]
+  },
+  "kick": {
+    "title": "Kick User",
+    "description": "Kicks the user from the server with the option to clear their messages.",
+    "usage": "Usage: </{{command.name}}:{{command.id}}> `<user> [reason] [clear]`",
+    "permissions": [
+      "User Permissions: `Kick Members`",
+      "Bot Permissions: `Kick Members`"
+    ],
+    "examples": [
+      "`/kick user:@user` - Kicks the user from the server.",
+      "`/kick user:@user reason:Spamming` - Kicks the user with a reason.",
+      "`/kick user:@user clear:True` - Kicks the user and clears their messages."
+    ]
+  },
+  "mute": {
+    "title": "Mute User",
+    "description": "Mutes the user in the server, preventing them from sending messages.",
+    "usage": "Usage: </{{command.name}}:{{command.id}}> `<user> <duration> <time> [reason]`",
+    "permissions": [
+      "User Permissions: `Manage Roles`",
+      "Bot Permissions: `Manage Roles`"
+    ],
+    "examples": [
+      "`/mute user:@user` - Mutes the user indefinitely.",
+      "`/mute user:@user duration:1 time:Day(s)` - Mutes the user for 1 day.",
+      "`/mute user:@user reason:Spamming duration:1 time:Hour(s)` - Mutes the user for 1 hour with a reason."
+    ]
+  },
+  "newthread": {
+    "title": "Start a New Modmail Thread",
+    "description": "Starts a new modmail thread with the specified user, allowing for private communication.",
+    "usage": "Usage: </{{command.name}}:{{command.id}}> `<user> <message>`",
+    "permissions": [
+      "User Permissions: `Manage Messages`",
+      "Bot Permissions: `Send Messages`"
+    ],
+    "examples": [
+      "`/newthread user:@user message:Hello!` - Starts a new modmail thread with the user and sends a message."
+    ]
+  },
+  "register": {
+    "title": "Register User",
+    "description": "Helps you manually verify a user with gender specific roles or not.",
+    "usage": "Usage: </{{command.name}}:{{command.id}}> `<user> <gender>`",
+    "permissions": [
+      "User Permissions: `Manage Roles`",
+      "Bot Permissions: `Manage Roles`"
+    ],
+    "examples": [
+      "`/register user:@user gender:Other \uD83E\uDDD1` - Registers the user with just the member role."
+    ]
+  }
+}

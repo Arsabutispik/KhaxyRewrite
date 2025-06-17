@@ -277,5 +277,12 @@
     "user_has_open_threads": "User has a open thread. You can't unsuspend this thread.",
     "unsuspended": "This mod mail thread has been unsuspended. You can now reply to the user.",
     "error": "An error occurred while unsuspending the thread. Developers have been notified."
+  },
+  "help": {
+    "command_usage": "Command Usage",
+    "permissions": "Permissions",
+    "examples": "Examples",
+    "command_not_found": "Command not found.",
+    "footer": "<param> are required parameters, [param] are optional parameters."
   }
 }
