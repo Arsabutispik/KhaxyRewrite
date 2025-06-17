@@ -1,26 +1,73 @@
 ---
-name: Bug report
-about: Create a report to help us improve
-title: "[BUG]"
-labels: bug
-assignees: ""
+name: "Bug Report"
+about: "Report unexpected behavior or broken features in the Discord bot"
+title: "[Bug]: "
+labels: ["bug"]
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## Summary
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+Give a brief summary of the bug.
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+---
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+## What Happened?
 
-**Additional context**
-Add any other context about the problem here.
+Clearly describe what the bug is.
+> Example: "When using `/warn`, the bot crashes if no reason is provided."
+
+---
+
+## Steps to Reproduce
+
+Help us reproduce the bug:
+
+1. **Command used:** `/command-name`
+2. **Server context (if applicable):** Name or ID
+3. **Steps:**
+    - Go to '...'
+    - Click on '...'
+    - See error
+
+---
+
+## Expected Behavior
+
+What should have happened instead?
+
+---
+
+## Actual Behavior
+
+What actually happened?
+
+---
+
+## Screenshots / Logs
+
+If applicable, upload screenshots or copy any relevant logs, error messages, or bot responses.
+
+---
+
+## Environment
+
+Please fill out what applies:
+
+- Bot Version:
+- Discord.js Version:
+- Node.js Version:
+- Hosting (Self-hosted/VPS/Cloud/etc):
+
+---
+
+## Additional Context
+
+Anything else we should know?
+
+---
+
+## Checklist
+
+- [ ] I have searched existing issues.
+- [ ] I can reliably reproduce this bug.
+- [ ] I have included as much detail as possible.
