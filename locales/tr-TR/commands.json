@@ -282,6 +282,7 @@
     "command_usage": "Komut Kullanımı",
     "permissions": "Gerekli İzinler",
     "examples": "Örnekler",
-    "command_not_found": "Komut bulunamadı."
+    "command_not_found": "Komut bulunamadı.",
+    "footer": "<param> - Zorunlu parametre, [param] - İsteğe bağlı parametre"
   }
 }
