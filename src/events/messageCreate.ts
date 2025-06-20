@@ -155,6 +155,14 @@ export default {
               sent_to: ModMailMessageSentTo.THREAD,
               message_id: BigInt(message.id),
             });
+            await createModMailMessage(channel.id, {
+              author_id: BigInt(message.client.user.id),
+              sent_at: new Date().toISOString(),
+              author_type: ModMailMessageType.CLIENT,
+              content: guild_config.mod_mail_message,
+              sent_to: ModMailMessageSentTo.USER,
+              message_id: BigInt(message.id),
+            });
           } catch (e) {
             logger.error({ message: "Error inserting mod mail message", error: e });
             await message.reply(t("error_inserting"));
@@ -273,6 +281,14 @@ export default {
             user_id: BigInt(message.author.id),
             status: ModMailThreadStatus.OPEN,
             created_at: new Date().toISOString(),
+          });
+          await createModMailMessage(channel.id, {
+            author_id: BigInt(message.client.user.id),
+            sent_at: new Date().toISOString(),
+            author_type: ModMailMessageType.CLIENT,
+            content: guild_config.mod_mail_message,
+            sent_to: ModMailMessageSentTo.USER,
+            message_id: BigInt(message.id),
           });
         } catch (e) {
           logger.error({

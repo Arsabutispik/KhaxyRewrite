@@ -168,7 +168,7 @@ export default {
         author_type: ModMailMessageType.CLIENT,
         content: bot_message.content,
       });
-      await createModMailMessage(interaction.channelId, {
+      await createModMailMessage(channel.id, {
         author_id: BigInt(interaction.user.id),
         sent_at: new Date(),
         author_type: ModMailMessageType.STAFF,
@@ -179,7 +179,7 @@ export default {
       await interaction.editReply({
         content: t("thread_created", { channel: channel.toString() }),
       });
-      await createModMailMessage(interaction.channelId, {
+      await createModMailMessage(channel.id, {
         author_id: BigInt(interaction.user.id),
         sent_at: new Date(),
         author_type: ModMailMessageType.CLIENT,

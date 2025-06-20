@@ -1,7 +1,13 @@
 import { SlashCommandBase } from "@customTypes";
-import { InteractionContextType, MessageFlags, PermissionsBitField, SlashCommandBuilder } from "discord.js";
-import { getGuildConfig, getModMailThread, getModMailThreadsByUser, updateModMailThread } from "@database";
-import { ModMailThreadStatus } from "@constants";
+import { InteractionContextType, Locale, MessageFlags, PermissionsBitField, SlashCommandBuilder } from "discord.js";
+import {
+  createModMailMessage,
+  getGuildConfig,
+  getModMailThread,
+  getModMailThreadsByUser,
+  updateModMailThread,
+} from "@database";
+import { ModMailMessageSentTo, ModMailMessageType, ModMailThreadStatus } from "@constants";
 import { toStringId } from "@utils";
 import { logger } from "@lib";
 
@@ -55,6 +61,22 @@ export default {
     try {
       await updateModMailThread(toStringId(interaction.channelId), {
         status: ModMailThreadStatus.OPEN,
+      });
+      await createModMailMessage(interaction.channelId, {
+        author_id: BigInt(interaction.user.id),
+        sent_at: new Date(),
+        author_type: ModMailMessageType.STAFF,
+        sent_to: ModMailMessageSentTo.COMMAND,
+        content: `/${interaction.command?.nameLocalizations?.[guild_config.language.split("-")[0] as Locale]}`,
+        message_id: BigInt(interaction.id),
+      });
+      await createModMailMessage(interaction.channelId, {
+        author_id: BigInt(interaction.user.id),
+        sent_at: new Date(),
+        author_type: ModMailMessageType.CLIENT,
+        sent_to: ModMailMessageSentTo.THREAD,
+        content: t("unsuspended"),
+        message_id: BigInt(interaction.id),
       });
       await interaction.editReply(t("unsuspended"));
     } catch (error) {

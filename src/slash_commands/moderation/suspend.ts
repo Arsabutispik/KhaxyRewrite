@@ -60,7 +60,7 @@ export default {
         sent_at: new Date(),
         author_type: ModMailMessageType.CLIENT,
         sent_to: ModMailMessageSentTo.THREAD,
-        content: t("cancelled"),
+        content: t("suspended"),
         message_id: BigInt(response.resource?.message?.id || 0),
       });
     } catch (error) {
