@@ -23,6 +23,7 @@ import {
   getModMailThread,
   getModMailThreadsByUser,
   updateBumpLeaderboard,
+  updateModMailThread,
 } from "@database";
 export default {
   name: Events.MessageCreate,
@@ -329,6 +330,19 @@ export default {
         }
         const t = client.i18next.getFixedT(guild_config.language, "events", "messageCreate.mod_mail");
         try {
+          if (threads[0].close_date) {
+            await channel.send(
+              t("reopened", {
+                user: message.author.tag,
+                closer: threads[0].closer_id ? `<@${threads[0].closer_id}>` : "unknown",
+              }),
+            );
+            await updateModMailThread(channel.id, {
+              status: ModMailThreadStatus.OPEN,
+              close_date: null,
+              closer_id: null,
+            });
+          }
           await channel.send(
             `**[${message.author.tag}]**: ${message.content}\n${message.attachments?.map((attachment) => attachment.url).join("\n")}`,
           );

@@ -128,6 +128,7 @@ export default {
       try {
         await updateModMailThread(interaction.channelId, {
           close_date: dayjs().add(dayjs_duration).toDate(),
+          closer_id: BigInt(interaction.user.id),
         });
       } catch (e) {
         await interaction.reply(t("error"));

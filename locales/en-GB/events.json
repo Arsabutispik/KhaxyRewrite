@@ -58,6 +58,7 @@
       "channel_missing": "Channel is missing. Moderators need to set the channel for the mod mail to work.",
       "topic": "Mod Mail conversation with {{user}}",
       "error_sending": "An error occurred while attempting to send the message.",
+      "reopened": "{{user}} replied to modmail thread, thread won't be closed. ({{closer}})",
       "error_inserting": "An error occurred while attempting to insert the message into the database."
     }
   },

@@ -58,6 +58,7 @@
       "channel_missing": "Kanal eksik. Modlar mod mail'in çalışması için kanalı ayarlamalıdır.",
       "topic": "{{user}} ile Mod Mail konuşması",
       "error_sending": "Mesaj göndermeye çalışırken bir hata oluştu.",
+      "reopened": "{{user}} modmaile cevap verdi, konuşma kapanmayacak. ({{closer}})",
       "error_inserting": "Mesajı veritabanına eklemeye çalışırken bir hata oluştu."
     }
   },
