@@ -93,5 +93,112 @@
     "examples": [
       "`/kaydet kullanıcı:@kullanıcı cinisyet: Diğer \uD83E\uDDD1` - Kullanıcıyı üye rolüyle kaydeder."
     ]
+  },
+  "reply": {
+    "title": "Modmail İletişim Kanalına Yanıt Ver",
+    "description": "Geçerli modmail iletişim kanalına yanıt verir, kullanıcıyla iletişimi sürdürür.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}> `<mesaj>`",
+    "permissions": [
+      "Kullanıcı İzinleri: `Mesajları Yönet`"
+    ],
+    "examples": [
+      "`/cevapla mesaj:Merhaba!` - Geçerli modmail iletişim kanalına bir mesajla yanıt verir."
+    ]
+  },
+  "suspend": {
+    "title": "Modmail İletişim Kanalını Askıya Al",
+    "description": "Geçerli modmail iletişim kanalını askıya alır, daha fazla mesaj gönderilmesini engeller. Modmail kanalında kullanılmalıdır.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}>",
+    "permissions": [
+      "Kullanıcı İzinleri: `Mesajları Yönet`"
+    ]
+  },
+  "unban": {
+    "title": "Kullanıcının Yasağını Kaldır",
+    "description": "Kullanıcının sunucudan yasaklanmasını kaldırır, böylece tekrar katılabilir.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}> `<kullanıcı> [sebep]`",
+    "permissions": [
+      "Kullanıcı İzinleri: `Üyeleri Yasakla`",
+      "Bot İzinleri: `Üyeleri Yasakla`"
+    ],
+    "examples": [
+      "`/yasak-kaldır kullanıcı:@kullanıcı` - Kullanıcının yasağını kaldırır.",
+        "`/yasak-kaldır kullanıcı:@kullanıcı sebep:Yanlış anlama` - Kullanıcının yasağını kaldırır ve sebep belirtir."
+    ]
+  },
+  "unmute": {
+    "title": "Kullanıcının Susturmasını Kaldır",
+    "description": "Kullanıcının sunucudaki susturmasını kaldırır, böylece tekrar mesaj gönderebilir.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}> `<kullanıcı>`",
+    "permissions": [
+      "Kullanıcı İzinleri: `Rolleri Yönet`",
+      "Bot İzinleri: `Rolleri Yönet`"
+    ],
+    "examples": [
+      "`/susturmayı-kaldır kullanıcı:@kullanıcı` - Kullanıcının susturmasını kaldırır."
+    ]
+  },
+  "unsuspend": {
+    "title": "Modmail İletişim Kanalının Askısını Kaldır",
+    "description": "Geçerli modmail iletişim kanalının askısını kaldırır, böylece kullanıcı tekrar mesaj gönderebilir.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}>",
+    "permissions": [
+      "Kullanıcı İzinleri: `Mesajları Yönet`"
+    ]
+  },
+  "warn": {
+    "title": "Kullanıcıyı Uyar",
+    "description": "Kullanıcıyı sunucuda uyarır, bu uyarılar daha sonra takip edilebilir.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}> `<kullanıcı> <sebep>`",
+    "permissions": [
+      "Kullanıcı İzinleri: `Üyeleri Denetle`"
+    ],
+    "examples": [
+      "`/uyar kullanıcı:@kullanıcı sebep:Spam yapma` - Kullanıcıyı spam yaptığı için uyarır."
+    ]
+  },
+  "list": {
+    "title": "Şarkı Sıralarını Listele",
+    "description": "Sunucudaki şarkı sıralarını listeler, hangi şarkıların sırada olduğunu gösterir.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}>"
+  },
+  "loop": {
+    "title": "Şarkıyı Döngüye Al",
+    "description": "Şu anda çalınan şarkıyı veya listeyi döngüye al ya da döngüyü kapat.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}>"
+  },
+  "pause": {
+    "title": "Şarkıyı Duraklat veya Devam Ettir",
+    "description": "Şu anda çalınan şarkıyı duraklatır veya devam ettirir.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}>"
+  },
+  "playing": {
+    "title": "Şu Anda Çalan Şarkıyı Göster",
+    "description": "Şu anda çalınan şarkıyı gösterir, hangi şarkının çalındığını belirtir.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}>"
+  },
+  "shuffle": {
+    "title": "Şarkı Sırasını Karıştır",
+    "description": "Şarkı sırasını karıştırır, sıradaki şarkıları rastgele bir şekilde düzenler.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}>"
+  },
+  "skip": {
+    "title": "Şarkıyı Atla",
+    "description": "Şu anda çalınan şarkıyı atlar ve sıradaki şarkıya geçer.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}>"
+  },
+  "help": {
+    "title": "Yardım",
+    "description": "Bu komut, botun tüm komutlarını ve nasıl kullanılacağını gösterir.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}> `<komut>`",
+    "examples": [
+      "`/yardım komut:ban` - Kullanıcıyı yasaklama komutunun nasıl kullanılacağını gösterir.",
+      "`/yardım komut:mute` - Kullanıcıyı susturma komutunun nasıl kullanılacağını gösterir."
+    ]
+  },
+  "ping": {
+    "title": "Ping",
+    "description": "Botun gecikmesini gösterir.",
+    "usage": "Kullanım: </{{command.name}}:{{command.id}}>"
   }
 }

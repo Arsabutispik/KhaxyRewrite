@@ -93,5 +93,112 @@
     "examples": [
       "`/register user:@user gender:Other \uD83E\uDDD1` - Registers the user with just the member role."
     ]
+  },
+  "reply": {
+    "title": "Reply to a Modmail Thread",
+    "description": "Replies to the current modmail thread, allowing for continued communication with the user.",
+    "usage": "Usage: </{{command.name}}:{{command.id}}> `<message>`",
+    "permissions": [
+      "User Permissions: `Manage Messages`"
+    ],
+    "examples": [
+      "`/reply message:Hello!` - Replies to the current modmail thread with a message."
+    ]
+  },
+  "suspend": {
+    "title": "Suspend Modmail Thread",
+    "description": "Suspends the current modmail thread, preventing further messages until resumed.",
+    "usage": "Usage: </{{command.name}}:{{command.id}}>",
+    "permissions": [
+      "User Permissions: `Manage Messages`"
+    ]
+  },
+  "unban": {
+    "title": "Unban User",
+    "description": "Unbans a user from the server, allowing them to rejoin.",
+    "usage": "Usage: </{{command.name}}:{{command.id}}> `<user> [reason]`",
+    "permissions": [
+      "User Permissions: `Ban Members`",
+      "Bot Permissions: `Ban Members`"
+    ],
+    "examples": [
+      "`/unban user:@user` - Unbans the user from the server.",
+        "`/unban user:@user reason:Appealed` - Unbans the user with a reason."
+    ]
+  },
+  "unmute": {
+    "title": "Unmute User",
+    "description": "Unmutes a user in the server, allowing them to send messages again.",
+    "usage": "Usage: </{{command.name}}:{{command.id}}> `<user>`",
+    "permissions": [
+      "User Permissions: `Manage Roles`",
+      "Bot Permissions: `Manage Roles`"
+    ],
+    "examples": [
+      "`/unmute user:@user` - Unmutes the user in the server."
+    ]
+  },
+  "unsuspend": {
+    "title": "Unsuspend Modmail Thread",
+    "description": "Unsuspends the current modmail thread, allowing further messages to be sent.",
+    "usage": "Usage: </{{command.name}}:{{command.id}}>",
+    "permissions": [
+      "User Permissions: `Manage Messages`"
+    ]
+  },
+  "warn": {
+    "title": "Warn User",
+    "description": "Issues a warning to the user, which can be tracked for moderation purposes.",
+    "usage": "Usage: </{{command.name}}:{{command.id}}> `<user> <reason>`",
+    "permissions": [
+      "User Permissions: `Moderate Members`"
+    ],
+    "examples": [
+      "`/warn user:@user reason:Inappropriate behavior` - Issues a warning to the user."
+    ]
+  },
+  "list": {
+    "title": "List current queue",
+    "description": "Lists the current queue of songs",
+    "usage": "Usage: </{{command.name}}:{{command.id}}>"
+  },
+  "loop": {
+    "title": "Loop current song",
+    "description": "Loops the current song queue or turn it off",
+    "usage": "Usage: </{{command.name}}:{{command.id}}> <mode>"
+  },
+  "pause": {
+    "title": "Pause or Resume the current song",
+    "description": "Pauses the current song or resumes it if already paused",
+    "usage": "Usage: </{{command.name}}:{{command.id}}>"
+  },
+  "playing": {
+    "title": "Show currently playing song",
+    "description": "Displays the currently playing song in the voice channel",
+    "usage": "Usage: </{{command.name}}:{{command.id}}>"
+  },
+  "shuffle": {
+    "title": "Shuffle the current queue",
+    "description": "Shuffles the current song queue",
+    "usage": "Usage: </{{command.name}}:{{command.id}}>"
+  },
+  "skip": {
+    "title": "Skip the current song",
+    "description": "Skips the currently playing song in the voice channel",
+    "usage": "Usage: </{{command.name}}:{{command.id}}>"
+  },
+  "help": {
+    "title": "Help",
+    "description": "Provides information about the available commands and how to use them.",
+    "usage": "Usage: </{{command.name}}:{{command.id}}> `<command>`",
+    "examples": [
+      "`/help command:ban` - Displays help information for the ban command.",
+      "`/help command:mute` - Displays help information for the mute command."
+    ]
+  },
+  "ping": {
+    "title": "Ping",
+    "description": "Checks the bot's latency and responsiveness.",
+    "usage": "Usage: </{{command.name}}:{{command.id}}>"
   }
 }
