@@ -38,11 +38,17 @@ export default {
     const command_name = interaction.options.getString("command", true);
     let command_collection;
     if (process.env.NODE_ENV === "development") {
-      await interaction.client.application.commands
-        .fetch({ guildId: process.env.GUILD_ID, withLocalizations: true })
-        .catch(() => null);
+      command_collection =
+        interaction.client.application.commands.cache.size > 0
+          ? interaction.client.application.commands.cache
+          : await interaction.client.application.commands
+              .fetch({ guildId: process.env.GUILD_ID, withLocalizations: true })
+              .catch(() => null);
     } else {
-      command_collection = await interaction.client.application.commands.fetch({ withLocalizations: true });
+      command_collection =
+        interaction.client.application.commands.cache.size > 0
+          ? interaction.client.application.commands.cache
+          : await interaction.client.application.commands.fetch({ withLocalizations: true });
     }
     const command = command_collection?.find(
       (cmd) =>
