@@ -1,5 +1,11 @@
 import type { SlashCommandBase } from "@customTypes";
-import { InteractionContextType, MessageFlagsBitField, PermissionsBitField, SlashCommandBuilder } from "discord.js";
+import {
+  InteractionContextType,
+  Locale,
+  MessageFlagsBitField,
+  PermissionsBitField,
+  SlashCommandBuilder,
+} from "discord.js";
 import { toStringId } from "@utils";
 import { logger } from "@lib";
 import { ModMailMessageSentTo, ModMailMessageType, ModMailThreadStatus } from "@constants";
@@ -85,6 +91,16 @@ export default {
         sent_at: new Date(),
         author_type: ModMailMessageType.STAFF,
         content: interaction.options.getAttachment("attachment")
+          ? `/${interaction.command?.nameLocalizations?.[guild_config.language.split("-")[0] as Locale]} ${message} ${interaction.options.getAttachment("attachment")?.url}`
+          : `/${interaction.command?.nameLocalizations?.[guild_config.language.split("-")[0] as Locale]} ${message}`,
+        sent_to: ModMailMessageSentTo.COMMAND,
+        message_id: BigInt(id),
+      });
+      await createModMailMessage(interaction.channelId, {
+        author_id: BigInt(interaction.member.id),
+        sent_at: new Date(),
+        author_type: ModMailMessageType.STAFF,
+        content: interaction.options.getAttachment("attachment")
           ? `${message} ${interaction.options.getAttachment("attachment")?.url}`
           : message,
         sent_to: ModMailMessageSentTo.USER,
@@ -98,8 +114,10 @@ export default {
       return interaction.reply(t("error"));
     }
     await interaction.editReply({ content: t("success") });
+    const role =
+      interaction.member.roles.highest.name === "@everyone" ? t("no_role") : interaction.member.roles.highest.name;
     await interaction.channel!.send({
-      content: `\`${messages.filter((row) => row.author_type === "staff").length + 1}\` **(${interaction.member.roles.highest.name})** **[${interaction.member.user.tag}]**: ${message}`,
+      content: `\`${messages.filter((row) => row.author_type === "staff").length + 1}\` **(${role})** **[${interaction.member.user.tag}]**: ${message}`,
       files: interaction.options.getAttachment("attachment") ? [interaction.options.getAttachment("attachment")!] : [],
     });
   },

@@ -181,7 +181,8 @@
     "member_not_found": "Member not found. Is the member still in the server?",
     "error": "An error occurred while accessing the database.",
     "success": "Message has been sent to the user.",
-    "suspended": "This mod mail thread has been suspended. Unsuspend the thread to reply."
+    "suspended": "This mod mail thread has been suspended. Unsuspend the thread to reply.",
+    "no_role": "No Role"
   },
   "newthread": {
     "user_not_in_guild": "The user is not a member of the server.",

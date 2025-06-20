@@ -1,7 +1,8 @@
 import type { SlashCommandBase } from "@customTypes";
-import { InteractionContextType, MessageFlags, PermissionsBitField, SlashCommandBuilder } from "discord.js";
+import { InteractionContextType, Locale, MessageFlags, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import { logger } from "@lib";
-import { getGuildConfig, getModMailThread, updateModMailThread } from "@database";
+import { createModMailMessage, getGuildConfig, getModMailThread, updateModMailThread } from "@database";
+import { ModMailMessageSentTo, ModMailMessageType } from "@constants";
 
 export default {
   memberPermissions: [PermissionsBitField.Flags.ManageMessages],
@@ -42,9 +43,26 @@ export default {
       await updateModMailThread(interaction.channelId, {
         close_date: null,
       });
-      await interaction.reply({
+      const response = await interaction.reply({
         content: t("cancelled"),
         flags: MessageFlags.Ephemeral,
+        withResponse: true,
+      });
+      await createModMailMessage(interaction.channelId, {
+        author_id: BigInt(interaction.user.id),
+        sent_at: new Date(),
+        author_type: ModMailMessageType.STAFF,
+        sent_to: ModMailMessageSentTo.COMMAND,
+        content: `/${interaction.command?.nameLocalizations?.[guild_config.language.split("-")[0] as Locale]}`,
+        message_id: BigInt(interaction.id),
+      });
+      await createModMailMessage(interaction.channelId, {
+        author_id: BigInt(interaction.user.id),
+        sent_at: new Date(),
+        author_type: ModMailMessageType.CLIENT,
+        sent_to: ModMailMessageSentTo.THREAD,
+        content: t("cancelled"),
+        message_id: BigInt(response.resource?.message?.id || 0),
       });
     } catch (error) {
       logger.log({

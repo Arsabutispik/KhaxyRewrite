@@ -11,4 +11,5 @@ export enum ModMailMessageType {
 export enum ModMailMessageSentTo {
   USER = "user",
   THREAD = "thread",
+  COMMAND = "command",
 }

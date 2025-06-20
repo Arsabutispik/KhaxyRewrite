@@ -2,6 +2,7 @@ import type { SlashCommandBase } from "@customTypes";
 import {
   ChannelType,
   InteractionContextType,
+  Locale,
   MessageFlags,
   PermissionsBitField,
   SlashCommandBuilder,
@@ -167,6 +168,25 @@ export default {
         author_type: ModMailMessageType.CLIENT,
         content: bot_message.content,
       });
+      await createModMailMessage(interaction.channelId, {
+        author_id: BigInt(interaction.user.id),
+        sent_at: new Date(),
+        author_type: ModMailMessageType.STAFF,
+        sent_to: ModMailMessageSentTo.COMMAND,
+        content: `/${interaction.command?.nameLocalizations?.[guild_config.language.split("-")[0] as Locale]}`,
+        message_id: BigInt(interaction.id),
+      });
+      await interaction.editReply({
+        content: t("thread_created", { channel: channel.toString() }),
+      });
+      await createModMailMessage(interaction.channelId, {
+        author_id: BigInt(interaction.user.id),
+        sent_at: new Date(),
+        author_type: ModMailMessageType.CLIENT,
+        sent_to: ModMailMessageSentTo.THREAD,
+        content: t("thread_created", { channel: channel.toString() }),
+        message_id: BigInt(interaction.id),
+      });
     } catch (e) {
       logger.log({
         level: "error",
@@ -178,10 +198,6 @@ export default {
       });
       await user.send(t("db_error"));
       await channel.delete();
-      return;
     }
-    await interaction.editReply({
-      content: t("thread_created", { channel: channel.toString() }),
-    });
   },
 } as SlashCommandBase;

@@ -6,6 +6,13 @@ export default {
   name: Events.ClientReady,
   once: true,
   async execute(client) {
+    if (process.env.NODE_ENV === "development") {
+      await client.application.commands
+        .fetch({ guildId: process.env.GUILD_ID, withLocalizations: true })
+        .catch(() => null);
+    } else {
+      await client.application.commands.fetch({ withLocalizations: true });
+    }
     await recoverMissedCronjob(client);
     const emojis: Array<{ name: string; id: string; fallback: string }> = [
       {

@@ -1,5 +1,5 @@
 import type { SlashCommandBase } from "@customTypes";
-import { ModMailThreadStatus } from "@constants";
+import { ModMailMessageSentTo, ModMailMessageType, ModMailThreadStatus } from "@constants";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -11,6 +11,8 @@ import {
   SlashCommandBuilder,
   MessageFlagsBitField,
   InteractionContextType,
+  Locale,
+  Message,
 } from "discord.js";
 import dayjs from "dayjs";
 import dayjsduration from "dayjs/plugin/duration.js";
@@ -18,7 +20,7 @@ import relativeTime from "dayjs/plugin/relativeTime.js";
 import "dayjs/locale/tr.js";
 import { logger } from "@lib";
 import { modMailLog, toStringId } from "@utils";
-import { getGuildConfig, getModMailThread, updateModMailThread } from "@database";
+import { createModMailMessage, getGuildConfig, getModMailThread, updateModMailThread } from "@database";
 export default {
   memberPermissions: [PermissionsBitField.Flags.ModerateMembers],
   clientPermissions: [PermissionsBitField.Flags.ManageChannels],
@@ -126,9 +128,40 @@ export default {
         .locale(guild_config.language || "en")
         .fromNow(true);
       try {
+        const response = interaction.replied
+          ? await interaction.followUp({
+              content: t("close_duration", { duration: long_duration }),
+              withResponse: true,
+            })
+          : await interaction.reply({
+              content: t("close_duration", { duration: long_duration }),
+              withResponse: true,
+            });
         await updateModMailThread(interaction.channelId, {
           close_date: dayjs().add(dayjs_duration).toDate(),
           closer_id: BigInt(interaction.user.id),
+        });
+        let responseId;
+        if (response instanceof Message) {
+          responseId = response.id;
+        } else {
+          responseId = response.resource?.message?.id;
+        }
+        await createModMailMessage(interaction.channelId, {
+          author_id: BigInt(interaction.user.id),
+          sent_at: new Date(),
+          author_type: ModMailMessageType.STAFF,
+          sent_to: ModMailMessageSentTo.COMMAND,
+          content: `/${interaction.command?.nameLocalizations?.[guild_config.language.split("-")[0] as Locale]} ${duration} ${time}`,
+          message_id: BigInt(responseId || 0),
+        });
+        await createModMailMessage(interaction.channelId, {
+          author_id: BigInt(interaction.user.id),
+          sent_at: new Date(),
+          author_type: ModMailMessageType.CLIENT,
+          sent_to: ModMailMessageSentTo.THREAD,
+          content: t("close_duration", { duration: long_duration }),
+          message_id: BigInt(responseId || 0),
         });
       } catch (e) {
         await interaction.reply(t("error"));
@@ -136,35 +169,67 @@ export default {
           message: e.message,
           stack: e.stack,
         });
-        return;
-      }
-      if (interaction.replied) {
-        await interaction.editReply(t("close_duration", { duration: long_duration }));
-      } else {
-        await interaction.reply(t("close_duration", { duration: long_duration }));
       }
     } else {
       await updateModMailThread(interaction.channelId, {
         status: ModMailThreadStatus.CLOSED,
       });
       const modmail_log_channel = interaction.guild.channels.cache.get(toStringId(guild_config.mod_mail_channel_id));
+      const response = interaction.replied
+        ? await interaction.followUp({
+            content: t("close"),
+            withResponse: true,
+          })
+        : await interaction.reply({
+            content: t("close"),
+            withResponse: true,
+          });
+      try {
+        const message = await interaction.guild.members.cache
+          .get(toStringId(mod_mail_thread.user_id))
+          ?.send(t("thread_closed_dm", { guild: interaction.guild!.name }));
+        await createModMailMessage(interaction.channelId, {
+          author_id: BigInt(interaction.user.id),
+          sent_at: new Date(),
+          author_type: ModMailMessageType.STAFF,
+          sent_to: ModMailMessageSentTo.COMMAND,
+          content: `/${interaction.command?.nameLocalizations?.[guild_config.language.split("-")[0] as Locale]}`,
+          message_id: BigInt(interaction.id),
+        });
+        let responseId;
+        if (response instanceof Message) {
+          responseId = response.id;
+        } else {
+          responseId = response.resource?.message?.id;
+        }
+        await createModMailMessage(interaction.channelId, {
+          author_id: BigInt(interaction.user.id),
+          sent_at: new Date(),
+          author_type: ModMailMessageType.CLIENT,
+          sent_to: ModMailMessageSentTo.THREAD,
+          content: t("close"),
+          message_id: BigInt(responseId || 0),
+        });
+        await createModMailMessage(interaction.channelId, {
+          author_id: BigInt(interaction.user.id),
+          sent_at: new Date(),
+          author_type: ModMailMessageType.CLIENT,
+          sent_to: ModMailMessageSentTo.USER,
+          content: t("thread_closed_dm", { guild: interaction.guild!.name }),
+          message_id: BigInt(message?.id || 0),
+        });
+      } catch (error) {
+        logger.log({
+          message: "Failed to send DM to user or when creating mod mail message.",
+          level: "warn",
+          error,
+        });
+      }
       if (modmail_log_channel) {
         const user = await client.users.fetch(toStringId(mod_mail_thread.user_id)).catch(() => null);
         await modMailLog(client, interaction.channel!, user, interaction.user);
       }
-      if (interaction.replied) {
-        await interaction.editReply(t("close"));
-      } else {
-        await interaction.reply(t("close"));
-      }
       await interaction.channel!.delete();
-      try {
-        await interaction.guild.members.cache
-          .get(toStringId(mod_mail_thread.user_id))
-          ?.send(t("thread_closed_dm", { guild: interaction.guild!.name }));
-      } catch {
-        return;
-      }
     }
   },
 } as SlashCommandBase;

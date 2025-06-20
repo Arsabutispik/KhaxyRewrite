@@ -25,7 +25,7 @@ export async function updateModMailMessage(
 ): Promise<void> {
   if (Object.keys(message).length === 0) return;
 
-  await prisma.mod_mail_messages.update({
+  await prisma.mod_mail_messages.updateMany({
     where: { message_id: BigInt(messageId) },
     data: message,
   });

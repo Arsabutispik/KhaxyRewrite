@@ -37,9 +37,6 @@ export async function modMailLog(client: Client, channel: TextChannel, user: Use
     }
     if (row.author_type === "staff" && row.sent_to === "user") {
       const author = await client.users.fetch(toStringId(row.author_id)).catch(() => null);
-      messages.push(
-        `[${dayjs(row.sent_at)}] ${t("command")} [${author ? author.tag : "Unknown"}] /reply ${row.content}`,
-      );
       messages.push(`[${dayjs(row.sent_at)}] ${t("to_user")} [${author ? author.tag : "Unknown"}] ${row.content}`);
     }
     if (row.author_type === "user" && row.sent_to === "thread") {
@@ -48,6 +45,10 @@ export async function modMailLog(client: Client, channel: TextChannel, user: Use
     if (row.author_type === "staff" && row.sent_to === "thread") {
       const author = await client.users.fetch(toStringId(row.author_id)).catch(() => null);
       messages.push(`[${dayjs(row.sent_at)}] ${t("to_thread")} [${author ? author.tag : "Unknown"}] ${row.content}`);
+    }
+    if (row.author_type === "staff" && row.sent_to === "command") {
+      const author = await client.users.fetch(toStringId(row.author_id)).catch(() => null);
+      messages.push(`[${dayjs(row.sent_at)}] ${t("command")} [${author ? author.tag : "Unknown"}] ${row.content}`);
     }
   }
   const buffer = Buffer.from(messages.join("\n"), "utf-8");

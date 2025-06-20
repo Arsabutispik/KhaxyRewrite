@@ -181,7 +181,8 @@
     "member_not_found": "Kullanıcı bulunamadı. Kullanıcı hala sunucuda mı?",
     "error": "Veritabanı güncellenirken hata oluştu.",
     "success": "Mesaj kullanıcıya gönderildi.",
-    "suspended": "Bu mod mail konuşması askıya alındı. Cevaplamak için tekrar açın."
+    "suspended": "Bu mod mail konuşması askıya alındı. Cevaplamak için tekrar açın.",
+    "no_role": "Rol Yok"
   },
   "newthread": {
     "user_not_in_guild": "Kullanıcı sunucuda bulunamadı.",
