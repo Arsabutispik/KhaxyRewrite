@@ -6,7 +6,7 @@ import { getGuildConfig } from "@database";
 import { InfractionType } from "@constants";
 
 export default {
-  memberPermissions: [PermissionsBitField.Flags.ManageGuild],
+  memberPermissions: [PermissionsBitField.Flags.ModerateMembers],
   data: new SlashCommandBuilder()
     .setName("warn")
     .setNameLocalizations({
@@ -17,7 +17,7 @@ export default {
       tr: "Bir kullanıcıyı uyarır",
     })
     .setContexts(InteractionContextType.Guild)
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.ModerateMembers)
     .addUserOption((option) =>
       option
         .setName("user")

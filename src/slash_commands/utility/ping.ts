@@ -13,7 +13,7 @@ export default {
     }),
   async execute(interaction) {
     await interaction.reply({
-      content: `🏓 Pong! Latency is ${interaction.client.ws.ping}ms`,
+      content: `🏓 Pong! Websocket Latency is ${interaction.client.ws.ping}ms\nAPI Latency is ${Date.now() - interaction.createdTimestamp}ms`,
       flags: MessageFlags.Ephemeral,
     });
   },

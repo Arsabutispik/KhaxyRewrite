@@ -10,6 +10,9 @@ export default {
   clientPermissions: [PermissionsBitField.Flags.ManageRoles],
   data: new SlashCommandBuilder()
     .setName("unmute")
+    .setNameLocalizations({
+      tr: "susturmayı-kaldır",
+    })
     .setDescription("Unmute a user")
     .setDescriptionLocalizations({
       tr: "Bir kullanıcının susturmasını kaldırır",
