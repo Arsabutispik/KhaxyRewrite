@@ -4,13 +4,10 @@ import { logger } from "@lib";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// Convert import.meta.url to a file path
 const thisFile = fileURLToPath(import.meta.url);
+const invokedFile = process.argv[1] ? path.resolve(process.argv[1]) : "";
 
-// Normalize both paths
-const isExecutedDirectly = path.resolve(process.argv[1]) === path.resolve(thisFile);
-
-if (isExecutedDirectly) {
+if (invokedFile && path.relative(invokedFile, thisFile) === "") {
   console.error("❌ This script must be run using 'pnpm run remove-commands'.");
   process.exit(1);
 }
