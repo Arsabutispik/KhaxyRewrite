@@ -9,12 +9,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const commands: unknown[] = [];
 
-// Prevent manual execution
-if (import.meta.url === `file://${process.argv[1]}`) {
-  console.error("❌ This script must be run using 'pnpm deploy-commands'.");
-  process.exit(1);
-}
-
 // Recursive function to read all command files
 async function registerCommands(...dirs: string[]) {
   for (const dir of dirs) {
