@@ -1,16 +1,6 @@
 import { REST, Routes } from "discord.js";
 import "dotenv/config.js";
 import { logger } from "@lib";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const thisFile = fileURLToPath(import.meta.url);
-const invokedFile = process.argv[1] ? path.resolve(process.argv[1]) : "";
-
-if (invokedFile && path.relative(invokedFile, thisFile) === "") {
-  console.error("❌ This script must be run using 'pnpm run remove-commands'.");
-  process.exit(1);
-}
 
 if (!process.env.TOKEN) {
   logger.error("❌ Token is not defined in the .env file", { discord: false });
