@@ -132,7 +132,7 @@ CronJob.from({
   timeZone: "UTC",
 });
 CronJob.from({
-  cronTime: "0 0 0 * * *",
+  cronTime: "0 0 * * *",
   onTick: () => colorUpdate(client),
   onComplete: () => {
     logger.log({
