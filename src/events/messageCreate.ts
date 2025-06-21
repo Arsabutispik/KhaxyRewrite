@@ -427,7 +427,7 @@ export default {
       message.author.id === "302050872383242240" &&
       message.channel.id === toStringId(leaderboard)
     ) {
-      await updateBumpLeaderboard(message.guild.id, message.author.id);
+      await updateBumpLeaderboard(message.guild.id, message.interaction.user.id);
       await message.delete();
       const result = await bumpLeaderboard(message.client, message.guild.id, message.author);
       if (result?.error) {
