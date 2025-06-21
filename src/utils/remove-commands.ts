@@ -1,10 +1,17 @@
 import { REST, Routes } from "discord.js";
 import "dotenv/config.js";
 import { logger } from "@lib";
+import path from "path";
+import { fileURLToPath } from "url";
 
-// Prevent manual execution
-if (import.meta.url === `file://${process.argv[1]}`) {
-  console.error("❌ This script must be run using 'pnpm remove-commands'.");
+// Convert import.meta.url to a file path
+const thisFile = fileURLToPath(import.meta.url);
+
+// Normalize both paths
+const isExecutedDirectly = path.resolve(process.argv[1]) === path.resolve(thisFile);
+
+if (isExecutedDirectly) {
+  console.error("❌ This script must be run using 'pnpm run remove-commands'.");
   process.exit(1);
 }
 
