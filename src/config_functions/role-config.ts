@@ -130,10 +130,12 @@ export async function dynamicRole(
       time: 1000 * 60 * 5,
     });
   } catch {
-    await result.edit({
-      content: t("timeout"),
-      components: [],
-    });
+    await result
+      .edit({
+        content: t("timeout"),
+        components: [],
+      })
+      .catch(() => null);
     return;
   }
   await message_component.deferUpdate();

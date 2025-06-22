@@ -60,5 +60,17 @@ function formatDuration(ms: number): string {
     ? `${hours}:${minutes}:${seconds}` // e.g., 1:02:15
     : `${minutes}:${seconds}`; // e.g., 02:15
 }
+/**
+ * Trims a string to a specified maximum length, ensuring it does not cut off words.
+ * If the string is longer than the maximum length, it will be trimmed and an ellipsis will be added.
+ * @param str - The string to trim.
+ * @param maxLength - The maximum length of the string.
+ * @returns The trimmed string with an ellipsis if it was trimmed.
+ */
+function trimString(str: string, maxLength = 100): string {
+  if (str.length <= maxLength) return str;
+  const trimmed = str.slice(0, maxLength);
+  return trimmed.slice(0, trimmed.lastIndexOf(" ")) + "...";
+}
 
-export { sleep, missingPermissionsAsString, replacePlaceholders, toStringId, formatDuration };
+export { sleep, missingPermissionsAsString, replacePlaceholders, toStringId, formatDuration, trimString };

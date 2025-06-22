@@ -15,7 +15,7 @@ import {
 } from "discord.js";
 import type { guilds as Guilds } from "@prisma/client";
 import type { TFunction } from "i18next";
-import { toStringId } from "@utils";
+import { toStringId, trimString } from "@utils";
 import { getGuildConfig, updateGuildConfig } from "@database";
 
 export async function registerConfig(interaction: ChatInputCommandInteraction<"cached">) {
@@ -179,7 +179,7 @@ export async function dynamicMessage(
     .setRequired(false)
     .setStyle(TextInputStyle.Paragraph);
   if (data[message]) {
-    text_component.setPlaceholder(data[message]);
+    text_component.setPlaceholder(trimString(data[message], 97));
   }
   const action_row = new ActionRowBuilder<TextInputBuilder>().setComponents(text_component);
   const modal = new ModalBuilder()
