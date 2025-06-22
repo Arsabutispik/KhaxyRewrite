@@ -78,31 +78,34 @@ export default {
     const t = client.i18next.getFixedT(guild_config.language || "en", "commands", "register");
     const member = interaction.options.getMember("user");
     if (!member) {
-      await interaction.reply(t("no_member"));
+      await interaction.reply({ content: t("no_member"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
     const gender = interaction.options.getString("gender", true);
     const registerChannel = interaction.guild.channels.cache.get(toStringId(guild_config.register_channel_id));
     if (!guild_config.register_channel_id || !registerChannel) {
-      await interaction.reply(t("no_register_channel"));
+      await interaction.reply({ content: t("no_register_channel"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
     if (interaction.channelId !== registerChannel.id) {
-      await interaction.reply(t("wrong_channel", { channel: registerChannel.id }));
+      await interaction.reply({
+        content: t("wrong_channel", { channel: registerChannel.id }),
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+      });
       return;
     }
     if (!guild_config.member_role_id || !interaction.guild.roles.cache.has(toStringId(guild_config.member_role_id))) {
-      await interaction.reply(t("no_member_role"));
+      await interaction.reply({ content: t("no_member_role"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
     if (member.roles.cache.has(toStringId(guild_config.member_role_id))) {
-      await interaction.reply(t("already_registered"));
+      await interaction.reply({ content: t("already_registered"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
     switch (gender) {
       case "male":
         if (!guild_config.male_role_id || !interaction.guild.roles.cache.has(toStringId(guild_config.male_role_id))) {
-          await interaction.reply(t("no_male_role"));
+          await interaction.reply({ content: t("no_male_role"), flags: MessageFlagsBitField.Flags.Ephemeral });
           return;
         }
         try {
@@ -133,7 +136,7 @@ export default {
           !guild_config.female_role_id ||
           !interaction.guild.roles.cache.has(toStringId(guild_config.female_role_id))
         ) {
-          await interaction.reply(t("no_female_role"));
+          await interaction.reply({ content: t("no_female_role"), flags: MessageFlagsBitField.Flags.Ephemeral });
           return;
         }
         try {
