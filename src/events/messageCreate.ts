@@ -429,7 +429,7 @@ export default {
     ) {
       await updateBumpLeaderboard(message.guild.id, message.interaction.user.id);
       await message.delete();
-      const result = await bumpLeaderboard(message.client, message.guild.id, message.author);
+      const result = await bumpLeaderboard(message.client, message.guild.id, message.interaction.user);
       if (result?.error) {
         await message.reply(result.error);
         return;
