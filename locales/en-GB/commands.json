@@ -64,6 +64,7 @@
     "no_register_channel": "Register channel not found. Please update the register channel in the settings.",
     "wrong_channel": "You can only register in <#{{channel}}>",
     "no_member_role": "Member role not found. Please update the member role in the settings.",
+    "already_registered": "User is already registered.",
     "no_male_role": "Male role not found. Please update the male role in the settings.",
     "success": "{{confirm}} **{{member}}** has been registered.",
     "error": "Error while registering the user. {{error}}",

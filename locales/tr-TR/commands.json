@@ -64,6 +64,7 @@
     "no_register_channel": "Kayıt kanalı bulunamadı. Ayarlar kısmından kayıt kanalını güncelleyin.",
     "wrong_channel": "Sadece <#{{channel}}> kanalında kayıt olabilirsiniz.",
     "no_member_role": "Kayıt rolü bulunamadı. Ayarlar kısmından kayıt rolünü güncelleyin.",
+    "already_registered": "Kullanıcı zaten kayıtlı.",
     "no_male_role": "Erkek rolü bulunamadı. Ayarlar kısmından erkek rolünü güncelleyin.",
     "success": "{{confirm}} **{{user}}**, başarıyla kayıt edildi",
     "error": "Kullanıcı kayıt edilirken hata oluştu. {{error}}",

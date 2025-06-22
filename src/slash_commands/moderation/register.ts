@@ -95,6 +95,10 @@ export default {
       await interaction.reply(t("no_member_role"));
       return;
     }
+    if (member.roles.cache.has(toStringId(guild_config.member_role_id))) {
+      await interaction.reply(t("already_registered"));
+      return;
+    }
     switch (gender) {
       case "male":
         if (!guild_config.male_role_id || !interaction.guild.roles.cache.has(toStringId(guild_config.male_role_id))) {
@@ -104,9 +108,13 @@ export default {
         try {
           await member.roles.add(toStringId(guild_config.male_role_id));
           await member.roles.add(toStringId(guild_config.member_role_id));
-          await interaction.reply(
-            t("success", { member, confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format }),
-          );
+          await interaction.reply({
+            content: t("success", {
+              user: member.toString(),
+              confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
+            }),
+            flags: MessageFlagsBitField.Flags.Ephemeral,
+          });
         } catch (e) {
           await interaction.reply({
             content: t("error", { error: e.message }),
@@ -131,9 +139,13 @@ export default {
         try {
           await member.roles.add(toStringId(guild_config.female_role_id));
           await member.roles.add(toStringId(guild_config.member_role_id));
-          await interaction.reply(
-            t("success", { member, confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format }),
-          );
+          await interaction.reply({
+            content: t("success", {
+              user: member.toString(),
+              confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
+            }),
+            flags: MessageFlagsBitField.Flags.Ephemeral,
+          });
         } catch (e) {
           await interaction.reply({
             content: t("error", { error: e.message }),
@@ -150,9 +162,13 @@ export default {
       case "other":
         try {
           await member.roles.add(toStringId(guild_config.member_role_id));
-          await interaction.reply(
-            t("success", { member, confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format }),
-          );
+          await interaction.reply({
+            content: t("success", {
+              user: member.toString(),
+              confirm: client.allEmojis.get(client.config.Emojis.confirm)?.format,
+            }),
+            flags: MessageFlagsBitField.Flags.Ephemeral,
+          });
         } catch (e) {
           await interaction.reply({
             content: t("error", { error: e.message }),
