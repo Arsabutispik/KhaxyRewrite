@@ -41,7 +41,8 @@ async function proccesColorUpdate(guild: Guild, config: Guilds) {
     logger.warn(`Bot doesn't have permission to manage roles in guild ${id}.`);
     return;
   }
-  const role = guild.roles.cache.find((role) => role.id === toStringId(colour_id_of_the_day));
+  if (!colour_id_of_the_day) return;
+  const role = guild.roles.cache.get(toStringId(colour_id_of_the_day));
   if (!role) {
     logger.warn(`Role ${colour_id_of_the_day} not found in guild ${id}.`);
     return;
@@ -63,7 +64,7 @@ async function proccesColorUpdate(guild: Guild, config: Guilds) {
   try {
     // Update the color name in the database
     await updateGuildConfig(guild.id, {
-      colour_name_of_the_day: colour_name_of_the_day,
+      colour_name_of_the_day: colorName as string,
     });
     // Edit the role with the new color and name
     await role.edit({
