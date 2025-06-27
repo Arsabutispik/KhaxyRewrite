@@ -20,7 +20,8 @@ jobs:
     - name: Deploy via SSH
       run: |
         ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
-        export PATH="$HOME/.local/share/pnpm:$PATH"
+        export PNPM_HOME="/root/.nvm/versions/node/v22.16.0/bin/pnpm"
+        export PATH="$PNPM_HOME:$PATH"
           cd /opt/discord-bot
           git pull origin master
           pnpm install --frozen-lockfile
