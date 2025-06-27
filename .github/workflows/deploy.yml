@@ -110,5 +110,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh api -X POST /repos/${{ github.repository }}/deployments/${{ steps.create_deployment.outputs.deployment_id }}/statuses \
-            -f state=failure
+          echo '{
+            "ref": "'"${{ github.event.workflow_run.head_sha }}"'",
+            "environment": "production",
+            "auto_merge": false
+          }' | gh api -X POST /repos/Arsabutispik/Khaxy/deployments --input -
