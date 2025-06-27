@@ -58,5 +58,13 @@ jobs:
           "ref": "'"$GITHUB_SHA"'",
           "environment": "production",
           "auto_merge": false,
-          "required_contexts": ["Build & Verify","CodeQL","Dependabot Updates"]
+          "required_contexts": [
+                "Setup & Install",
+                "Analyze (actions)",
+                "Analyze (javascript-typescript)",
+                "ESLint",
+                "Type Check",
+                "Run Tests",
+                "Validate i18n Keys"
+                ]
           }' | gh api -X POST /repos/Arsabutispik/Khaxy/deployments --input -
