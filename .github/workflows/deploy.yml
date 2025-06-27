@@ -9,25 +9,27 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
       - name: Install GitHub CLI
         run: |
+          VERSION=$(curl -s https://api.github.com/repos/cli/cli/releases/latest | jq -r .tag_name)
           ARCH=$(uname -m)
           if [ "$ARCH" = "x86_64" ]; then
             ARCH="amd64"
           elif [ "$ARCH" = "aarch64" ]; then
             ARCH="arm64"
           fi
-          curl -fsSL "https://github.com/cli/cli/releases/latest/download/gh_${ARCH}.deb" -o gh.deb
+          curl -fsSL "https://github.com/cli/cli/releases/download/${VERSION}/gh_${VERSION}_linux_${ARCH}.deb" -o gh.deb
           sudo dpkg -i gh.deb || sudo apt-get install -f -y
 
       - name: Authenticate gh CLI
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh auth login --with-token <<< "$GH_TOKEN"
+          echo $GH_TOKEN | gh auth login --with-token
 
       - name: Create deployment
         id: create_deploy
@@ -42,8 +44,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh api repos/${{ github.repository }}/deployments/${{ steps.create_deploy.outputs.deployment_id }}/statuses \
-            -f state=in_progress
+          gh api repos/${{ github.repository }}/deployments/${{ steps.create_deploy.outputs.deployment_id }}/statuses -f state=in_progress
 
       - name: Deploy to VPS
         run: |
@@ -63,13 +64,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh api repos/${{ github.repository }}/deployments/${{ steps.create_deploy.outputs.deployment_id }}/statuses \
-            -f state=success
+          gh api repos/${{ github.repository }}/deployments/${{ steps.create_deploy.outputs.deployment_id }}/statuses -f state=success
 
       - name: Mark deployment failure
         if: failure()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh api repos/${{ github.repository }}/deployments/${{ steps.create_deploy.outputs.deployment_id }}/statuses \
-            -f state=failure
+          gh api repos/${{ github.repository }}/deployments/${{ steps.create_deploy.outputs.deployment_id }}/statuses -f state=failure
