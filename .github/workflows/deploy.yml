@@ -4,8 +4,10 @@ on:
   push:
     branches:
       - master  # or main, whatever you're using
-permissions: 
+permissions:
   contents: read
+  deployments: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
