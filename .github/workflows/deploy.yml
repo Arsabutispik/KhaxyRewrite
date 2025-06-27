@@ -90,12 +90,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          deployment_id=$(gh api -X POST /repos/${{ github.repository }}/deployments \
-            -f ref=${{ github.event.workflow_run.head_sha }} \
-            -f environment=production \
-            -f auto_merge=false \
-            --jq '.id')
-          echo "deployment_id=$deployment_id" >> $GITHUB_OUTPUT
+          echo '{
+          "ref": "'"${{ github.event.workflow_run.head_sha }}"'",
+          "environment": "production",
+          "auto_merge": false
+          }' | gh api -X POST /repos/${{ github.repository }}/deployments --input - --jq '.id' > deployment_id.txt
+          echo "deployment_id=$(cat deployment_id.txt)" >> $GITHUB_OUTPUT
 
       - name: Mark deployment as successful
         if: success()
@@ -110,8 +110,5 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo '{
-            "ref": "'"${{ github.event.workflow_run.head_sha }}"'",
-            "environment": "production",
-            "auto_merge": false
-          }' | gh api -X POST /repos/Arsabutispik/Khaxy/deployments --input -
+          gh api -X POST /repos/${{ github.repository }}/deployments/${{ steps.create_deployment.outputs.deployment_id }}/statuses \
+            -f state=failure
