@@ -52,7 +52,7 @@ async function proccesColorUpdate(guild: Guild, config: Guilds) {
     logger.warn(`Bot's highest role is lower than the target role in guild ${id}.`);
     return;
   }
-  const name = role.name.replace(colour_name_of_the_day || "", " ");
+  const name = role.name.replace(colour_name_of_the_day || "", "");
   // Generate a random color
   const x = Math.round(0xffffff * Math.random()).toString(16);
   const y = 6 - x.length;
