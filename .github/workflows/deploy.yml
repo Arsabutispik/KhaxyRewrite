@@ -54,4 +54,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-         gh deployment create -R ${{ github.repository }} --ref ${{ github.sha }} --environment production --auto-merge=false
+         gh api -X POST /repos/Arsabutispik/Khaxy/deployments \
+          -f ref=${{ github.sha }} \
+          -f environment=production \
+          -f auto_merge=false
