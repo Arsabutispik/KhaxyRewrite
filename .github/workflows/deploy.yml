@@ -8,30 +8,36 @@ permissions:
   contents: read
 jobs:
   deploy:
-    name: Deploy to VPS
     runs-on: ubuntu-latest
-
     steps:
-      - name: 📥 Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: 🚀 Create GitHub Deployment
-        id: deployment
-        uses: peter-evans/create-deployment@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          environment: production
-          transient_environment: false
-          auto_inactive: true
+      - name: Install GitHub CLI
+        run: |
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+          sudo apt-add-repository https://cli.github.com/packages
+          sudo apt update
+          sudo apt install gh -y
 
-      - name: 📡 Mark deployment as in_progress
-        uses: peter-evans/deployment-status@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
-          state: in_progress
+      - name: Authenticate gh CLI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo $GITHUB_TOKEN | gh auth login --with-token
 
-      - name: 🛠️ Deploy to VPS
+      - name: Create deployment
+        id: create_deploy
+        run: |
+          gh api repos/${{ github.repository }}/deployments -f ref=${{ github.sha }} -f environment=production -F auto_merge=false > deployment.json
+          DEPLOYMENT_ID=$(jq '.id' deployment.json)
+          echo "deployment_id=$DEPLOYMENT_ID" >> $GITHUB_OUTPUT
+
+      - name: Mark deployment in progress
+        run: |
+          gh api repos/${{ github.repository }}/deployments/${{ steps.create_deploy.outputs.deployment_id }}/statuses \
+            -f state=in_progress
+
+      - name: Deploy to VPS
         run: |
           ssh -T ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
             set -e
@@ -44,18 +50,14 @@ jobs:
             sudo systemctl restart discord-bot.service
           EOF
 
-      - name: ✅ Mark deployment as successful
+      - name: Mark deployment success
         if: success()
-        uses: peter-evans/deployment-status@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
-          state: success
+        run: |
+          gh api repos/${{ github.repository }}/deployments/${{ steps.create_deploy.outputs.deployment_id }}/statuses \
+            -f state=success
 
-      - name: ❌ Mark deployment as failed
+      - name: Mark deployment failure
         if: failure()
-        uses: peter-evans/deployment-status@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
-          state: failure
+        run: |
+          gh api repos/${{ github.repository }}/deployments/${{ steps.create_deploy.outputs.deployment_id }}/statuses \
+            -f state=failure
