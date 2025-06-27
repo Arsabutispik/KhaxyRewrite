@@ -1,77 +1,53 @@
-name: Deploy Bot to VPS
+name: Deploy
 
 on:
-  push:
-    branches:
-      - master  # or main, whatever you're using
+  workflow_run:
+    workflows: ["Build & Verify"]
+    types:
+      - completed
+
 permissions:
   contents: read
   deployments: write
 
 jobs:
   deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-      - name: Install GitHub CLI
-        run: |
-          VERSION=$(curl -s https://api.github.com/repos/cli/cli/releases/latest | jq -r .tag_name)
-          VERSION="${VERSION#v}"
-          ARCH=$(uname -m)
-          if [ "$ARCH" = "x86_64" ]; then
-            ARCH="amd64"
-          elif [ "$ARCH" = "aarch64" ]; then
-            ARCH="arm64"
-          fi
-          curl -fsSL "https://github.com/cli/cli/releases/download/v${VERSION}/gh_${VERSION}_linux_${ARCH}.deb" -o gh.deb
-          sudo dpkg -i gh.deb || sudo apt-get install -f -y
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22.16.0'
 
-      - name: Authenticate gh CLI
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-         gh auth login --with-token <<< "$GH_TOKEN" || true
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: '10.11.1'
 
-      - name: Create deployment
-        id: create_deploy
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh api repos/${{ github.repository }}/deployments -f ref=${{ github.sha }} -f environment=production -F auto_merge=false > deployment.json
-          DEPLOYMENT_ID=$(jq '.id' deployment.json)
-          echo "deployment_id=$DEPLOYMENT_ID" >> $GITHUB_OUTPUT
-
-      - name: Mark deployment in progress
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh api repos/${{ github.repository }}/deployments/${{ steps.create_deploy.outputs.deployment_id }}/statuses -f state=in_progress
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Deploy to VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_KEY: ${{ secrets.VPS_KEY }}
         run: |
-          ssh -T ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
-            set -e
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            nvm use 22
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << EOF
             cd /opt/discord-bot
-            git pull origin main
+            git pull
             pnpm install --frozen-lockfile
             sudo systemctl restart discord-bot.service
           EOF
 
-      - name: Mark deployment success
-        if: success()
+      - name: Create deployment on GitHub
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh api repos/${{ github.repository }}/deployments/${{ steps.create_deploy.outputs.deployment_id }}/statuses -f state=success
-
-      - name: Mark deployment failure
-        if: failure()
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh api repos/${{ github.repository }}/deployments/${{ steps.create_deploy.outputs.deployment_id }}/statuses -f state=failure
+          echo "$GH_TOKEN" | gh auth login --with-token
+          gh api repos/Arsabutispik/Khaxy/deployments -f ref=${{ github.event.workflow_run.head_sha }} -f environment=production -F auto_merge=false
