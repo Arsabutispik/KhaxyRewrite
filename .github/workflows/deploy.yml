@@ -31,6 +31,38 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Wait for all check runs to complete
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          COMMIT_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          MAX_RETRIES=20
+          SLEEP_TIME=10
+
+          for i in $(seq 1 $MAX_RETRIES); do
+            statuses=$(gh api repos/${GITHUB_REPOSITORY}/commits/${COMMIT_SHA}/check-runs --jq '.check_runs[].status' | sort | uniq)
+
+            if [[ "$statuses" == "completed" ]]; then
+              conclusions=$(gh api repos/${GITHUB_REPOSITORY}/commits/${COMMIT_SHA}/check-runs --jq '.check_runs[].conclusion' | sort | uniq)
+
+              if [[ "$conclusions" == "success" ]]; then
+                echo "✅ All check runs completed successfully."
+                break
+              else
+                echo "❌ One or more check runs failed:"
+                gh api repos/${GITHUB_REPOSITORY}/commits/${COMMIT_SHA}/check-runs --jq '.check_runs[] | {name: .name, conclusion: .conclusion}'
+                exit 1
+              fi
+            else
+              echo "⏳ Check runs in progress: $statuses. Retrying in $SLEEP_TIME seconds..."
+              sleep $SLEEP_TIME
+            fi
+          done
+
+          echo "⏱️ Timed out waiting for check runs."
+          exit 1
+
       - name: Deploy to VPS
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
