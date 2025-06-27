@@ -14,25 +14,27 @@ jobs:
 
       - name: Install GitHub CLI
         run: |
-          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
-          sudo apt-add-repository https://cli.github.com/packages
-          sudo apt update
-          sudo apt install gh -y
+          curl -fsSL https://github.com/cli/cli/releases/latest/download/gh_$(uname -m).deb -o gh.deb
+          sudo dpkg -i gh.deb || sudo apt-get install -f -y
 
       - name: Authenticate gh CLI
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo $GITHUB_TOKEN | gh auth login --with-token
+          gh auth login --with-token <<< "$GH_TOKEN"
 
       - name: Create deployment
         id: create_deploy
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh api repos/${{ github.repository }}/deployments -f ref=${{ github.sha }} -f environment=production -F auto_merge=false > deployment.json
           DEPLOYMENT_ID=$(jq '.id' deployment.json)
           echo "deployment_id=$DEPLOYMENT_ID" >> $GITHUB_OUTPUT
 
       - name: Mark deployment in progress
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh api repos/${{ github.repository }}/deployments/${{ steps.create_deploy.outputs.deployment_id }}/statuses \
             -f state=in_progress
@@ -45,19 +47,23 @@ jobs:
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             nvm use 22
             cd /opt/discord-bot
-            git pull origin master
+            git pull origin main
             pnpm install --frozen-lockfile
             sudo systemctl restart discord-bot.service
           EOF
 
       - name: Mark deployment success
         if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh api repos/${{ github.repository }}/deployments/${{ steps.create_deploy.outputs.deployment_id }}/statuses \
             -f state=success
 
       - name: Mark deployment failure
         if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh api repos/${{ github.repository }}/deployments/${{ steps.create_deploy.outputs.deployment_id }}/statuses \
             -f state=failure
