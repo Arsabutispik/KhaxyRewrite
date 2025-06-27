@@ -57,5 +57,6 @@ jobs:
          echo '{
           "ref": "'"$GITHUB_SHA"'",
           "environment": "production",
-          "auto_merge": false
+          "auto_merge": false,
+          "required_contexts": ["Build & Verify","CodeQL","Dependabot Updates"]
           }' | gh api -X POST /repos/Arsabutispik/Khaxy/deployments --input -
