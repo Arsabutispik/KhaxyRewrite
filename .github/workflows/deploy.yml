@@ -11,44 +11,8 @@ permissions:
   deployments: write
 
 jobs:
-  wait-for-statuses:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-latest
-    outputs:
-      status_passed: ${{ steps.wait-for-status.outputs.status_passed }}
-
-    steps:
-      - name: Wait for all required status checks to succeed
-        id: wait-for-status
-        env:
-          REPO: ${{ github.repository }}
-          SHA: ${{ github.event.workflow_run.head_sha }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "Waiting for all required status checks to pass for commit $SHA..."
-          for i in {1..20}; do
-            response=$(gh api repos/$REPO/commits/$SHA/status --silent)
-            failed_or_pending=$(echo "$response" | jq -r '.statuses[] | select(.state != "success") | .context' || true)
-
-            if [ -z "$failed_or_pending" ]; then
-              echo "::set-output name=status_passed::true"
-              echo "All status checks succeeded."
-              exit 0
-            else
-              echo "Waiting... These statuses are not successful yet:"
-              echo "$failed_or_pending"
-            fi
-
-            sleep 15
-          done
-
-          echo "::set-output name=status_passed::false"
-          echo "Timed out waiting for status checks to pass."
-          exit 1
-
   deploy:
-    needs: wait-for-statuses
-    if: needs.wait-for-statuses.outputs.status_passed == 'true'
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
