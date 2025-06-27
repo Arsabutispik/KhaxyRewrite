@@ -52,7 +52,6 @@ jobs:
               if [[ -z "$failed" ]]; then
                 echo "✅ All check runs (excluding self) completed successfully."
                 exit 0
-                break
               else
                 echo "❌ Some check runs failed:"
                 echo "$failed"
@@ -87,11 +86,29 @@ jobs:
           EOF
 
       - name: Create deployment on GitHub
+        id: create_deployment
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo '{
-            "ref": "'"${{ github.event.workflow_run.head_sha }}"'",
-            "environment": "production",
-            "auto_merge": false
-          }' | gh api -X POST /repos/Arsabutispik/Khaxy/deployments --input -
+          deployment_id=$(gh api -X POST /repos/${{ github.repository }}/deployments \
+            -f ref=${{ github.event.workflow_run.head_sha }} \
+            -f environment=production \
+            -f auto_merge=false \
+            --jq '.id')
+          echo "deployment_id=$deployment_id" >> $GITHUB_OUTPUT
+
+      - name: Mark deployment as successful
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api -X POST /repos/${{ github.repository }}/deployments/${{ steps.create_deployment.outputs.deployment_id }}/statuses \
+            -f state=success
+
+      - name: Mark deployment as failed
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api -X POST /repos/${{ github.repository }}/deployments/${{ steps.create_deployment.outputs.deployment_id }}/statuses \
+            -f state=failure
