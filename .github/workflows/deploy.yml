@@ -1,35 +1,61 @@
-name: Deploy Discord Bot
+name: Deploy Bot to VPS
 
 on:
   push:
     branches:
-      - master
-
-permissions:
+      - master  # or main, whatever you're using
+permissions: 
   contents: read
-
 jobs:
   deploy:
+    name: Deploy to VPS
     runs-on: ubuntu-latest
 
     steps:
-    - name: Setup SSH
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.VPS_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+      - name: 📥 Checkout repo
+        uses: actions/checkout@v4
 
-    - name: Deploy via SSH
-      run: |
-            ssh -T ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+      - name: 🚀 Create GitHub Deployment
+        id: deployment
+        uses: peter-evans/create-deployment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: production
+          transient_environment: false
+          auto_inactive: true
+
+      - name: 📡 Mark deployment as in_progress
+        uses: peter-evans/deployment-status@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+          state: in_progress
+
+      - name: 🛠️ Deploy to VPS
+        run: |
+          ssh -T ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
             set -e
             export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # Load nvm
-            nvm use 22 || nvm use node  # Switch to Node.js version (adjust as needed)
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm use 22
             cd /opt/discord-bot
             git pull origin master
             pnpm install --frozen-lockfile
             sudo systemctl restart discord-bot.service
-            EOF
+          EOF
 
+      - name: ✅ Mark deployment as successful
+        if: success()
+        uses: peter-evans/deployment-status@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+          state: success
+
+      - name: ❌ Mark deployment as failed
+        if: failure()
+        uses: peter-evans/deployment-status@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+          state: failure
