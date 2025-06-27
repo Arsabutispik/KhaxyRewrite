@@ -23,6 +23,7 @@ jobs:
     - name: Deploy via SSH
       run: |
             ssh -T ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            set -e
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # Load nvm
             nvm use 22 || nvm use node  # Switch to Node.js version (adjust as needed)
