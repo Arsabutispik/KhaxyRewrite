@@ -51,6 +51,7 @@ jobs:
               failed=$(echo "$statuses" | jq -r --arg CURRENT "$CURRENT_JOB_NAME" '.[] | select(.name != $CURRENT and .conclusion != "success") | "- \(.name) [\(.conclusion)]"')
               if [[ -z "$failed" ]]; then
                 echo "✅ All check runs (excluding self) completed successfully."
+                exit 0
                 break
               else
                 echo "❌ Some check runs failed:"
