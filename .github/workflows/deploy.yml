@@ -16,13 +16,14 @@ jobs:
       - name: Install GitHub CLI
         run: |
           VERSION=$(curl -s https://api.github.com/repos/cli/cli/releases/latest | jq -r .tag_name)
+          VERSION="${VERSION#v}"
           ARCH=$(uname -m)
           if [ "$ARCH" = "x86_64" ]; then
             ARCH="amd64"
           elif [ "$ARCH" = "aarch64" ]; then
             ARCH="arm64"
           fi
-          curl -fsSL "https://github.com/cli/cli/releases/download/${VERSION}/gh_${VERSION}_linux_${ARCH}.deb" -o gh.deb
+          curl -fsSL "https://github.com/cli/cli/releases/download/v${VERSION}/gh_${VERSION}_linux_${ARCH}.deb" -o gh.deb
           sudo dpkg -i gh.deb || sudo apt-get install -f -y
 
       - name: Authenticate gh CLI
