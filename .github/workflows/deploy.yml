@@ -52,5 +52,4 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "$GH_TOKEN" | gh auth login --with-token
-          gh api repos/Arsabutispik/Khaxy/deployments -f ref=${{ github.event.workflow_run.head_sha }} -f environment=production -F auto_merge=false
+          gh auth login --with-token <<< "$GH_TOKEN"
