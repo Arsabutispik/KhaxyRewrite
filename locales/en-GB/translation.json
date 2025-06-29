@@ -33,6 +33,8 @@
     "timeout": "Message timed out. Please run the command again.",
     "member": "Set Member Role",
     "member_description": "The role given when a member registers.",
+    "unverified": "Set Unverified Role",
+    "unverified_description": "The role given when a member joins the server if the registration module is enabled.",
     "male": "Set Male Role",
     "male_description": "The role given when a member registers as male.",
     "female": "Set Female Role",
@@ -48,6 +50,10 @@
     "member_role_id": {
       "unset": "Member role has been removed.",
       "set": "Member role has been set to {{role}}."
+    },
+    "unverified_role_id": {
+      "unset": "Unverified role has been removed.",
+      "set": "Unverified role has been set to {{role}}."
     },
     "male_role_id": {
       "unset": "Male role has been removed.",

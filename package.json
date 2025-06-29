@@ -7,10 +7,10 @@
   "scripts": {
     "deploy-commands": "tsc && tsc-alias && node --enable-source-maps dist/utils/deploy-commands.js",
     "remove-commands": "tsc && tsc-alias && node --enable-source-maps dist/utils/remove-commands.js",
-    "start": "tsc && tsc-alias && prisma migrate deploy && node .",
+    "start": "prisma migrate deploy && prisma generate && tsc && tsc-alias && node .",
     "validate-translations": "node scripts/ValidateI18nKeys.js",
     "test": "vitest",
-    "dev": "tsc && tsc-alias && prisma migrate dev && node --enable-source-maps ."
+    "dev": "prisma migrate dev && prisma generate && tsc && tsc-alias && node --enable-source-maps ."
   },
   "dependencies": {
     "@discord-player/extractor": "^7.1.0",

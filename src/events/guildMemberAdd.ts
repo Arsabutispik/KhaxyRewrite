@@ -98,6 +98,25 @@ export default {
       )
         return;
       await register_welcome_channel.send(replacePlaceholders(guild_config.register_join_message, replacements));
+      // If the guild set up an unverified role, assign it to the member
+      if (
+        guild_config.unverified_role_id &&
+        member.guild.roles.cache.has(toStringId(guild_config.unverified_role_id))
+      ) {
+        try {
+          await member.roles.add(toStringId(guild_config.unverified_role_id));
+        } catch (error) {
+          logger.log({
+            level: "error",
+            message: "Error assigning unverified role",
+            error: error,
+            meta: {
+              guildID: member.guild.id,
+              userID: member.id,
+            },
+          });
+        }
+      }
     }
   },
 } satisfies EventBase<Events.GuildMemberAdd>;
