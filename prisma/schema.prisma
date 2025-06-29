@@ -52,6 +52,7 @@ model guilds {
   last_bump_winner             String?
   last_bump_winner_count       Int?
   last_bump_winner_total_count Int?
+  unverified_role_id          BigInt?
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.

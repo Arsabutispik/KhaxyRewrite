@@ -102,6 +102,23 @@ export default {
       await interaction.reply({ content: t("already_registered"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
+    if (guild_config.unverified_role_id && member.roles.cache.has(toStringId(guild_config.unverified_role_id))) {
+      try {
+        await member.roles.remove(toStringId(guild_config.unverified_role_id));
+      } catch (e) {
+        await interaction.reply({
+          content: t("error", { error: e.message }),
+          flags: MessageFlagsBitField.Flags.Ephemeral,
+        });
+        logger.error({
+          message: `Error while removing unverified role from user ${member.user.tag} in guild ${interaction.guild.name}`,
+          error: e,
+          guild: interaction.guild.id,
+          user: interaction.user.id,
+        });
+        return;
+      }
+    }
     switch (gender) {
       case "male":
         if (!guild_config.male_role_id || !interaction.guild.roles.cache.has(toStringId(guild_config.male_role_id))) {

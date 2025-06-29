@@ -20,7 +20,8 @@ type RoleType =
   | "colour_id_of_the_day"
   | "mute_role_id"
   | "dj_role_id"
-  | "staff_role_id";
+  | "staff_role_id"
+  | "unverified_role_id";
 
 export async function roleConfig(interaction: ChatInputCommandInteraction<"cached">) {
   const client = interaction.client;
@@ -43,6 +44,12 @@ export async function roleConfig(interaction: ChatInputCommandInteraction<"cache
         value: "member_role_id",
         description: t("member_description"),
         emoji: "👤",
+      },
+      {
+        label: t("unverified"),
+        value: "unverified_role_id",
+        description: t("unverified_description"),
+        emoji: "❓",
       },
       {
         label: t("male"),
@@ -149,7 +156,7 @@ export async function dynamicRole(
     });
   } else {
     if (
-      message_component.values[0] !== "dj_role" &&
+      !["dj_role_id", "staff_role_id"].includes(message_component.values[0]) &&
       message_component.guild!.members.me!.roles.highest.position <
         message_component.guild.roles.cache.get(message_component.values[0])!.position
     ) {
