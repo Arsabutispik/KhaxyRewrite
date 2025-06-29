@@ -10,7 +10,13 @@ import { YoutubeiExtractor } from "discord-player-youtubei";
 import { SoundcloudExtractor } from "discord-player-soundcloud";
 import process from "node:process";
 import { CronJob } from "cron";
-import { checkPunishments, colorUpdate, checkExpiredThreads, RegisterSlashCommands } from "@utils";
+import {
+  checkPunishments,
+  colorUpdate,
+  checkExpiredThreads,
+  RegisterSlashCommands,
+  CheckExpiredModMailBlacklists,
+} from "@utils";
 import { getGuildConfig } from "@database";
 
 dotenv.config();
@@ -128,6 +134,12 @@ CronJob.from({
 CronJob.from({
   cronTime: "* * * * *",
   onTick: async () => await checkExpiredThreads(client),
+  start: true,
+  timeZone: "UTC",
+});
+CronJob.from({
+  cronTime: "* * * * *",
+  onTick: async () => await CheckExpiredModMailBlacklists(client),
   start: true,
   timeZone: "UTC",
 });

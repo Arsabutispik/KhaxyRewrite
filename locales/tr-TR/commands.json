@@ -286,5 +286,32 @@
     "examples": "Örnekler",
     "command_not_found": "Komut bulunamadı.",
     "footer": "<param> - Zorunlu parametre, [param] - İsteğe bağlı parametre"
+  },
+  "modmail-blacklist": {
+    "no_reason": "Kara listeye alma sebebi belirtilmedi.",
+    "cannot_blacklist_self": "Kendini kara listeye alamazsın.",
+    "cannot_blacklist_bot": "Botu kara listeye alamazsın.",
+    "duration_without_time": "Süre için bir zaman birimi belirtmelisin.",
+    "time_without_duration": "Zaman birimi için bir süre belirtmelisin.",
+    "blacklist_success": "{{confirm}} **{{user}}** kullanıcısı kara listeye **{{duration}}** boyunca alındı. Sebep: ```{{reason}}```",
+    "blacklist_error": "Kullanıcı kara listeye alınırken hata oluştu. Bot geliştiricilerine bildirildi.",
+    "blacklist_remove": {
+      "not_found": "{{user}} için kara liste girdisi bulunamadı. Bu demek oluyor ki kullanıcı kara listede değil.",
+      "success": "{{confirm}} {{user}} kullanıcısının kara listesi kaldırıldı.",
+      "error": "Kullanıcının kara listesi kaldırılırken hata oluştu. Bot geliştiricilerine bildirildi."
+    },
+    "blacklist_get": {
+      "not_found": "{{user}} için kara liste girdisi bulunamadı. Bu demek oluyor ki kullanıcı kara listede değil.",
+      "embed": {
+        "title": "{{user}} İçin Kara Liste Girdisi",
+        "fields": {
+          "reason": "Sebep",
+          "duration": "Süre",
+          "created_at": "Oluşturulduğu Tarih",
+          "expires_at": "Sona Eriyor",
+          "moderator": "Sorumlu Moderatör"
+        }
+      }
+    }
   }
 }

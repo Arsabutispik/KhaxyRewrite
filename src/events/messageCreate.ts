@@ -24,6 +24,7 @@ import {
   getModMailThreadsByUser,
   updateBumpLeaderboard,
   updateModMailThread,
+  getModmailBlacklistByUser,
 } from "@database";
 export default {
   name: Events.MessageCreate,
@@ -41,12 +42,24 @@ export default {
         if (shared_guilds.size === 0) return;
         if (shared_guilds.size === 1) {
           const guild = shared_guilds.first()!;
+
           const guild_config = await getGuildConfig(guild.id);
           if (!guild_config) {
             await message.reply("The server data is unavailable.");
             return;
           }
           const t = client.i18next.getFixedT(guild_config.language, "events", "messageCreate.mod_mail");
+          const blacklist = await getModmailBlacklistByUser(guild.id, message.author.id);
+          if (blacklist) {
+            await message.reply(
+              t("blacklisted", {
+                guild: guild.name,
+                reason: blacklist.reason,
+                expires: blacklist.expires_at ? dayjs(blacklist.expires_at).fromNow() : t("never"),
+              }),
+            );
+            return;
+          }
           const member = await guild.members.fetch(message.author.id).catch(() => null);
           if (!member) {
             await message.reply(t("not_member"));
@@ -217,6 +230,17 @@ export default {
           return;
         }
         const t = client.i18next.getFixedT(guild_config.language, "events", "messageCreate.mod_mail");
+        const blacklist = await getModmailBlacklistByUser(guild.id, message.author.id);
+        if (blacklist) {
+          await message.reply(
+            t("blacklisted", {
+              guild: guild.name,
+              reason: blacklist.reason,
+              expires: blacklist.expires_at ? dayjs(blacklist.expires_at).fromNow() : t("never"),
+            }),
+          );
+          return;
+        }
         let member;
         try {
           member = await guild.members.fetch(message.author.id);

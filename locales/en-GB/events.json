@@ -44,12 +44,15 @@
   },
   "messageCreate": {
     "mod_mail": {
+      "blacklisted": "You are blacklisted from using mod mail in {{guild}}. Your blacklist reason is: **{{reason}}**. Your blacklist expires on: **{{expires}}**.",
+      "never": "Never",
       "initial": "`Account Age:` **{{account_age}}**, `ID:` **{{user.id}}**\n`Username:` **{{user.username}}** (<@{{user.id}}>), `Join Date:` **{{join_date}}**\n**»»----------------------------¤----------------------------««**",
       "not_member": "You are not a member of the server.",
       "confirm": "Yes",
       "cancel": "No",
       "confirm_title": "Confirm Mod Mail Thread Button",
       "confirm_description": "Click the button below to confirm the mod mail thread for {{guild}}, or click the cancel button to cancel the thread.",
+      "timeout": "You took too long to respond. The mod mail thread has been cancelled.",
       "cancelled_title": "Mod Mail Thread Cancelled",
       "cancelled_description": "The mod mail thread for {{guild}} has been cancelled.",
       "confirmed_title": "Mod Mail Thread Confirmed",

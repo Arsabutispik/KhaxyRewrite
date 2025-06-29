@@ -6,6 +6,7 @@ const Emojis = {
   reject: "1278053315334111353",
   ban: "1278053275429634162",
   edit: "127805",
+  infinity: "1388903881635008752",
 };
 export const Config = {
   Emojis,

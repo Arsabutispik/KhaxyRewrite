@@ -50,6 +50,11 @@ export default {
         id: client.config.Emojis.edit,
         fallback: "✏️",
       },
+      {
+        name: "infinite",
+        id: client.config.Emojis.infinity,
+        fallback: "♾️",
+      },
     ];
     await loadEmojis(client, emojis);
     const messages: { message: string; type: ActivityType.Custom | undefined }[] = [
