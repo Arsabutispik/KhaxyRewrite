@@ -224,10 +224,12 @@ export default {
               {
                 name: t("embed.moderation.fields.register_day_limit"),
                 value: guild_config.days_to_kick.toString(),
+                inline: true,
               },
               {
                 name: t("embed.moderation.fields.default_expiry"),
                 value: guild_config.default_expiry.toString(),
+                inline: true,
               },
             );
           actionRow.setComponents(newSelectMenu);
@@ -250,6 +252,11 @@ export default {
               {
                 name: t("embed.role.fields.member_role"),
                 value: guild_config.member_role_id ? `<@&${guild_config.member_role_id}>` : t("none"),
+                inline: true,
+              },
+              {
+                name: t("embed.role.fields.unverified_role"),
+                value: guild_config.unverified_role_id ? `<@&${guild_config.unverified_role_id}>` : t("none"),
                 inline: true,
               },
               {

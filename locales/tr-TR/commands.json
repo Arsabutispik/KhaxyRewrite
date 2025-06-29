@@ -148,6 +148,7 @@
           "color_of_the_day": "Günün Rengi",
           "dj_role": "DJ Rolü",
           "member_role": "Üye Rolü",
+          "unverified_role": "Doğrulanmamış Rolü",
           "male_role": "Erkek Rolü",
           "female_role": "Kadın Rolü",
           "mute_role": "Susturulmuş Rolü"
