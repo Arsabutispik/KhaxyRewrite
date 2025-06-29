@@ -148,6 +148,7 @@
           "color_of_the_day": "Colour of the Day",
           "dj_role": "DJ Role",
           "member_role": "Member Role",
+          "unverified_role": "Unverified Role",
           "male_role": "Male Role",
           "female_role": "Female Role",
           "mute_role": "Mute Role"
