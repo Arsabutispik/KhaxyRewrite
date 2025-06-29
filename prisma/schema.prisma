@@ -114,3 +114,13 @@ model punishments {
 
   @@unique([guild_id, user_id, type], map: "unique_punishments")
 }
+
+model modmail_blacklist {
+  id        BigInt @id @default(autoincrement())
+  guild_id  BigInt
+  user_id   BigInt
+  created_at DateTime @db.Timestamp(6)
+  expires_at DateTime? @db.Timestamp(6)
+  reason    String
+  moderator_id BigInt
+}

@@ -248,5 +248,8 @@
         "required": "\uD83D\uDCCA Gerekli Oy"
       }
     }
+  },
+  "check_expired_modmail_blacklists": {
+    "expired_modmail_blacklist_notification": "🔔 **{{guild}}** sunucusu için modmail kara listesi süresi doldu."
   }
 }

@@ -286,5 +286,32 @@
     "examples": "Examples",
     "command_not_found": "Command not found.",
     "footer": "<param> are required parameters, [param] are optional parameters."
+  },
+  "modmail-blacklist": {
+    "no_reason": "No reason provided for blacklisting.",
+    "cannot_blacklist_self": "You cannot blacklist yourself.",
+    "cannot_blacklist_bot": "You cannot blacklist a bot.",
+    "duration_without_time": "You must provide a time unit for the duration.",
+    "time_without_duration": "You must provide a duration for the time unit.",
+    "blacklist_success": "{{confirm}} **{{user}}** has been blacklisted for **{{duration}}** with reason: ```{{reason}}```",
+    "blacklist_error": "An error occurred while blacklisting the user. Developers have been notified.",
+    "blacklist_remove": {
+      "not_found": "Blacklist entry for {{user}} not found. This means the user is not blacklisted.",
+      "success": "{{confirm}} {{user}} has been removed from the blacklist.",
+      "error": "An error occurred while removing the user from the blacklist. Developers have been notified."
+    },
+    "blacklist_get": {
+      "not_found": "Blacklist entry for {{user}} not found. This means the user is not blacklisted.",
+      "embed": {
+        "title": "Blacklist Entry for {{user}}",
+        "fields": {
+          "reason": "Reason",
+          "duration": "Duration",
+          "created_at": "Blacklisted At",
+          "expires_at": "Expires At",
+          "moderator": "Responsible Moderator"
+        }
+      }
+    }
   }
 }

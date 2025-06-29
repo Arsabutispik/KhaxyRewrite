@@ -6,3 +6,4 @@ export * from "./queries/bump-leaderboards.js";
 export * from "./queries/cronjobs.js";
 export * from "./queries/mod-mail-messages.js";
 export * from "./queries/mod-mail-threads.js";
+export * from "./queries/modmail-blacklist.js";

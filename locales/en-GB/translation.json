@@ -248,5 +248,8 @@
         "required": "\uD83D\uDCCA Required"
       }
     }
+  },
+  "check_expired_modmail_blacklists": {
+    "expired_modmail_blacklist_notification": "🔔 Modmail blacklist for **{{guild}}** expired"
   }
 }
