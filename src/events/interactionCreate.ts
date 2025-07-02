@@ -85,6 +85,11 @@ export default {
         };
         // Execute the command
         await player.context.provide(data, () => command.execute(interaction));
+        logger.log({
+          level: "info",
+          message: `Command ${interaction.commandName} executed by ${interaction.user.username} in ${Date.now() - interaction.createdTimestamp}ms successfully.`,
+          discord: false,
+        });
       } catch (error) {
         logger.log({
           level: "error",
