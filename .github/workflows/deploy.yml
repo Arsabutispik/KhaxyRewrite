@@ -96,10 +96,12 @@ jobs:
             set -e
             export PATH="/root/.nvm/versions/node/v22.16.0/bin:$PATH"
             cd /opt/discord-bot
-            git pull
+            git rev-parse HEAD > .last_good_commit
+            git fetch --all
+            git reset --hard $NEW_COMMIT
             pnpm install --frozen-lockfile
             sudo systemctl restart discord-bot.service
-            EOF
+          EOF
 
       - name: Mark deployment as successful
         if: success()
