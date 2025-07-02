@@ -87,6 +87,7 @@ jobs:
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
           VPS_KEY: ${{ secrets.VPS_KEY }}
+          NEW_COMMIT: ${{ github.event.workflow_run.head_sha }}
         run: |
           mkdir -p ~/.ssh
           echo "$VPS_KEY" > ~/.ssh/id_rsa
