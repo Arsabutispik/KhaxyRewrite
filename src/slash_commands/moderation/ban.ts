@@ -108,7 +108,7 @@ export default {
       await interaction.reply({ content: t("cant_ban_higher"), flags: MessageFlagsBitField.Flags.Ephemeral });
       return;
     }
-
+    await interaction.deferReply();
     const reason = interaction.options.getString("reason") || t("no_reason");
     const duration = interaction.options.getNumber("duration");
     const time = interaction.options.getString("time");
@@ -135,7 +135,7 @@ export default {
           client,
         });
       } catch (error) {
-        await interaction.reply(t("database_error"));
+        await interaction.editReply(t("database_error"));
         logger.error({
           message: `Error while inserting punishment/infraction for user ${user.tag} from guild ${interaction.guild!.name}`,
           error,
@@ -153,7 +153,7 @@ export default {
               duration: long_duration,
             }),
           );
-          await interaction.reply({
+          await interaction.editReply({
             content: t("message.success.duration", {
               user: user.tag,
               duration: long_duration,
@@ -162,7 +162,7 @@ export default {
             }),
           });
         } else {
-          await interaction.reply({
+          await interaction.editReply({
             content: t("message.success.duration_no_member", {
               user: user.tag,
               duration: long_duration,
@@ -172,7 +172,7 @@ export default {
           });
         }
       } catch {
-        await interaction.reply({
+        await interaction.editReply({
           content: t("message.fail.duration", {
             user: user.tag,
             duration: long_duration,
@@ -184,7 +184,7 @@ export default {
       try {
         await interaction.guild!.members.ban(user, { reason, deleteMessageSeconds: 604800 });
       } catch (error) {
-        await interaction.reply(t("failed_to_ban", { user: user.tag }));
+        await interaction.editReply(t("failed_to_ban", { user: user.tag }));
         logger.error({
           message: `Error while banning user ${user.tag} from guild ${interaction.guild!.name}`,
           error,
@@ -222,7 +222,7 @@ export default {
           client,
         });
       } catch (e) {
-        await interaction.reply(t("database_error"));
+        await interaction.editReply(t("database_error"));
         logger.error({
           message: `Error while inserting infraction for user ${user.tag} from guild ${interaction.guild!.name}`,
           error: e,
@@ -235,7 +235,7 @@ export default {
         if (member) {
           await user.send(t("message.dm.permanent", { guild: interaction.guild!.name, reason }));
 
-          await interaction.reply({
+          await interaction.editReply({
             content: t("message.success.permanent", {
               user: user.tag,
               case: guild_config.case_id,
@@ -243,7 +243,7 @@ export default {
             }),
           });
         } else {
-          await interaction.reply({
+          await interaction.editReply({
             content: t("message.success.permanent_no_member", {
               user: user.tag,
               case: guild_config.case_id,
@@ -252,7 +252,7 @@ export default {
           });
         }
       } catch {
-        await interaction.reply({
+        await interaction.editReply({
           content: t("message.fail.permanent", {
             user: user.tag,
             case: guild_config.case_id,
@@ -263,7 +263,7 @@ export default {
       try {
         await interaction.guild!.members.ban(user, { reason, deleteMessageSeconds: 604800 });
       } catch (error) {
-        await interaction.reply(t("failed_to_ban", { user: user.tag }));
+        await interaction.editReply(t("failed_to_ban", { user: user.tag }));
         logger.error({
           message: `Error while banning user ${user.tag} from guild ${interaction.guild!.name}`,
           error,

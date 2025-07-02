@@ -33,6 +33,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Create deployment on GitHub
+        id: create_deployment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo '{
+            "ref": "'"${{ github.event.workflow_run.head_sha }}"'",
+            "environment": "production",
+            "auto_merge": false
+          }' | gh api -X POST /repos/${{ github.repository }}/deployments --input - --jq '.id' > deployment_id.txt
+          echo "deployment_id=$(cat deployment_id.txt)" >> $GITHUB_OUTPUT
+
       - name: Wait for all check runs to complete (excluding self)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -44,7 +56,7 @@ jobs:
           SLEEP_TIME=10
 
           for i in $(seq 1 $MAX_RETRIES); do
-            echo "⏳ Checking check run statuses... (attempt $i)"
+            echo "Checking check run statuses... (attempt $i)"
             statuses=$(gh api repos/${GITHUB_REPOSITORY}/commits/${COMMIT_SHA}/check-runs \
               --jq '[.check_runs[] | {name, status, conclusion}]')
 
@@ -52,24 +64,25 @@ jobs:
             if [[ -z "$incomplete" ]]; then
               failed=$(echo "$statuses" | jq -r --arg CURRENT "$CURRENT_JOB_NAME" '.[] | select(.name != $CURRENT and .conclusion != "success") | "- \(.name) [\(.conclusion)]"')
               if [[ -z "$failed" ]]; then
-                echo "✅ All check runs (excluding self) completed successfully."
+                echo "All check runs (excluding self) completed successfully."
                 exit 0
               else
-                echo "❌ Some check runs failed:"
+                echo "Some check runs failed:"
                 echo "$failed"
                 exit 1
               fi
             else
-              echo "⏳ Some check runs still in progress (excluding self):"
+              echo "Some check runs still in progress (excluding self):"
               echo "$incomplete"
               sleep $SLEEP_TIME
             fi
           done
 
-          echo "❌ Timed out waiting for check runs to complete."
+          echo "Timed out waiting for check runs to complete."
           exit 1
 
       - name: Deploy to VPS
+        id: deploy_to_vps
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
@@ -78,27 +91,23 @@ jobs:
           mkdir -p ~/.ssh
           echo "$VPS_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << EOF
-          set -e
-          export PATH="/root/.nvm/versions/node/v22.16.0/bin:$PATH"
+
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << 'EOF'
+            set -e
+            export PATH="/root/.nvm/versions/node/v22.16.0/bin:$PATH"
             cd /opt/discord-bot
             git pull
             pnpm install --frozen-lockfile
             sudo systemctl restart discord-bot.service
-          EOF
+            EOF
 
-      - name: Create deployment on GitHub
-        id: create_deployment
+      - name: Mark deployment as successful
+        if: success()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo '{
-          "ref": "'"${{ github.event.workflow_run.head_sha }}"'",
-          "environment": "production",
-          "auto_merge": false
-          }' | gh api -X POST /repos/${{ github.repository }}/deployments --input - --jq '.id' > deployment_id.txt
-          echo "deployment_id=$(cat deployment_id.txt)" >> $GITHUB_OUTPUT
-
+          gh api -X POST /repos/${{ github.repository }}/deployments/${{ steps.create_deployment.outputs.deployment_id }}/statuses \
+          -f state=success
       - name: Mark deployment as successful
         if: success()
         env:
@@ -107,10 +116,39 @@ jobs:
           gh api -X POST /repos/${{ github.repository }}/deployments/${{ steps.create_deployment.outputs.deployment_id }}/statuses \
             -f state=success
 
+      - name: Rollback on failure
+        if: failure()
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_KEY: ${{ secrets.VPS_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$VPS_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << 'EOF'
+            set -e
+            cd /opt/discord-bot
+
+            if [ ! -f .last_good_commit ]; then
+              echo "No previous commit found for rollback."
+              exit 1
+            fi
+
+            echo "Rolling back to previous commit..."
+            LAST_COMMIT=$(cat .last_good_commit)
+            git reset --hard $LAST_COMMIT
+
+            export PATH="/root/.nvm/versions/node/v22.16.0/bin:\$PATH"
+            pnpm install --frozen-lockfile
+
+            sudo systemctl restart discord-bot.service
+            EOF
       - name: Mark deployment as failed
         if: failure()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh api -X POST /repos/${{ github.repository }}/deployments/${{ steps.create_deployment.outputs.deployment_id }}/statuses \
+            gh api -X POST /repos/${{ github.repository }}/deployments/${{ steps.create_deployment.outputs.deployment_id }}/statuses \
             -f state=failure
