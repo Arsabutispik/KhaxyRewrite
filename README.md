@@ -34,21 +34,9 @@ Khaxy is a modern rewrite of the [Khaxy_Legacy](https://github.com/Arsabutispik/
 3. **Set up environment variables:**
    - Copy `.env.example` to `.env` and fill in the required values (e.g., Discord bot token, database URL).
 
-4. **Set up the database:**
+4. **Start the bot:**
    ```sh
-   npx prisma migrate deploy
-   ```
-
-5. **Build the project:**
-   ```sh
-   npm run build
-   ```
-
-6. **Start the bot:**
-   ```sh
-   npm start
-   # or for development
-   npm run dev
+   pnpm run start
    ```
 
 ## Usage
@@ -70,4 +58,4 @@ Contributions are welcome! Please open issues or pull requests for new features,
 4. Push to your fork and open a pull request
 
 ## License
-This project is licensed under the MIT License.
+This project is licensed under the GNU GPLv3 License.
